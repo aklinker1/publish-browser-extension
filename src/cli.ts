@@ -31,6 +31,7 @@ main(async () => {
           clientId: parseRequiredStringFlag('chrome-client-id'),
           clientSecret: parseRequiredStringFlag('chrome-client-secret'),
           refreshToken: parseRequiredStringFlag('chrome-refresh-token'),
+          publishTarget: 'default',
         }
       : undefined,
     firefox: firefoxZip

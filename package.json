@@ -49,6 +49,7 @@
     "esbuild": "^0.14.42",
     "esbuild-node-externals": "^1.4.1",
     "esno": "^0.16.3",
+    "form-data": "^4.0.0",
     "gulp": "^4.0.2",
     "husky": "^8.0.1",
     "prettier": "^2.6.2",
