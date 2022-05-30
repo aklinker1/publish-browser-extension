@@ -22,19 +22,28 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "compile": "tsc --noEmit",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "test": "",
     "test:watch": "",
     "test-publish": "",
     "prepare": "husky install"
   },
   "dependencies": {
+    "@types/node": "^16",
+    "cli-highlight": "^2.1.11",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.kebabcase": "^4.1.1",
+    "lodash.snakecase": "^4.1.1",
     "node-fetch": "^3.2.4"
   },
   "devDependencies": {
+    "@types/lodash.camelcase": "^4.3.7",
+    "@types/lodash.kebabcase": "^4.1.7",
+    "@types/lodash.snakecase": "^4.1.7",
     "husky": "^8.0.1",
     "prettier": "^2.6.2",
     "pretty-quick": "^3.1.3",
+    "rollup": "^2.75.3",
     "typescript": "^4.7.2",
     "vite": "^2.9.9"
   }
