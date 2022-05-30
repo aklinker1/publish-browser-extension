@@ -39,7 +39,7 @@ function tsc(): Plugin {
   function runTsc() {
     if (compiled) return;
     process.stdout.write('\n');
-    execSync('./node_modules/.bin/tsc -p tsconfig.build.json', {
+    execSync('tsc -p tsconfig.build.json', {
       stdio: 'inherit',
     });
     compiled = true;
