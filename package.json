@@ -1,0 +1,41 @@
+{
+  "name": "publish-browser-extension",
+  "description": "Easily publish chrome/browser extensions to their stores",
+  "keywords": [
+    "chrome-web-store",
+    "firefox-addon-store",
+    "chrome",
+    "firefox",
+    "addon",
+    "store",
+    "extension",
+    "browser"
+  ],
+  "author": {
+    "name": "Aaron Klinker",
+    "url": "https://github.com/aklinker1"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": "dist/cli.js",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "compile": "tsc --noEmit",
+    "build": "tsc && vite build",
+    "test": "",
+    "test:watch": "",
+    "test-publish": "",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "node-fetch": "^3.2.4"
+  },
+  "devDependencies": {
+    "husky": "^8.0.1",
+    "prettier": "^2.6.2",
+    "pretty-quick": "^3.1.3",
+    "typescript": "^4.7.2",
+    "vite": "^2.9.9"
+  }
+}
