@@ -3,7 +3,7 @@
     "target": "es2016",
     "module": "commonjs",
     "lib": ["ESNext"],
-    "types": ["node", "vite/client"],
+    "types": ["node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
