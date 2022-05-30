@@ -36,9 +36,12 @@ function tsc(): Plugin {
   }
 
   let compiled = false;
-  async function runTsc() {
+  function runTsc() {
     if (compiled) return;
-    await execSync('./node_modules/.bin/tsc -p tsconfig.build.json');
+    process.stdout.write('\n');
+    execSync('./node_modules/.bin/tsc -p tsconfig.build.json', {
+      stdio: 'inherit',
+    });
     compiled = true;
   }
   return {
@@ -47,7 +50,7 @@ function tsc(): Plugin {
       if (!isWrite) return;
       if (!options.dir) throw Error('rollup output directory does not exist');
 
-      await runTsc();
+      runTsc();
       await emitDeclarationFiles(options.dir, this.emitFile);
     },
   };
