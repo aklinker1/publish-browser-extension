@@ -12,8 +12,6 @@ export class ChromeWebStore {
   constructor(readonly options: ChromeWebStoreOptions) {}
 
   async publish(): Promise<PublishResult> {
-    return {
-      success: true,
-    };
+    throw Error('Publishing to the Chrome Web Store is not implemented yet');
   }
 }

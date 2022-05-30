@@ -11,8 +11,8 @@ export class FirefoxAddonStore {
   constructor(readonly options: FirefoxAddonStoreOptions) {}
 
   async publish(): Promise<PublishResult> {
-    return {
-      success: true,
-    };
+    throw Error(
+      'Publishing to the Firefox Addons Store is not implemented yet',
+    );
   }
 }
