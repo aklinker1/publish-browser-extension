@@ -1,3 +1,4 @@
+import { Log } from '../utils/log';
 import { PublishResult } from './types';
 
 export interface FirefoxAddonStoreOptions {
@@ -8,9 +9,14 @@ export interface FirefoxAddonStoreOptions {
 }
 
 export class FirefoxAddonStore {
-  constructor(readonly options: FirefoxAddonStoreOptions) {}
+  readonly name = 'Firefox Addon Store';
 
-  async publish(): Promise<PublishResult> {
+  constructor(
+    readonly options: FirefoxAddonStoreOptions,
+    readonly deps: { log: Log },
+  ) {}
+
+  async publish(): Promise<void> {
     throw Error(
       'Publishing to the Firefox Addons Store is not implemented yet',
     );

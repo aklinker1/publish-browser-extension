@@ -79,6 +79,8 @@ export default defineConfig({
           entryFileNames: getOutputFilename('.js'),
           format: 'commonjs',
           exports: 'named',
+          // This string doesn't matter, just including this method disables chunks
+          manualChunks: () => 'anything.js',
         },
       ],
     },

@@ -17,15 +17,18 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": "dist/cli.js",
+  "bin": {
+    "publish-extension": "dist/cli.js"
+  },
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "compile": "tsc --noEmit",
     "build": "vite build",
+    "build:extension": "vite build",
     "test": "",
     "test:watch": "",
-    "test-publish": "",
+    "dev": "./scripts/dev.sh",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -40,6 +43,7 @@
     "@types/lodash.camelcase": "^4.3.7",
     "@types/lodash.kebabcase": "^4.1.7",
     "@types/lodash.snakecase": "^4.1.7",
+    "esno": "^0.16.3",
     "husky": "^8.0.1",
     "prettier": "^2.6.2",
     "pretty-quick": "^3.1.3",

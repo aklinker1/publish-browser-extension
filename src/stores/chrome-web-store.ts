@@ -1,3 +1,4 @@
+import { Log } from '../utils/log';
 import { PublishResult } from './types';
 
 export interface ChromeWebStoreOptions {
@@ -9,9 +10,14 @@ export interface ChromeWebStoreOptions {
 }
 
 export class ChromeWebStore {
-  constructor(readonly options: ChromeWebStoreOptions) {}
+  readonly name = 'Chrome Web Store';
 
-  async publish(): Promise<PublishResult> {
+  constructor(
+    readonly options: ChromeWebStoreOptions,
+    readonly deps: { log: Log },
+  ) {}
+
+  async publish(): Promise<void> {
     throw Error('Publishing to the Chrome Web Store is not implemented yet');
   }
 }

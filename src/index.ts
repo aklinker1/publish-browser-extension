@@ -3,30 +3,52 @@ import {
   IStore,
   FirefoxAddonStore,
   PublishFailure,
+  PublishResult,
+  PublishSuccess,
 } from './stores';
 import { PublishOptions, Result } from './types';
+import { Log } from './utils/log';
 
 export async function publishExtension(
   options: PublishOptions,
-  stores = { chrome: ChromeWebStore, firefox: FirefoxAddonStore },
+  deps = {
+    chrome: ChromeWebStore,
+    firefox: FirefoxAddonStore,
+    log: new Log(),
+  },
 ): Promise<Result> {
+  const { log } = deps;
+
   // Build operations
+  log.printTitle('Configuring publishers');
   const ops: [keyof PublishOptions, IStore][] = [];
-  options.chrome && ops.push(['chrome', new stores.chrome(options.chrome)]);
-  options.firefox && ops.push(['firefox', new stores.firefox(options.firefox)]);
+  if (options.chrome) {
+    const store = new deps.chrome(options.chrome, { log });
+    log.printStoreOptions(store.name, options.chrome);
+    ops.push(['chrome', store]);
+  }
+  if (options.firefox) {
+    const store = new deps.firefox(options.firefox, { log });
+    log.printStoreOptions(store.name, options.firefox);
+    ops.push(['firefox', store]);
+  }
 
   // Publish
+  log.printTitle('Publishing');
   const result: Result = {};
   for (const [key, store] of ops) {
-    result[key] = await store.publish().catch(catchErr);
+    log.printSubtitle(`${store.name}...`);
+    result[key] = await store
+      .publish()
+      .then<PublishSuccess>(() => {
+        log.success('Done!');
+        return { success: true };
+      })
+      .catch<PublishFailure>(err => {
+        log.printFailure(store.name, err);
+        return { success: false, err };
+      });
   }
 
   return result;
-}
-
-function catchErr(err: any): PublishFailure {
-  return {
-    success: false,
-    err,
-  };
 }
