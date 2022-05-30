@@ -21,7 +21,7 @@ publish-extension \
 ###### JS Usage
 
 ```js
-import { publishExtension } from 'browser-extension-publisher';
+import { publishExtension } from 'publish-browser-extension';
 
 publishExtension({
   chrome: 'dist/chrome.zip',
