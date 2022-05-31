@@ -38,36 +38,27 @@ publishExtension({
   .catch(err => console.error(err));
 ```
 
-## Supported Stores
+### Supported Stores
 
-With this tool you can publish to the following extension stores:
+- 🟢 **Chrome Web Store**
+- 🟢 **Firefox Addons**
+- 🔴 ~~_Microsoft Store_~~
+- 🔴 ~~_App Store_~~
+- 🔴 ~~_Opera Addons_~~
 
-- Chrome Web Store
-- Firefox Addons
+> If you'd like to add support for any of the unsupported 🔴 stores, feel free to open a PR! Firefox and Chrome are the only stores I'm publishing to right now, so I won't do the others until I need to publish there, _which may be never_.
 
-And here are the stores that are not supported:
+## Documentation
 
-- Microsoft Store (Edge)
-- App Store (Safari)
-- Opera Addons
+For docs, run `publish-extension --help`. It includes everything you'll need: examples, flags, environment varialbes, etc.
 
-> If you want to add support for one of these stores, please open a PR
-
-## Contributors
+## Contributing
 
 <a href="https://github.com/aklinker1/publish-browser-extension/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=aklinker1/publish-browser-extension" />
 </a>
 
-## Usage
-
-For documentation, see the help output from the CLI tool. It includes everything you'll need: examples, flags, environment varialbes, etc.
-
-```bash
-publish-extension --help
-```
-
-## Contributing
+### Setup
 
 1. Install [node](https://nodejs.org)
 2. Install [`pnpm`](https://pnpm.io/)
@@ -85,27 +76,31 @@ publish-extension --help
 
 ### Scripts
 
-Checkout the scripts in the package.json, they're all self-explanatory, but here are some examples:
+Checkout the scripts in the `package.json`, they're all self-explanatory, but here are some examples:
 
 ```bash
-pnpm format        # Run prettier to format source code
-pnpm test          # Run unit tests
+pnpm format  # Run prettier to format source code
+pnpm test    # Run unit tests
 ```
 
 ### Manual Testing
 
-The `dev:*` scripts are going to be the main way of manually testing the extension. You can create
-test extensions on the stores and use the tool to publish to them.
+The `dev` scripts are going to be the main way of manually testing the tool. You can create test extensions on the stores and use the `dev` to publish to them.
 
-When you create the extension listings, first run `pnpm gulp buildExtension` to build a simple test extension. That command will output `extension/chrome.zip` and `extension/firefox.zip`. Use those ZIP files for the initial upload. Make sure you also don't publish these test extensions publicly, so just don't publish it for chrome, and make the firefox extension unlisted.
+Before you create the extension listings, run `pnpm gulp buildExtension` to build a simple test extension, `extension/chrome.zip` and `extension/firefox.zip`. Use those ZIP files for the initial upload. **Make sure you also don't publish these test extensions publicly**, so:
 
-Then update your `.env` file so the `dev:*` scripts don't publish them publicly either:
+1. Just don't submit the extension for review on the Chrome Web Store
+2. Make the Firefox extension is marked as unlisted
 
-- `CHROME_SKIP_SUBMIT_REVIEW=true`
-- `CHROME_PUBLISH_TARGET=trustedTesters`
-- `FIREFOX_CHANNEL=unlisted`
+Then update your `.env` file so the `dev` scripts don't publish them publicly either:
 
-Then run any of the following to actually upload the test extension to the stores:
+```env
+CHROME_SKIP_SUBMIT_REVIEW=true
+CHROME_PUBLISH_TARGET=trustedTesters
+FIREFOX_CHANNEL=unlisted
+```
+
+Then you can run the `dev` scripts to manually test out changes:
 
 ```bash
 # Chrome
