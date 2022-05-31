@@ -9,4 +9,4 @@ export interface PublishOptions {
   firefox?: FirefoxAddonStoreOptions;
 }
 
-export type Result = Partial<Record<keyof PublishOptions, PublishResult>>;
+export type Results = Partial<Record<keyof PublishOptions, PublishResult>>;

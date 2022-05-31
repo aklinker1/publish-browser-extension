@@ -3,10 +3,9 @@ import {
   IStore,
   FirefoxAddonStore,
   PublishFailure,
-  PublishResult,
   PublishSuccess,
 } from './stores';
-import { PublishOptions, Result } from './types';
+import { PublishOptions, Results } from './types';
 import { Log } from './utils/log';
 
 export async function publishExtension(
@@ -16,7 +15,7 @@ export async function publishExtension(
     firefox: FirefoxAddonStore,
     log: new Log(),
   },
-): Promise<Result> {
+): Promise<Results> {
   const { log } = deps;
 
   // Build operations
@@ -35,7 +34,7 @@ export async function publishExtension(
 
   // Publish
   log.printTitle('Publishing');
-  const result: Result = {};
+  const result: Results = {};
   for (const [key, store] of ops) {
     log.printSubtitle(`${store.name}...`);
     result[key] = await store
