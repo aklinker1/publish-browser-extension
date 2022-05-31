@@ -17,6 +17,11 @@
     "name": "Aaron Klinker",
     "url": "https://github.com/aklinker1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aklinker1/publish-browser-extension"
+  },
+  "homepage": "https://github.com/aklinker1/publish-browser-extension#readme",
   "files": [
     "src",
     "dist"
