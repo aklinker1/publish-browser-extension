@@ -1,6 +1,0 @@
-extension
-.husky
-.prettier*
-pnpm-lock.yaml
-.env
-.env.*

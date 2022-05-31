@@ -1,6 +1,8 @@
 {
   "name": "publish-browser-extension",
   "description": "Easily publish chrome/browser extensions to their stores",
+  "license": "MIT",
+  "version": "0.1.0",
   "keywords": [
     "chrome-web-store",
     "firefox-addon-store",
@@ -15,6 +17,10 @@
     "name": "Aaron Klinker",
     "url": "https://github.com/aklinker1"
   },
+  "files": [
+    "src",
+    "dist"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -27,7 +33,6 @@
     "build": "gulp build",
     "gulp": "gulp",
     "gulp:tasks": "gulp --tasks",
-    "build:extension": "vite build",
     "test": "",
     "test:watch": "",
     "dev": "env-cmd ./scripts/dev.sh",
@@ -36,6 +41,7 @@
     "dev:firefox": "env-cmd ./scripts/dev.sh firefox",
     "dev:help": "env-cmd ./scripts/dev.sh help",
     "generate-firefox-token": "env-cmd esno scripts/firefox-token.ts",
+    "prepack": "gulp build",
     "prepare": "husky install"
   },
   "dependencies": {
