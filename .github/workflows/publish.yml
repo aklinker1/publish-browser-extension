@@ -59,6 +59,9 @@ jobs:
           node-version: '16.x'
           cache: 'pnpm'
 
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Create Changelog
         id: changelog
         uses: TriPSs/conventional-changelog-action@v3
