@@ -22,12 +22,15 @@ export function parseRequiredStringFlag(
   desc: string,
 ): RequiredFlag<string> {
   const flag = parseFlag(flagName, 'string', desc);
-  const { value } = flag;
-  if (value == null) throw Error(`--${flagName} is required, but not passed`);
   return {
     ...flag,
     required: true,
-    value,
+    get value() {
+      const { value } = flag;
+      if (value == null)
+        throw Error(`--${flagName} is required, but not passed`);
+      return value;
+    },
   };
 }
 
