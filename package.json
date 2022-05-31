@@ -44,7 +44,7 @@
     "lodash.camelcase": "^4.3.0",
     "lodash.kebabcase": "^4.1.1",
     "lodash.snakecase": "^4.1.1",
-    "node-fetch": "^3.2.4",
+    "node-fetch": "^2",
     "web-ext": "^6.8.0"
   },
   "devDependencies": {
@@ -53,6 +53,7 @@
     "@types/lodash.camelcase": "^4.3.7",
     "@types/lodash.kebabcase": "^4.1.7",
     "@types/lodash.snakecase": "^4.1.7",
+    "@types/node-fetch": "^2",
     "archiver": "^5.3.1",
     "env-cmd": "^10.1.0",
     "esbuild": "^0.14.42",
