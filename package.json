@@ -1,7 +1,7 @@
 {
   "name": "publish-browser-extension",
   "description": "Easily publish chrome/browser extensions to their stores",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "keywords": [
     "chrome-web-store",
