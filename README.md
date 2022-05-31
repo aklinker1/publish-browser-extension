@@ -39,7 +39,7 @@ publishExtension({
 With this tool you can publish to the following extension stores:
 
 - [x] Chrome Web Store
-- [ ] Firefox Addons
+- [x] Firefox Addons
 
 And here are the stores that are not supported:
 
