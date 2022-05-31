@@ -2,7 +2,6 @@
   "name": "publish-browser-extension",
   "description": "Easily publish chrome/browser extensions to their stores",
   "license": "MIT",
-  "version": "0.1.0",
   "keywords": [
     "chrome-web-store",
     "firefox-addon-store",
@@ -33,8 +32,8 @@
     "build": "gulp build",
     "gulp": "gulp",
     "gulp:tasks": "gulp --tasks",
-    "test": "",
-    "test:watch": "",
+    "test": "echo 'TODO'",
+    "test:watch": "echo 'TODO'",
     "dev": "env-cmd ./scripts/dev.sh",
     "dev:all": "env-cmd ./scripts/dev.sh all",
     "dev:chrome": "env-cmd ./scripts/dev.sh chrome",
