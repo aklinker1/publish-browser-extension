@@ -1,0 +1,39 @@
+name: Verify
+on: [push, workflow_call]
+
+jobs:
+  verify:
+    name: Verify Code
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install PNPM
+        with:
+          version: 7.x.x
+
+      - name: Install Node 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Formatting
+        run: pnpm format:check
+
+      - name: Type Check
+        run: pnpm compile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      - name: Check CLI
+        run: node dist/cli.js --help
