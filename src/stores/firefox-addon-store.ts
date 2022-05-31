@@ -7,8 +7,8 @@ export interface FirefoxAddonStoreOptions {
   zip: string;
   sourcesZip?: string;
   extensionId: string;
-  issuer: string;
-  secret: string;
+  jwtIssuer: string;
+  jwtSecret: string;
   channel?: 'listed' | 'unlisted';
 }
 
@@ -62,8 +62,8 @@ export class FirefoxAddonStore {
     return {
       ...process.env,
       WEB_EXT_ARTIFACTS_DIR: zipDir,
-      WEB_EXT_API_KEY: this.options.issuer,
-      WEB_EXT_API_SECRET: this.options.secret,
+      WEB_EXT_API_KEY: this.options.jwtIssuer,
+      WEB_EXT_API_SECRET: this.options.jwtSecret,
       WEB_EXT_ID: this.wrappedExtensionId,
       WEB_EXT_CHANNEL: this.options.channel,
       WEB_EXT_SOURCE_DIR: zipDir,

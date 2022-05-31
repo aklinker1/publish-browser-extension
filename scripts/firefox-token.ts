@@ -4,8 +4,8 @@ import { AddonsApi } from '../src/apis/addons-api';
 // pnpm generate-firefox-token
 
 const api = new AddonsApi({
-  issuer: process.env.FIREFOX_ISSUER ?? '',
-  secret: process.env.FIREFOX_SECRET ?? '',
+  jwtIssuer: process.env.FIREFOX_JWT_ISSUER ?? '',
+  jwtSecret: process.env.FIREFOX_JWT_SECRET ?? '',
 });
 
 console.log(api['createJwt'](5 * 60));

@@ -13,9 +13,9 @@ pnpm add -D browser-extension-publisher
 
 ```bash
 publish-extension \
-    --chrome dist/chrome.zip \
-    --firefox dist/firefox.zip \
-    --firefox-sources dist/sources.zip
+    --chrome-zip dist/chrome.zip \
+    --firefox-zip dist/firefox.zip \
+    --firefox-sources-zip dist/sources.zip
 ```
 
 ###### JS Usage
@@ -57,7 +57,7 @@ And here are the stores that are not supported:
 
 ## Usage
 
-For documentation, see the help output from the CLI tool:
+For documentation, see the help output from the CLI tool. It includes everything you'll need: examples, flags, environment varialbes, etc.
 
 ```bash
 publish-extension --help

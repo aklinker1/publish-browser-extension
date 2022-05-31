@@ -6,8 +6,8 @@ import fs from 'fs';
 import path from 'path';
 
 export interface AddonsApiOptions {
-  issuer: string;
-  secret: string;
+  jwtIssuer: string;
+  jwtSecret: string;
 }
 
 export interface AddonPagination<T> {
@@ -101,12 +101,12 @@ export class AddonsApi {
   private createJwt(timeoutInS = 30): string {
     const issuedAt = Math.floor(Date.now() / 1000);
     const payload = {
-      iss: this.options.issuer,
+      iss: this.options.jwtIssuer,
       jti: Math.random().toString(),
       iat: issuedAt,
       exp: issuedAt + timeoutInS,
     };
-    const secret = this.options.secret ?? '';
+    const secret = this.options.jwtSecret ?? '';
     return jwt.sign(payload, secret, { algorithm: 'HS256' });
   }
 
