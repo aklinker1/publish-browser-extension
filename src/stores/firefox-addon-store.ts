@@ -1,11 +1,15 @@
 import { Log } from '../utils/log';
-import { PublishResult } from './types';
+import { exec } from 'child_process';
+import path from 'path';
+import { AddonsApi } from '../apis/addons-api';
 
 export interface FirefoxAddonStoreOptions {
   zip: string;
+  sourcesZip?: string;
   extensionId: string;
   issuer: string;
   secret: string;
+  channel?: 'listed' | 'unlisted';
 }
 
 export class FirefoxAddonStore {
@@ -17,8 +21,64 @@ export class FirefoxAddonStore {
   ) {}
 
   async publish(): Promise<void> {
-    throw Error(
-      'Publishing to the Firefox Addons Store is not implemented yet',
-    );
+    await this.validateUploadSign();
+    if (this.options.sourcesZip)
+      await this.uploadSource(this.options.sourcesZip);
+  }
+
+  async validateUploadSign() {
+    console.log('Validating, signing, and uploading new ZIP file...');
+    await new Promise<void>((res, rej) => {
+      exec(
+        './node_modules/.bin/web-ext --no-config-discovery sign',
+        { env: this.webExtEnv },
+        (err, stdout, stderr) => {
+          if (err == null) return res();
+
+          process.stdout.write(stdout);
+          process.stderr.write(stderr);
+          rej(err);
+        },
+      );
+    });
+  }
+
+  async uploadSource(sourceZip: string) {
+    console.log('Uploading sources ZIP file...');
+    const api = new AddonsApi(this.options);
+    const [latestVersion] = await api.listVersions({
+      extensionId: this.wrappedExtensionId,
+      filter: 'all_with_unlisted',
+    });
+    await api.uploadSource({
+      extensionId: this.wrappedExtensionId,
+      versionId: latestVersion.id,
+      sourceFile: sourceZip,
+    });
+  }
+
+  private get webExtEnv() {
+    const zipDir = path.dirname(this.options.zip);
+    return {
+      ...process.env,
+      WEB_EXT_ARTIFACTS_DIR: zipDir,
+      WEB_EXT_API_KEY: this.options.issuer,
+      WEB_EXT_API_SECRET: this.options.secret,
+      WEB_EXT_ID: this.wrappedExtensionId,
+      WEB_EXT_CHANNEL: this.options.channel,
+      WEB_EXT_SOURCE_DIR: zipDir,
+    };
+  }
+
+  /**
+   * Ensure the extension id is wrapped in curly braces, that's what the addon store API is expecting
+   * @example
+   * "test" -> "{test}"
+   */
+  private get wrappedExtensionId(): string {
+    let id = this.options.extensionId;
+    if (!id.startsWith('{')) id = '{' + id;
+    if (!id.endsWith('}')) id += '}';
+    return id;
   }
 }

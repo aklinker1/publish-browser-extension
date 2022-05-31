@@ -41,7 +41,7 @@ export async function publishExtension(
     result[key] = await store
       .publish()
       .then<PublishSuccess>(() => {
-        log.success('Done!');
+        log.success(`✔ ${store.name}`);
         return { success: true };
       })
       .catch<PublishFailure>(err => {

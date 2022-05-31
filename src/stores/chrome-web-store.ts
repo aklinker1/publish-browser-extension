@@ -3,7 +3,7 @@ import fetch, { Response } from 'node-fetch';
 import FormData from 'form-data';
 import fs from 'fs';
 import path from 'path';
-import { getErrorMessage } from '../utils/errors';
+import { checkStatusCode, responseBody } from '../utils/fetch';
 
 export interface ChromeWebStoreOptions {
   zip: string;
@@ -48,8 +48,8 @@ export class ChromeWebStore {
         redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
       }),
     })
-      .then(this.checkStatusCode)
-      .then<GcpTokenDetails>(res => res.json() as Promise<any>);
+      .then(checkStatusCode)
+      .then(responseBody<GcpTokenDetails>());
   }
 
   async uploadZip(token: GcpTokenDetails) {
@@ -67,7 +67,7 @@ export class ChromeWebStore {
         Authorization: this.getAuthorizationHeader(token),
         'x-goog-api-version': 2,
       }),
-    }).then(this.checkStatusCode);
+    }).then(checkStatusCode);
   }
 
   async submitForReview(token: GcpTokenDetails) {
@@ -78,25 +78,11 @@ export class ChromeWebStore {
         'x-goog-api-version': '2',
         'Content-Length': '0',
       },
-    }).then(this.checkStatusCode);
+    }).then(checkStatusCode);
   }
 
   private getAuthorizationHeader(token: GcpTokenDetails): string {
     return `${token.token_type} ${token.access_token}`;
-  }
-
-  private async checkStatusCode(res: Response) {
-    if (res.status >= 400) {
-      const body = await res
-        .text()
-        .catch(
-          e => `failed to parse message body as text: ${getErrorMessage(e)}`,
-        );
-      throw Error(
-        `Request failed with status ${res.status} ${res.statusText} and body: ${body}`,
-      );
-    }
-    return res;
   }
 
   private get tokenEndpoint(): string {

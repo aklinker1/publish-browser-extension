@@ -1,4 +1,3 @@
-import { exit } from 'process';
 import { publishExtension } from '.';
 import { ChromeWebStore, FirefoxAddonStore } from './stores';
 import { PublishOptions } from './types';
@@ -37,9 +36,13 @@ main(async () => {
     firefox: firefoxZip
       ? {
           zip: firefoxZip,
-          extensionId: parseRequiredStringFlag('chrome-extension-id'),
+          sourcesZip: parseFlag('firefox-sources', 'string'),
+          extensionId: parseRequiredStringFlag('firefox-extension-id'),
           issuer: parseRequiredStringFlag('firefox-issuer'),
           secret: parseRequiredStringFlag('firefox-secret'),
+          channel:
+            parseFlag<'listed' | 'unlisted'>('firefox-channel', 'string') ??
+            'listed',
         }
       : undefined,
   };
@@ -50,6 +53,7 @@ main(async () => {
   if (result.chrome?.success === false) failureCount++;
   if (result.firefox?.success === false) failureCount++;
 
+  log.blankLine();
   if (failureCount > 0) {
     log.error(
       `Publishing failed for ${failureCount} store${
@@ -59,7 +63,7 @@ main(async () => {
     process.stdout.write('\n');
     process.exit(failureCount);
   } else {
-    log.success('Done!');
+    log.success('Published to all stores');
     process.stdout.write('\n');
   }
 });

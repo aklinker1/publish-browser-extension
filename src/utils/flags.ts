@@ -8,7 +8,10 @@ export function parseRequiredStringFlag(flagName: string): string {
   return value;
 }
 
-export function parseFlag(flagName: string, type: 'string'): string | undefined;
+export function parseFlag<T extends string = string>(
+  flagName: string,
+  type: 'string',
+): T | undefined;
 export function parseFlag(flagName: string, type: 'boolean'): boolean;
 export function parseFlag(
   flagName: string,

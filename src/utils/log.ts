@@ -1,3 +1,5 @@
+import { NotImplemented } from './errors';
+
 const ESC = '\x1b';
 
 export interface LogOptions {
@@ -30,11 +32,13 @@ export class Log {
   }
 
   printTitle(message: string) {
-    console.log(`${this.RESET}${this.BOLD}${message}${this.RESET}`);
+    console.log(`${this.RESET}\n${this.BOLD}${message}${this.RESET}`);
   }
 
   printSubtitle(message: string) {
-    console.log(`${this.RESET}${this.BOLD}${this.CYAN}${message}${this.RESET}`);
+    console.log(
+      `${this.RESET}\n${this.BOLD}${this.CYAN}${message}${this.RESET}`,
+    );
   }
 
   error(message: string) {
@@ -59,5 +63,9 @@ export class Log {
   printFailure(target: string, err: any) {
     this.error(`✖ ${target} failed`);
     console.log(err);
+  }
+
+  blankLine() {
+    console.log();
   }
 }
