@@ -1,6 +1,7 @@
 {
   "name": "publish-browser-extension",
   "description": "Easily publish chrome/browser extensions to their stores",
+  "version": "1.0.0",
   "license": "MIT",
   "keywords": [
     "chrome-web-store",
@@ -86,6 +87,5 @@
         "body-parser"
       ]
     }
-  },
-  "version": "1.0.0"
+  }
 }
