@@ -5,8 +5,6 @@
 
 ```bash
 npm i -D publish-browser-extension
-yarn add -D publish-browser-extension
-pnpm add -D publish-browser-extension
 ```
 
 ###### CLI Usage
@@ -17,6 +15,8 @@ publish-extension \
     --firefox-zip dist/firefox.zip \
     --firefox-sources-zip dist/sources.zip
 ```
+
+> Environment variables omitted for brevity, run `publish-extension --help` for the list of required environment variables
 
 ###### JS Usage
 
