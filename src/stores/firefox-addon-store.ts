@@ -1,7 +1,10 @@
 import { Log } from '../utils/log';
 import { exec } from 'child_process';
 import path from 'path';
+import os from 'os';
 import { AddonsApi } from '../apis/addons-api';
+import { mkdtemp } from 'node:fs/promises';
+import extract from 'extract-zip';
 
 export interface FirefoxAddonStoreOptions {
   zip: string;
@@ -37,10 +40,11 @@ export class FirefoxAddonStore {
 
   async validateUploadSign() {
     console.log('Validating, signing, and uploading new ZIP file...');
+    const env = await this.getWebExtEnv();
     await new Promise<void>((res, rej) => {
       exec(
         './node_modules/.bin/web-ext --no-config-discovery sign',
-        { env: this.webExtEnv },
+        { env },
         (err, stdout, stderr) => {
           if (err == null) return res();
 
@@ -65,8 +69,12 @@ export class FirefoxAddonStore {
     });
   }
 
-  private get webExtEnv() {
+  private async getWebExtEnv() {
     const zipDir = path.dirname(this.options.zip);
+    const srcDir = await mkdtemp(
+      path.join(os.tmpdir(), 'publish-browser-extension-firefox-'),
+    );
+    await extract(this.options.zip, { dir: srcDir });
     return {
       ...process.env,
       WEB_EXT_ARTIFACTS_DIR: zipDir,
@@ -74,7 +82,7 @@ export class FirefoxAddonStore {
       WEB_EXT_API_SECRET: this.options.jwtSecret,
       WEB_EXT_ID: this.wrappedExtensionId,
       WEB_EXT_CHANNEL: this.options.channel,
-      WEB_EXT_SOURCE_DIR: zipDir,
+      WEB_EXT_SOURCE_DIR: srcDir,
     };
   }
 
