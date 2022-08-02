@@ -23,14 +23,21 @@ export class ChromeWebStore {
     const api = new CwsApi(this.options);
     const token = await api.getToken();
 
-    if (dryRun) return;
+    if (dryRun) {
+      this.deps.log.warn('DRY RUN: Skipping upload and publish...');
+      return;
+    }
 
     await api.uploadZip({
       extensionId: this.options.extensionId,
       zipFile: this.options.zip,
       token,
     });
-    if (this.options.skipSubmitReview) return;
+
+    if (this.options.skipSubmitReview) {
+      this.deps.log.warn('Skipping submit for review (skipSubmitReview=true)');
+      return;
+    }
     await api.submitForReview({
       extensionId: this.options.extensionId,
       publishTarget: this.options.publishTarget,
