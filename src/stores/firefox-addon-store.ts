@@ -17,7 +17,6 @@ export class FirefoxAddonStore {
   private api: AddonsApi;
 
   constructor(
-    readonly dryRun: boolean | undefined,
     readonly options: FirefoxAddonStoreOptions,
     readonly deps: { log: Log },
   ) {

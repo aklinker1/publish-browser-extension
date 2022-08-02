@@ -14,7 +14,6 @@ export class ChromeWebStore {
   readonly name = 'Chrome Web Store';
 
   constructor(
-    readonly dryRun: boolean | undefined,
     readonly options: ChromeWebStoreOptions,
     readonly deps: { log: Log },
   ) {}
