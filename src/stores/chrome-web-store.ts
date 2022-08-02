@@ -23,17 +23,18 @@ export class ChromeWebStore {
     const api = new CwsApi(this.options);
     const token = await api.getToken();
 
-    if (!dryRun) {
-      await api.uploadZip({
-        extensionId: this.options.extensionId,
-        zipFile: this.options.zip,
-        token,
-      });
-      await api.submitForReview({
-        extensionId: this.options.extensionId,
-        publishTarget: this.options.publishTarget,
-        token,
-      });
-    }
+    if (dryRun) return;
+
+    await api.uploadZip({
+      extensionId: this.options.extensionId,
+      zipFile: this.options.zip,
+      token,
+    });
+    if (this.options.skipSubmitReview) return;
+    await api.submitForReview({
+      extensionId: this.options.extensionId,
+      publishTarget: this.options.publishTarget,
+      token,
+    });
   }
 }
