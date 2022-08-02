@@ -1,6 +1,12 @@
 <h1 align="center">Publish Browser Extension</h1>
 <p align="center">Publish an extension to all the extension stores in a single command!</p>
 
+#### Features
+
+- [x] Publish to the **Chrome Web Store**
+- [x] Publish to the **Firefox Addon Store**
+- [x] **Upload sources** to the Firefox Addon Store
+
 ###### Install
 
 ```bash
@@ -11,46 +17,55 @@ npm i -D publish-browser-extension
 
 ```bash
 publish-extension \
-    --chrome-zip dist/chrome.zip \
-    --firefox-zip dist/firefox.zip \
-    --firefox-sources-zip dist/sources.zip
+    --dry-run \
+    --chrome-zip "dist/chrome.zip" \
+    --chrome-extension-id "<cws-extension-id>" \
+    --chrome-client-id "<gcp-client-id>" \
+    --chrome-client-secret "<gcp-client-secret>" \
+    --chrome-refresh-token "<gcp-refresh-token>" \
+    --chrome-publish-target "<default|trustedTesters>" \
+    --firefox-zip "dist/firefox.zip" \
+    --firefox-sources-zip "dist/sources.zip" \
+    --firefox-extension-id "<addons-extension-id>" \
+    --firefox-jwt-issuer "<addons-jwt-issuer>" \
+    --firefox-jwt-secret "<addons-jwt-secret>" \
+    --firefox-channel "<listed|unlisted>"
 ```
 
-> Environment variables omitted for brevity, run `publish-extension --help` for the list of required environment variables
+> See `publish-extension --help` for details on generating and retrieving each of these values
 
 ###### JS Usage
 
+<!-- prettier-ignore -->
 ```js
 import { publishExtension } from 'publish-browser-extension';
 
 publishExtension({
+  dryRun: true,
   chrome: {
     zip: 'dist/chrome.zip',
-    // ...
+    extensionId: '<cws-extension-id>',
+    clientId: '<gcp-client-id>',
+    clientSecret: '<gcp-client-secret>',
+    refreshToken: '<gcp-refresh-token>',
+    publishTarget: '<default|trustedTesters>',
   },
   firefox: {
     zip: 'dist/firefox.zip',
-    sources: 'dist/sources.zip',
-    // ...
+    sourcesZip: 'dist/sources.zip',
+    extensionId: '<addons-extension-id>',
+    jwtIssuer: '<addons-jwt-issuer>',
+    jwtSecret: '<addons-jwt-secret>',
+    channel: '<listed|unlisted>',
   },
 })
   .then(results => console.log(results))
   .catch(err => console.error(err));
 ```
 
-### Supported Stores
-
-- 🟢 **Chrome Web Store**
-- 🟢 **Firefox Addons**
-- 🔴 ~~_Microsoft Store_~~
-- 🔴 ~~_App Store_~~
-- 🔴 ~~_Opera Addons_~~
-
-> If you'd like to add support for any of the unsupported 🔴 stores, feel free to open a PR! Firefox and Chrome are the only stores I'm publishing to right now, so I won't do the others until I need to publish there, _which may be never_.
-
 ## Documentation
 
-For docs, run `publish-extension --help`. It includes everything you'll need: examples, flags, environment varialbes, etc.
+For docs, run `publish-extension --help`. It includes everything you'll need: examples, flags, environment variables, steps to retrieve secrets, etc.
 
 ## Contributing
 
