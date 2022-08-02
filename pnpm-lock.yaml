@@ -29,7 +29,6 @@ specifiers:
   web-ext: ^6.8.0
 
 dependencies:
-  '@types/node': 16.11.36
   cli-highlight: 2.1.11
   lodash.camelcase: 4.3.0
   lodash.kebabcase: 4.1.1
@@ -43,6 +42,7 @@ devDependencies:
   '@types/lodash.camelcase': 4.3.7
   '@types/lodash.kebabcase': 4.1.7
   '@types/lodash.snakecase': 4.1.7
+  '@types/node': 16.11.36
   '@types/node-fetch': 2.6.1
   archiver: 5.3.1
   env-cmd: 10.1.0
