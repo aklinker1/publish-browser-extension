@@ -8,6 +8,8 @@ import {
 import { PublishOptions, Results } from './types';
 import { Log } from './utils/log';
 
+export type { PublishOptions, Results };
+
 export async function publishExtension(
   options: PublishOptions,
   deps = {
