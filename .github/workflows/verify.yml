@@ -38,8 +38,8 @@ jobs:
       - name: Check CLI
         run: node dist/cli.js --help
 
-  publish:
-    name: Test Publish
+  e2e-test:
+    name: E2E Publish Test
     runs-on: ubuntu-22.04
     if: contains('refs/heads/main refs/heads/main', github.ref)
     steps:
