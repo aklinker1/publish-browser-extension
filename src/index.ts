@@ -18,7 +18,10 @@ export async function publishExtension(
 ): Promise<Results> {
   const { log } = deps;
 
-  if (options.dryRun) log.error('\nDRY RUN');
+  if (options.dryRun) {
+    log.blankLine();
+    log.error('DRY RUN');
+  }
 
   // Build operations
   log.printTitle('Configuring publishers');
