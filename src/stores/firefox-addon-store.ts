@@ -14,16 +14,23 @@ export interface FirefoxAddonStoreOptions {
 
 export class FirefoxAddonStore {
   readonly name = 'Firefox Addon Store';
+  private api: AddonsApi;
 
   constructor(
+    readonly dryRun: boolean | undefined,
     readonly options: FirefoxAddonStoreOptions,
     readonly deps: { log: Log },
-  ) {}
+  ) {
+    this.api = new AddonsApi(options);
+  }
 
-  async publish(): Promise<void> {
-    await this.validateUploadSign();
-    if (this.options.sourcesZip)
-      await this.uploadSource(this.options.sourcesZip);
+  async publish(dryRun?: boolean): Promise<void> {
+    await this.api.checkAuth({ extensionId: this.options.extensionId });
+    if (!dryRun) {
+      await this.validateUploadSign();
+      if (this.options.sourcesZip)
+        await this.uploadSource(this.options.sourcesZip);
+    }
   }
 
   async validateUploadSign() {
@@ -45,12 +52,11 @@ export class FirefoxAddonStore {
 
   async uploadSource(sourceZip: string) {
     console.log('Uploading sources ZIP file...');
-    const api = new AddonsApi(this.options);
-    const [latestVersion] = await api.listVersions({
+    const [latestVersion] = await this.api.listVersions({
       extensionId: this.wrappedExtensionId,
       filter: 'all_with_unlisted',
     });
-    await api.uploadSource({
+    await this.api.uploadSource({
       extensionId: this.wrappedExtensionId,
       versionId: latestVersion.id,
       sourceFile: sourceZip,

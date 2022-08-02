@@ -8,6 +8,6 @@ export interface PublishFailure {
 export type PublishResult = PublishSuccess | PublishFailure;
 
 export interface IStore {
-  publish(): Promise<void>;
+  publish(dryRun?: boolean): Promise<void>;
   name: string;
 }

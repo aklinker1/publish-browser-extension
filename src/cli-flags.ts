@@ -5,6 +5,12 @@ export const cliFlags = {
   help: () => parseFlag('help', 'boolean', 'Shows this help message.'),
   noColor: () =>
     parseFlag('no-color', 'boolean', 'Disable colored output in the terminal'),
+  dryRun: () =>
+    parseFlag(
+      'dry-run',
+      'boolean',
+      'Perform a dry run, do everything but upload and publish the extension (including check authentication)',
+    ),
 
   // Chrome
   chromeZip: () =>

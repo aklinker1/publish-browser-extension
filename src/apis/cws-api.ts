@@ -19,8 +19,6 @@ export interface CwsTokenDetails {
 }
 
 export class CwsApi {
-  token?: CwsTokenDetails;
-
   constructor(readonly options: CwsApiOptions) {}
 
   private tokenEndpoint() {
@@ -39,8 +37,12 @@ export class CwsApi {
     );
   }
 
-  async uploadZip(params: { extensionId: string; zipFile: string }) {
-    const Authorization = await this.getAuthHeader();
+  async uploadZip(params: {
+    extensionId: string;
+    zipFile: string;
+    token: CwsTokenDetails;
+  }) {
+    const Authorization = await this.getAuthHeader(params.token);
 
     console.log('Uploading new ZIP file...');
     const endpoint = this.uploadEndpoint(params.extensionId);
@@ -63,8 +65,9 @@ export class CwsApi {
   async submitForReview(params: {
     extensionId: string;
     publishTarget?: 'default' | 'trustedTesters';
+    token: CwsTokenDetails;
   }) {
-    const Authorization = await this.getAuthHeader();
+    const Authorization = await this.getAuthHeader(params.token);
 
     console.log('Submitting for review...');
     const endpoint = this.publishEndpoint(params.extensionId);
@@ -80,7 +83,7 @@ export class CwsApi {
     }).then(checkStatusCode);
   }
 
-  private getToken(): Promise<CwsTokenDetails> {
+  getToken(): Promise<CwsTokenDetails> {
     console.log('Getting an access token...');
     const endpoint = this.tokenEndpoint();
 
@@ -98,8 +101,7 @@ export class CwsApi {
       .then(responseBody<CwsTokenDetails>());
   }
 
-  private async getAuthHeader() {
-    this.token ??= await this.getToken();
-    return `${this.token.token_type} ${this.token.access_token}`;
+  private async getAuthHeader(token: CwsTokenDetails) {
+    return `${token.token_type} ${token.access_token}`;
   }
 }

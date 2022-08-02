@@ -38,7 +38,7 @@ export async function publishExtension(
   for (const [key, store] of ops) {
     log.printSubtitle(`${store.name}...`);
     result[key] = await store
-      .publish()
+      .publish(options.dryRun)
       .then<PublishSuccess>(() => {
         log.success(`✔ ${store.name}`);
         return { success: true };

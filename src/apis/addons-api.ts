@@ -23,6 +23,15 @@ export interface AddonVersion {
   id: number;
 }
 
+export interface AddonAuthor {
+  user_id: number;
+  name: string;
+  email: string;
+  role: string;
+  listed: boolean;
+  position: number;
+}
+
 export class AddonsApi {
   constructor(readonly options: AddonsApiOptions) {}
 
@@ -36,6 +45,30 @@ export class AddonsApi {
     return new URL(
       `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/versions/${versionId}/`,
     );
+  }
+
+  private addonAuthorsEndpoint(extensionId: string) {
+    return new URL(
+      `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/authors/`,
+    );
+  }
+
+  /**
+   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/authors.html#author-list
+   */
+  async listAuthors(params: { extensionId: string }): Promise<AddonAuthor[]> {
+    console.log('Listing extension authors...');
+    const endpoint = this.addonAuthorsEndpoint(params.extensionId);
+
+    return fetch(endpoint.href, {
+      headers: {
+        Authorization: this.getAuthHeader(),
+        'Content-type': 'application/json',
+      },
+    })
+      .then(checkStatusCode)
+      .then(responseBody<AddonAuthor[]>())
+      .then(body => body);
   }
 
   /**
@@ -93,6 +126,11 @@ export class AddonsApi {
         Authorization: this.getAuthHeader(),
       }),
     }).then(checkStatusCode);
+  }
+
+  async checkAuth(params: { extensionId: string }): Promise<void> {
+    console.log(`Checking auth for ${params.extensionId}...`);
+    await this.listAuthors(params);
   }
 
   /**

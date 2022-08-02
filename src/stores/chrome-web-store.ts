@@ -14,19 +14,26 @@ export class ChromeWebStore {
   readonly name = 'Chrome Web Store';
 
   constructor(
+    readonly dryRun: boolean | undefined,
     readonly options: ChromeWebStoreOptions,
     readonly deps: { log: Log },
   ) {}
 
-  async publish(): Promise<void> {
+  async publish(dryRun?: boolean): Promise<void> {
     const api = new CwsApi(this.options);
-    await api.uploadZip({
-      extensionId: this.options.extensionId,
-      zipFile: this.options.zip,
-    });
-    api.submitForReview({
-      extensionId: this.options.extensionId,
-      publishTarget: this.options.publishTarget,
-    });
+    const token = await api.getToken();
+
+    if (!dryRun) {
+      await api.uploadZip({
+        extensionId: this.options.extensionId,
+        zipFile: this.options.zip,
+        token,
+      });
+      await api.submitForReview({
+        extensionId: this.options.extensionId,
+        publishTarget: this.options.publishTarget,
+        token,
+      });
+    }
   }
 }
