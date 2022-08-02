@@ -1,6 +1,8 @@
 <h1 align="center">Publish Browser Extension</h1>
 <p align="center">Publish an extension to all the extension stores in a single command!</p>
 
+![Demo](.github/assets/demo.png)
+
 #### Features
 
 - [x] Publish to the **Chrome Web Store**
