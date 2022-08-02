@@ -40,11 +40,11 @@ export class FirefoxAddonStore {
 
   async validateUploadSign() {
     console.log('Validating, signing, and uploading new ZIP file...');
-    const env = await this.getWebExtEnv();
+    const srcDir = await this.unzipExtensionToTempDir();
     await new Promise<void>((res, rej) => {
       exec(
         './node_modules/.bin/web-ext --no-config-discovery sign',
-        { env },
+        { env: this.getWebExtEnv(srcDir) },
         (err, stdout, stderr) => {
           if (err == null) return res();
 
@@ -69,21 +69,24 @@ export class FirefoxAddonStore {
     });
   }
 
-  private async getWebExtEnv() {
-    const zipDir = path.dirname(this.options.zip);
-    const srcDir = await mkdtemp(
-      path.join(os.tmpdir(), 'publish-browser-extension-firefox-'),
-    );
-    await extract(this.options.zip, { dir: srcDir });
+  private getWebExtEnv(srcDir: string) {
     return {
       ...process.env,
-      WEB_EXT_ARTIFACTS_DIR: zipDir,
+      WEB_EXT_ARTIFACTS_DIR: path.dirname(this.options.zip),
       WEB_EXT_API_KEY: this.options.jwtIssuer,
       WEB_EXT_API_SECRET: this.options.jwtSecret,
       WEB_EXT_ID: this.wrappedExtensionId,
       WEB_EXT_CHANNEL: this.options.channel,
       WEB_EXT_SOURCE_DIR: srcDir,
     };
+  }
+
+  private async unzipExtensionToTempDir(): Promise<string> {
+    const srcDir = await mkdtemp(
+      path.join(os.tmpdir(), 'publish-browser-extension-firefox-'),
+    );
+    await extract(this.options.zip, { dir: srcDir });
+    return srcDir;
   }
 
   /**
