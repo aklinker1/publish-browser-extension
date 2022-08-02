@@ -24,7 +24,7 @@ export class FirefoxAddonStore {
   }
 
   async publish(dryRun?: boolean): Promise<void> {
-    await this.api.checkAuth({ extensionId: this.options.extensionId });
+    await this.api.checkAuth({ extensionId: this.wrappedExtensionId });
     if (!dryRun) {
       await this.validateUploadSign();
       if (this.options.sourcesZip)
