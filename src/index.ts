@@ -18,10 +18,7 @@ export async function publishExtension(
 ): Promise<Results> {
   const { log } = deps;
 
-  if (options.dryRun)
-    log.error(
-      'DRY RUN - auth will be checked, but nothing will be uploaded or published',
-    );
+  if (options.dryRun) log.error('\nDRY RUN');
 
   // Build operations
   log.printTitle('Configuring publishers');
