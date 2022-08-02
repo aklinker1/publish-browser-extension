@@ -62,7 +62,6 @@ jobs:
       - name: Publish
         run: ./scripts/dev.sh all
         env:
-          DRY_RUN: 'true'
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.TEST_CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.TEST_CHROME_CLIENT_SECRET }}
