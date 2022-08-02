@@ -30,6 +30,7 @@ main(async () => {
   };
 
   const options: PublishOptions = {
+    dryRun: cliFlags.dryRun().value,
     chrome: chromeZip
       ? {
           zip: chromeZip,
@@ -38,6 +39,7 @@ main(async () => {
           clientSecret: cliFlags.chromeClientSecret().value,
           refreshToken: cliFlags.chromeRefreshToken().value,
           publishTarget: cliFlags.chromePublishTarget().value,
+          skipSubmitReview: cliFlags.chromeSkipSubmitReview().value,
         }
       : undefined,
     firefox: firefoxZip

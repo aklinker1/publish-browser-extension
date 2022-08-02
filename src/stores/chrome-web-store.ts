@@ -8,6 +8,7 @@ export interface ChromeWebStoreOptions {
   clientSecret: string;
   refreshToken: string;
   publishTarget?: 'default' | 'trustedTesters';
+  skipSubmitReview?: boolean;
 }
 
 export class ChromeWebStore {
@@ -22,17 +23,25 @@ export class ChromeWebStore {
     const api = new CwsApi(this.options);
     const token = await api.getToken();
 
-    if (!dryRun) {
-      await api.uploadZip({
-        extensionId: this.options.extensionId,
-        zipFile: this.options.zip,
-        token,
-      });
-      await api.submitForReview({
-        extensionId: this.options.extensionId,
-        publishTarget: this.options.publishTarget,
-        token,
-      });
+    if (dryRun) {
+      this.deps.log.warn('DRY RUN: Skipping upload and publish...');
+      return;
     }
+
+    await api.uploadZip({
+      extensionId: this.options.extensionId,
+      zipFile: this.options.zip,
+      token,
+    });
+
+    if (this.options.skipSubmitReview) {
+      this.deps.log.warn('Skipping submission (skipSubmitReview=true)');
+      return;
+    }
+    await api.submitForReview({
+      extensionId: this.options.extensionId,
+      publishTarget: this.options.publishTarget,
+      token,
+    });
   }
 }

@@ -37,3 +37,39 @@ jobs:
 
       - name: Check CLI
         run: node dist/cli.js --help
+
+  e2e-test:
+    name: E2E Publish Test
+    runs-on: ubuntu-22.04
+    if: contains('refs/heads/main refs/heads/main', github.ref)
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install PNPM
+        with:
+          version: 7.x.x
+
+      - name: Install Node 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Publish
+        run: ./scripts/dev.sh all
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.TEST_CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.TEST_CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.TEST_CHROME_REFRESH_TOKEN }}
+          CHROME_SKIP_SUBMIT_REVIEW: 'true'
+          CHROME_PUBLISH_TARGET: trustedTesters
+          FIREFOX_EXTENSION_ID: ${{ secrets.TEST_FIREFOX_EXTENSION_ID }}
+          FIREFOX_JWT_ISSUER: ${{ secrets.TEST_FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.TEST_FIREFOX_JWT_SECRET }}
+          FIREFOX_CHANNEL: unlisted

@@ -50,6 +50,12 @@ export class Log {
     console.log(`${this.RESET}${this.BOLD}${this.RED}${message}${this.RESET}`);
   }
 
+  warn(message: string) {
+    console.log(
+      `${this.RESET}${this.BOLD}${this.YELLOW}${message}${this.RESET}`,
+    );
+  }
+
   success(message: string) {
     console.log(
       `${this.RESET}${this.BOLD}${this.GREEN}${message}${this.RESET}`,

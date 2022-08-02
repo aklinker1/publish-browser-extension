@@ -24,12 +24,15 @@ export class FirefoxAddonStore {
   }
 
   async publish(dryRun?: boolean): Promise<void> {
-    await this.api.checkAuth({ extensionId: this.options.extensionId });
-    if (!dryRun) {
-      await this.validateUploadSign();
-      if (this.options.sourcesZip)
-        await this.uploadSource(this.options.sourcesZip);
+    await this.api.checkAuth({ extensionId: this.wrappedExtensionId });
+    if (dryRun) {
+      this.deps.log.warn('DRY RUN: Skipping upload and publish...');
+      return;
     }
+
+    await this.validateUploadSign();
+    if (this.options.sourcesZip)
+      await this.uploadSource(this.options.sourcesZip);
   }
 
   async validateUploadSign() {

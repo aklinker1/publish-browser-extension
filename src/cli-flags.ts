@@ -45,6 +45,12 @@ export const cliFlags = {
       'string',
       "Where you would like to publish the extension to, 'trustedTesters' or 'default'. Not required, defaults to 'default'.",
     ),
+  chromeSkipSubmitReview: () =>
+    parseFlag(
+      'chrome-skip-submit-review',
+      'boolean',
+      "Just upload the extension zip, don't submit it for review or publish it",
+    ),
 
   // Firefox
   firefoxZip: () =>

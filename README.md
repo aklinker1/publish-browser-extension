@@ -1,6 +1,8 @@
 <h1 align="center">Publish Browser Extension</h1>
 <p align="center">Publish an extension to all the extension stores in a single command!</p>
 
+![Demo](.github/assets/demo.png)
+
 #### Features
 
 - [x] Publish to the **Chrome Web Store**
@@ -102,12 +104,12 @@ pnpm test    # Run unit tests
 
 The `dev` scripts are going to be the main way of manually testing the tool. You can create test extensions on the stores and use the `dev` to publish to them.
 
-Before you create the extension listings, run `pnpm gulp buildExtension` to build a simple test extension, `extension/chrome.zip` and `extension/firefox.zip`. Use those ZIP files for the initial upload. **Make sure you also don't publish these test extensions publicly**, so:
+Before you create the extension listings, run `pnpm gulp buildExtension` to build a simple test extension, `extension/chrome.zip`, `extension/firefox.zip`, and `extension/sources.zip`. Use those ZIP files for the initial upload. **Make sure you also don't publish these test extensions publicly**, so:
 
 1. Just don't submit the extension for review on the Chrome Web Store
 2. Make the Firefox extension is marked as unlisted
 
-Then update your `.env` file so the `dev` scripts don't publish them publicly either:
+To do this, update your `.env` file so the `dev` scripts don't publish them publicly either:
 
 ```env
 CHROME_SKIP_SUBMIT_REVIEW=true
