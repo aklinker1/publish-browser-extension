@@ -111,12 +111,6 @@ async function buildExtension() {
       scripts: ['background.js'],
     },
   });
-  await createExtensionZip(sourcesZip, {
-    manifest_version: 2,
-    background: {
-      scripts: ['background.ts'],
-    },
-  });
 }
 exports.buildExtension = buildExtension;
 
