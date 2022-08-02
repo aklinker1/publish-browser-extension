@@ -50,7 +50,6 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@types/node": "^16",
     "cli-highlight": "^2.1.11",
     "lodash.camelcase": "^4.3.0",
     "lodash.kebabcase": "^4.1.1",
@@ -59,6 +58,7 @@
     "web-ext": "^6.8.0"
   },
   "devDependencies": {
+    "@types/node": "^16",
     "@types/gulp": "^4.0.9",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/lodash.camelcase": "^4.3.7",
