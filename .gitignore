@@ -6,6 +6,7 @@ dist/
 !.env.template
 extension/chrome.zip
 extension/firefox.zip
+extension/sources.zip
 extension/manifest.json
 extension/*.xpi
 extension/.web-extension-id
