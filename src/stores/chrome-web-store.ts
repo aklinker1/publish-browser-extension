@@ -35,7 +35,7 @@ export class ChromeWebStore {
     });
 
     if (this.options.skipSubmitReview) {
-      this.deps.log.warn('Skipping submit for review (skipSubmitReview=true)');
+      this.deps.log.warn('Skipping submission (skipSubmitReview=true)');
       return;
     }
     await api.submitForReview({

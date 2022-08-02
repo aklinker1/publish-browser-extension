@@ -41,6 +41,7 @@ jobs:
   publish:
     name: Test Publish
     runs-on: ubuntu-22.04
+    if: contains('refs/heads/main refs/heads/main', github.ref)
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
