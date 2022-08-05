@@ -4,6 +4,7 @@ on: [workflow_dispatch]
 jobs:
   verify:
     uses: ./.github/workflows/verify.yml
+    secrets: inherit
 
   publish:
     name: Bump & Publish
