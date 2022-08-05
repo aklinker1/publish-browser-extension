@@ -10,6 +10,7 @@ async function main(exec: () => void | Promise<any>) {
     await exec();
   } catch (err) {
     console.error(err);
+    process.exit(1);
   }
 }
 
