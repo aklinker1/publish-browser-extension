@@ -6,6 +6,10 @@ import { AddonsApi } from '../apis/addons-api';
 import { mkdtemp } from 'node:fs/promises';
 import extract from 'extract-zip';
 
+// Signing fails with this message when signing listed extension - even though it fails, it's fine and it will be approved
+const LISTED_SIGNING_SUCCESS_ERROR_MESSAGE =
+  'Your add-on has been submitted for review. It passed validation but could not be automatically signed because this is a listed add-on.';
+
 export interface FirefoxAddonStoreOptions {
   zip: string;
   sourcesZip?: string;
@@ -47,6 +51,11 @@ export class FirefoxAddonStore {
         { env: this.getWebExtEnv(srcDir) },
         (err, stdout, stderr) => {
           if (err == null) return res();
+          if (
+            stdout.includes(LISTED_SIGNING_SUCCESS_ERROR_MESSAGE) ||
+            stderr.includes(LISTED_SIGNING_SUCCESS_ERROR_MESSAGE)
+          )
+            res();
 
           process.stdout.write(stdout);
           process.stderr.write(stderr);
