@@ -75,6 +75,7 @@ export class CwsApi {
       endpoint.searchParams.append('publishTarget', params.publishTarget);
 
     await fetch(endpoint.href, {
+      method: 'POST',
       headers: {
         Authorization,
         'x-goog-api-version': '2',
