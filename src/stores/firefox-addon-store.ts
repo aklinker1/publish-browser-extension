@@ -1,14 +1,8 @@
 import { Log } from '../utils/log';
-import { exec } from 'child_process';
-import path from 'path';
-import os from 'os';
-import { AddonsApi } from '../apis/addons-api';
-import { mkdtemp } from 'node:fs/promises';
-import extract from 'extract-zip';
-
-// Signing fails with this message when signing listed extension - even though it fails, it's fine and it will be approved
-const LISTED_SIGNING_SUCCESS_ERROR_MESSAGE =
-  'Your add-on has been submitted for review. It passed validation but could not be automatically signed because this is a listed add-on.';
+import { AddonDetails, AddonsApi, UploadDetails } from '../apis/addons-api';
+import { sleep } from '../utils/sleep';
+import { withTimeout } from '../utils/withTimeout';
+import { plural } from '../utils/plural';
 
 export interface FirefoxAddonStoreOptions {
   zip: string;
@@ -31,71 +25,54 @@ export class FirefoxAddonStore {
   }
 
   async publish(dryRun?: boolean): Promise<void> {
-    await this.api.checkAuth({ extensionId: this.wrappedExtensionId });
+    const addon = await this.api.details({
+      extensionId: this.wrappedExtensionId,
+    });
     if (dryRun) {
       this.deps.log.warn('DRY RUN: Skipping upload and publish...');
       return;
     }
 
-    await this.validateUploadSign();
-    if (this.options.sourcesZip)
-      await this.uploadSource(this.options.sourcesZip);
-  }
+    // Firefox recommends 5-10s polling and a 10 minute timeout
+    const pollInterval = 5e3; // 5 seconds
+    const timeout = 10 * 60e3; // 10 minutes
+    const uploadPromise = this.uploadAndPollValidation(pollInterval);
+    const upload = await withTimeout(uploadPromise, timeout);
 
-  async validateUploadSign() {
-    console.log('Validating, signing, and uploading new ZIP file...');
-    const srcDir = await this.unzipExtensionToTempDir();
-    await new Promise<void>((res, rej) => {
-      exec(
-        './node_modules/.bin/web-ext --no-config-discovery sign',
-        { env: this.getWebExtEnv(srcDir) },
-        (err, stdout, stderr) => {
-          if (err == null) return res();
-          if (
-            stdout.includes(LISTED_SIGNING_SUCCESS_ERROR_MESSAGE) ||
-            stderr.includes(LISTED_SIGNING_SUCCESS_ERROR_MESSAGE)
-          )
-            res();
-
-          process.stdout.write(stdout);
-          process.stderr.write(stderr);
-          rej(err);
-        },
-      );
-    });
-  }
-
-  async uploadSource(sourceZip: string) {
-    console.log('Uploading sources ZIP file...');
-    const [latestVersion] = await this.api.listVersions({
+    console.log('Submitting new version...');
+    const version = await this.api.versionCreate({
       extensionId: this.wrappedExtensionId,
-      filter: 'all_with_unlisted',
+      sourceFile: this.options.sourcesZip,
+      uploadUuid: upload.uuid,
     });
-    await this.api.uploadSource({
-      extensionId: this.wrappedExtensionId,
-      versionId: latestVersion.id,
-      sourceFile: sourceZip,
-    });
-  }
 
-  private getWebExtEnv(srcDir: string) {
-    return {
-      ...process.env,
-      WEB_EXT_ARTIFACTS_DIR: path.dirname(this.options.zip),
-      WEB_EXT_API_KEY: this.options.jwtIssuer,
-      WEB_EXT_API_SECRET: this.options.jwtSecret,
-      WEB_EXT_ID: this.wrappedExtensionId,
-      WEB_EXT_CHANNEL: this.options.channel,
-      WEB_EXT_SOURCE_DIR: srcDir,
-    };
-  }
-
-  private async unzipExtensionToTempDir(): Promise<string> {
-    const srcDir = await mkdtemp(
-      path.join(os.tmpdir(), 'publish-browser-extension-firefox-'),
+    const validationUrl = `https://addons.mozilla.org/en-US/developers/addon/${addon.id}/file/${version.file.id}/validation`;
+    const { errors, notices, warnings } = upload.validation;
+    console.log(
+      `Validation results: ${plural(errors, 'error')}, ${plural(
+        warnings,
+        'warning',
+      )}, ${plural(notices, 'notice')}`,
     );
-    await extract(this.options.zip, { dir: srcDir });
-    return srcDir;
+    if (!upload.valid) throw Error(`Extension is invalid: ${validationUrl}`);
+    else console.log(`Validation results available at: ${validationUrl}`);
+  }
+
+  async uploadAndPollValidation(
+    pollIntervalMs: number,
+  ): Promise<UploadDetails> {
+    let details = await this.api.uploadCreate({
+      file: this.options.zip,
+      channel: this.options.channel,
+    });
+
+    console.log('Waiting for validation results...');
+    while (!details.processed) {
+      await sleep(pollIntervalMs);
+      details = await this.api.uploadDetail(details);
+    }
+
+    return details;
   }
 
   /**

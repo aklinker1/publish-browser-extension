@@ -1,7 +1,7 @@
 import FormData from 'form-data';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
-import { checkStatusCode, responseBody } from '../utils/fetch';
+import { checkStatusCode } from '../utils/fetch';
 import fs from 'fs';
 import path from 'path';
 
@@ -19,118 +19,147 @@ export interface AddonPagination<T> {
   results: T[];
 }
 
+export interface AddonDetails {
+  id: string;
+}
+
 export interface AddonVersion {
   id: number;
 }
 
-export interface AddonAuthor {
-  user_id: number;
-  name: string;
-  email: string;
-  role: string;
-  listed: boolean;
-  position: number;
+export interface UploadDetails {
+  uuid: string;
+  channel: AddonChannel;
+  processed: boolean;
+  submitted: boolean;
+  url: string;
+  valid: boolean;
+  validation: {
+    errors: number;
+    warnings: number;
+    notices: number;
+  };
+  version: string;
 }
+
+export interface AddonVersion {
+  id: number;
+  file: {
+    id: number;
+  };
+}
+
+export type AddonChannel = 'listed' | 'unlisted';
 
 export class AddonsApi {
   constructor(readonly options: AddonsApiOptions) {}
 
-  private addonVersionsEndpoint(extensionId: string) {
+  private addonDetailEndpoint(extensionId: string) {
+    return new URL(
+      `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}`,
+    );
+  }
+
+  private addonsUploadCreateEndpoint() {
+    return new URL(`https://addons.mozilla.org/api/v5/addons/upload/`);
+  }
+
+  private addonsUploadDetailsEndpoint(uploadUuid: string) {
+    return new URL(
+      `https://addons.mozilla.org/api/v5/addons/upload/${uploadUuid}`,
+    );
+  }
+
+  private addonVersionCreateEndpoint(extensionId: string) {
     return new URL(
       `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/versions/`,
     );
   }
 
-  private addonVersionEndpoint(extensionId: string, versionId: number) {
-    return new URL(
-      `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/versions/${versionId}/`,
-    );
-  }
-
-  private addonAuthorsEndpoint(extensionId: string) {
-    return new URL(
-      `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/authors/`,
-    );
-  }
-
   /**
-   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/authors.html#author-list
+   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#detail
    */
-  async listAuthors(params: { extensionId: string }): Promise<AddonAuthor[]> {
-    console.log('Listing extension authors...');
-    const endpoint = this.addonAuthorsEndpoint(params.extensionId);
-
-    return fetch(endpoint.href, {
+  async details(params: { extensionId: string }): Promise<AddonDetails> {
+    console.log(`Getting addon details...`);
+    const endpoint = this.addonDetailEndpoint(params.extensionId);
+    const res = await fetch(endpoint.href, {
       headers: {
         Authorization: this.getAuthHeader(),
-        'Content-type': 'application/json',
       },
-    })
-      .then(checkStatusCode)
-      .then(responseBody<AddonAuthor[]>())
-      .then(body => body);
+    });
+    await checkStatusCode(res);
+    return await res.json();
   }
 
   /**
-   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#versions-list
+   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
    */
-  async listVersions(params: {
-    extensionId: string;
-    filter?: 'all_without_unlisted' | 'all_with_unlisted' | 'all_with_deleted';
-    page?: number;
-    pageSize?: number;
-  }): Promise<AddonVersion[]> {
-    console.log('Listing extension versions...');
-    const endpoint = this.addonVersionsEndpoint(params.extensionId);
-    if (params.filter) endpoint.searchParams.set('filter', params.filter);
-    if (params.page != null)
-      endpoint.searchParams.set('page', String(params.page));
-    if (params.pageSize != null)
-      endpoint.searchParams.set('page_size', String(params.pageSize));
-
-    return fetch(endpoint.href, {
-      headers: {
-        Authorization: this.getAuthHeader(),
-        'Content-type': 'application/json',
-      },
-    })
-      .then(checkStatusCode)
-      .then(responseBody<AddonPagination<AddonVersion>>())
-      .then(body => body.results);
-  }
-
-  /**
-   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
-   */
-  async uploadSource(params: {
-    extensionId: string;
-    versionId: number;
-    sourceFile: string;
-  }): Promise<void> {
-    console.log(`Uploading sources for versionId=${params.versionId}...`);
-    const endpoint = this.addonVersionEndpoint(
-      params.extensionId,
-      params.versionId,
-    );
+  async uploadCreate(params: {
+    file: string;
+    channel?: AddonChannel;
+  }): Promise<UploadDetails> {
+    console.log(`Uploading new ZIP file...`);
+    const endpoint = this.addonsUploadCreateEndpoint();
     const form = new FormData();
+    form.append('channel', params.channel ?? 'unlisted');
     form.append(
-      'source',
-      fs.createReadStream(params.sourceFile),
-      path.basename(params.sourceFile),
+      'upload',
+      fs.createReadStream(params.file),
+      path.basename(params.file),
     );
 
-    await fetch(endpoint.href, {
-      method: 'PATCH',
+    const res = await fetch(endpoint.href, {
+      method: 'POST',
       body: form,
       headers: form.getHeaders({
         Authorization: this.getAuthHeader(),
       }),
-    }).then(checkStatusCode);
+    });
+    await checkStatusCode(res);
+    return await res.json();
   }
 
-  async checkAuth(params: { extensionId: string }): Promise<void> {
-    console.log(`Checking auth for ${params.extensionId}...`);
-    await this.listAuthors(params);
+  /**
+   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-detail
+   */
+  async uploadDetail(params: { uuid: string }): Promise<UploadDetails> {
+    const endpoint = this.addonsUploadDetailsEndpoint(params.uuid);
+    const res = await fetch(endpoint.href, {
+      headers: {
+        Authorization: this.getAuthHeader(),
+      },
+    });
+    await checkStatusCode(res);
+    return await res.json();
+  }
+
+  async versionCreate(params: {
+    extensionId: string;
+    uploadUuid: string;
+    sourceFile?: string;
+  }): Promise<AddonVersion> {
+    const endpoint = this.addonVersionCreateEndpoint(params.extensionId);
+    const form = new FormData();
+    form.append('upload', params.uploadUuid);
+    if (params.sourceFile) {
+      form.append(
+        'source',
+        fs.createReadStream(params.sourceFile),
+        path.basename(params.sourceFile),
+      );
+    } else {
+      form.append('source', '');
+    }
+
+    const res = await fetch(endpoint.href, {
+      method: 'POST',
+      body: form,
+      headers: form.getHeaders({
+        Authorization: this.getAuthHeader(),
+      }),
+    });
+    await checkStatusCode(res);
+    return await res.json();
   }
 
   /**

@@ -70,7 +70,7 @@ const ESBUILD_DEFAULTS = {
   outdir: dist,
   bundle: true,
   platform: 'node',
-  external: [...Object.keys(dependencies), ...Object.keys(peerDependencies)],
+  external: Object.keys(dependencies),
 };
 
 async function clean() {
