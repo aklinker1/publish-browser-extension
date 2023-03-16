@@ -36,7 +36,7 @@ jobs:
         run: pnpm test
 
       - name: Check CLI
-        run: node dist/cli.js --help
+        run: node dist/cli.cjs --help
 
   e2e-test:
     name: E2E Publish Test
