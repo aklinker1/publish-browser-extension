@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-gulp buildDev
+pnpm build
 
 TARGET="$1"
 
