@@ -102,27 +102,53 @@ pnpm test    # Run unit tests
 
 ### Manual Testing
 
-The `dev` scripts are going to be the main way of manually testing the tool. You can create test extensions on the stores and use the `dev` to publish to them.
+The `dev` scripts are going to be the main way of manually testing the tool.
 
-Before you create the extension listings, run `pnpm gulp buildExtension` to build a simple test extension, `extension/chrome.zip`, `extension/firefox.zip`, and `extension/sources.zip`. Use those ZIP files for the initial upload.
+```sh
+# Firefox and Chrome
+pnpm dev:all
 
-Make sure you don't publish this test extension publicly by updating the `.env` file used for development:
+# Just Chrome
+pnpm dev:chrome
+
+# Just Firefox
+pnpm dev:firefox
+```
+
+#### First Time Setup
+
+Before running any of the dev commands, you have to upload a test extension to the stores. This is the extension the dev commands will publish updates for.
+
+1. Run `pnpm build`. This will build the library, but also create a test extension for you to upload
+1. In the Chrome Web Store, create a new extension using `extension/chrome.zip`, but don't submit it for review
+1. In the Firefox Addon Store, create a new extension using `extension/firefox.zip`, and set it as unlisted
+
+Next, you'll need to setup a `.env` file that contains all the secrets
 
 ```env
+# Your extension's ID is listed under the extension name at the top of the store listing page
+CHROME_EXTENSION_ID=<chrome.runtime.id>
+# Follow Google's docs to get these secrets:
+# https://developer.chrome.com/docs/webstore/using_webstore_api/
+CHROME_CLIENT_ID=...
+CHROME_CLIENT_SECRET=...
+CHROME_REFRESH_TOKEN=...
+
+# Your extension's UUID listed under the "technical details" section of the addon developer hub's page
+FIREFOX_EXTENSION_ID=...
+# Follow Mozilla docs for getting your credentials for the addon-server API
+# https://addons-server.readthedocs.io/en/latest/topics/api/auth.html#access-credentials
+FIREFOX_JWT_ISSUER=...
+FIREFOX_JWT_SECRET=...
+
+# Make sure you don't submit either extension for review or publish to production
 CHROME_SKIP_SUBMIT_REVIEW=true
 CHROME_PUBLISH_TARGET=trustedTesters
 FIREFOX_CHANNEL=unlisted
 ```
 
-Then you can run the `dev` scripts to manually test out changes:
+Then you can run the `dev` scripts to test out the publish CLI tool.
 
 ```bash
-# Chrome
-pnpm dev:chrome
-
-# Firefox
-pnpm dev:firefox
-
-# Chrome and Firefox
 pnpm dev:all
 ```
