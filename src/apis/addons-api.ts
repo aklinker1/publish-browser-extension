@@ -39,8 +39,19 @@ export interface UploadDetails {
   submitted: boolean;
   url: string;
   valid: boolean;
-  validation: {};
+  validation: {
+    errors: number;
+    warnings: number;
+    notices: number;
+  };
   version: string;
+}
+
+export interface AddonVersion {
+  id: number;
+  file: {
+    id: number;
+  };
 }
 
 export type AddonChannel = 'listed' | 'unlisted';
@@ -134,7 +145,7 @@ export class AddonsApi {
     extensionId: string;
     uploadUuid: string;
     sourceFile?: string;
-  }): Promise<void> {
+  }): Promise<AddonVersion> {
     const endpoint = this.addonVersionCreateEndpoint(params.extensionId);
     const form = new FormData();
     form.append('upload', params.uploadUuid);
@@ -156,9 +167,7 @@ export class AddonsApi {
       }),
     });
     await checkStatusCode(res);
-    const version = await res.json();
-    console.log({ version });
-    return version;
+    return await res.json();
   }
 
   /**

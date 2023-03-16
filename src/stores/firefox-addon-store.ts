@@ -48,23 +48,26 @@ export class FirefoxAddonStore {
   async uploadAndPollValidation(
     pollIntervalMs: number,
   ): Promise<UploadDetails> {
-    console.log('Uploading new file...');
     let details = await this.api.uploadCreate({
       file: this.options.zip,
       channel: this.options.channel,
     });
-    console.log(details);
 
     console.log('Waiting for validation results...');
     while (!details.processed) {
       await sleep(pollIntervalMs);
       details = await this.api.uploadDetail(details);
     }
+    const { errors, notices, warnings } = details.validation;
     console.log(
-      `Validation results: ${plural(1, 'error')}, ${plural(1, 'warning')}`,
+      `Validation results: ${plural(errors, 'error')}, ${plural(
+        warnings,
+        'warning',
+      )}, ${plural(notices, 'notice')}`,
     );
-    console.log(details.validation);
-    console.log('Validation results available at: ' + details.url);
+    console.log(
+      `Validation results available at: https://addons.mozilla.org/en-US/developers/addon/${this.options.extensionId}`,
+    );
 
     if (!details.valid) throw Error(`Extension is invalid`);
 
