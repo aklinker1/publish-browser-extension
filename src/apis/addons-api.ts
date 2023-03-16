@@ -27,15 +27,6 @@ export interface AddonVersion {
   id: number;
 }
 
-export interface AddonAuthor {
-  user_id: number;
-  name: string;
-  email: string;
-  role: string;
-  listed: boolean;
-  position: number;
-}
-
 export interface UploadDetails {
   uuid: string;
   channel: AddonChannel;
@@ -82,12 +73,6 @@ export class AddonsApi {
   private addonVersionCreateEndpoint(extensionId: string) {
     return new URL(
       `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/versions/`,
-    );
-  }
-
-  private addonAuthorsEndpoint(extensionId: string) {
-    return new URL(
-      `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/authors/`,
     );
   }
 
@@ -146,24 +131,6 @@ export class AddonsApi {
     });
     await checkStatusCode(res);
     return await res.json();
-  }
-
-  /**
-   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/authors.html#author-list
-   */
-  async listAuthors(params: { extensionId: string }): Promise<AddonAuthor[]> {
-    console.log('Listing extension authors...');
-    const endpoint = this.addonAuthorsEndpoint(params.extensionId);
-
-    return fetch(endpoint.href, {
-      headers: {
-        Authorization: this.getAuthHeader(),
-        'Content-type': 'application/json',
-      },
-    })
-      .then(checkStatusCode)
-      .then(responseBody<AddonAuthor[]>())
-      .then(body => body);
   }
 
   async versionCreate(params: {
