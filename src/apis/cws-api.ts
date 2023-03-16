@@ -47,9 +47,9 @@ export class CwsApi {
     console.log('Uploading new ZIP file...');
     const endpoint = this.uploadEndpoint(params.extensionId);
     const form = new FormData();
-    form.set(
+    form.append(
       'image',
-      await fileFrom(params.zipFile),
+      fs.createReadStream(params.zipFile),
       path.basename(params.zipFile),
     );
     await fetch(endpoint.href, {
