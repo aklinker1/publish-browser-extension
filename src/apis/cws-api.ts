@@ -1,7 +1,6 @@
 import { ofetch } from 'ofetch';
-import FormData from 'form-data';
-import fs from 'fs';
-import path from 'path';
+import { FormData, fileFrom } from 'node-fetch';
+import path from 'node:path';
 import { addAuthHeader } from '../utils/ofetch';
 
 export interface CwsApiOptions {
@@ -33,20 +32,20 @@ export class CwsApi {
 
   constructor(readonly options: CwsApiOptions) {}
 
-  uploadZip(params: {
+  async uploadZip(params: {
     extensionId: string;
     zipFile: string;
     token: CwsTokenDetails;
   }): Promise<unknown> {
     console.log('Uploading new ZIP file...');
     const form = new FormData();
-    form.append(
+    form.set(
       'image',
-      fs.createReadStream(params.zipFile),
+      await fileFrom(params.zipFile),
       path.basename(params.zipFile),
     );
 
-    return this.cwsOfetch(
+    return await this.cwsOfetch(
       `/upload/chromewebstore/v1.1/items/${params.extensionId}`,
       {
         method: 'PUT',
