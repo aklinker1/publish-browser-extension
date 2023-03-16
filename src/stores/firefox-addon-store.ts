@@ -53,6 +53,7 @@ export class FirefoxAddonStore {
       file: this.options.zip,
       channel: this.options.channel,
     });
+    console.log(details);
 
     console.log('Waiting for validation results...');
     while (!details.processed) {
