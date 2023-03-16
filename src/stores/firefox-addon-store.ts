@@ -33,6 +33,7 @@ export class FirefoxAddonStore {
       return;
     }
 
+    // Firefox recommends 5-10s polling and a 10 minute timeout
     const pollInterval = 5e3; // 5 seconds
     const timeout = 10 * 60e3; // 10 minutes
     const uploadPromise = this.uploadAndPollValidation(pollInterval);

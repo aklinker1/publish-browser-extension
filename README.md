@@ -106,7 +106,7 @@ The `dev` scripts are going to be the main way of manually testing the tool. You
 
 Before you create the extension listings, run `pnpm gulp buildExtension` to build a simple test extension, `extension/chrome.zip`, `extension/firefox.zip`, and `extension/sources.zip`. Use those ZIP files for the initial upload.
 
-Make sure you don't publish this test extension publicly by updating the `.env` file used for development.
+Make sure you don't publish this test extension publicly by updating the `.env` file used for development:
 
 ```env
 CHROME_SKIP_SUBMIT_REVIEW=true
