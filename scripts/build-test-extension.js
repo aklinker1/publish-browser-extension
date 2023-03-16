@@ -1,21 +1,8 @@
-const child_process = require('child_process');
-const fs = require('fs/promises');
-const { createWriteStream } = require('fs');
-const esbuild = require('esbuild');
-const { series, parallel } = require('gulp');
-const { dependencies, peerDependencies } = require('./package.json');
-const archiver = require('archiver');
+import { writeFile } from 'fs/promises';
+import { createWriteStream } from 'fs';
+import archiver from 'archiver';
 
 // Utils
-
-function exec(command) {
-  return new Promise((res, rej) => {
-    child_process.exec(command, (err, stdout, stderr) => {
-      if (err) rej(`${err?.message}:\n${stdout}\n${stderr}`);
-      else res();
-    });
-  });
-}
 
 function getUniqueVersion() {
   const date = new Date();
@@ -49,7 +36,7 @@ async function createExtensionZip(file, customManifest) {
     version: getUniqueVersion(),
     ...customManifest,
   };
-  await fs.writeFile(extensionManifest, JSON.stringify(manifest, null, 2));
+  await writeFile(extensionManifest, JSON.stringify(manifest, null, 2));
   archive.file(extensionManifest, { name: 'manifest.json' });
   archive.file('extension/background.js', { name: 'background.js' });
 
@@ -58,65 +45,19 @@ async function createExtensionZip(file, customManifest) {
   return done;
 }
 
-// Tasks
-
-const dist = 'dist';
 const chromeZip = 'extension/chrome.zip';
 const firefoxZip = 'extension/firefox.zip';
-const sourcesZip = 'extension/sources.zip';
 const extensionManifest = 'extension/manifest.json';
-const ESBUILD_DEFAULTS = {
-  sourcemap: true,
-  outdir: dist,
-  bundle: true,
-  platform: 'node',
-  external: Object.keys(dependencies),
-};
 
-async function clean() {
-  await fs.rm(dist, { recursive: true, force: true });
-  await fs.rm(chromeZip, { force: true });
-  await fs.rm(firefoxZip, { force: true });
-}
-exports.clean = clean;
-
-async function buildTypes() {
-  await exec('tsc -p tsconfig.build.json');
-}
-
-async function buildCli() {
-  await esbuild.build({
-    ...ESBUILD_DEFAULTS,
-    entryPoints: ['src/cli.ts'],
-  });
-}
-
-async function buildLibrary() {
-  await esbuild.build({
-    ...ESBUILD_DEFAULTS,
-    entryPoints: ['src/index.ts'],
-  });
-}
-
-async function buildExtension() {
-  await createExtensionZip(chromeZip, {
-    manifest_version: 3,
-    background: {
-      service_worker: 'background.js',
-    },
-  });
-  await createExtensionZip(firefoxZip, {
-    manifest_version: 2,
-    background: {
-      scripts: ['background.js'],
-    },
-  });
-}
-exports.buildExtension = buildExtension;
-
-exports.build = series(clean, parallel(buildTypes, buildCli, buildLibrary));
-
-exports.buildDev = series(
-  clean,
-  parallel(buildTypes, buildCli, buildLibrary, buildExtension),
-);
+await createExtensionZip(chromeZip, {
+  manifest_version: 3,
+  background: {
+    service_worker: 'background.js',
+  },
+});
+await createExtensionZip(firefoxZip, {
+  manifest_version: 2,
+  background: {
+    scripts: ['background.js'],
+  },
+});
