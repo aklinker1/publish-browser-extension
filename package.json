@@ -58,8 +58,7 @@
     "lodash.camelcase": "^4.3.0",
     "lodash.kebabcase": "^4.1.1",
     "lodash.snakecase": "^4.1.1",
-    "node-fetch": "^3.3.1",
-    "ofetch": "^1.0.1"
+    "node-fetch": "^2"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.8",
@@ -67,6 +66,7 @@
     "@types/lodash.kebabcase": "^4.1.7",
     "@types/lodash.snakecase": "^4.1.7",
     "@types/node": "^18",
+    "@types/node-fetch": "^2",
     "archiver": "^5.3.1",
     "env-cmd": "^10.1.0",
     "form-data": "^4.0.0",

@@ -1,9 +1,9 @@
 import FormData from 'form-data';
 import jwt from 'jsonwebtoken';
-import { ofetch } from 'ofetch';
+import fetch from 'node-fetch';
+import { checkStatusCode } from '../utils/fetch';
 import fs from 'fs';
 import path from 'path';
-import { addAuthHeader } from '../utils/ofetch';
 
 export interface AddonsApiOptions {
   jwtIssuer: string;
@@ -52,15 +52,23 @@ export interface AddonVersion {
 export type AddonChannel = 'listed' | 'unlisted';
 
 export class AddonsApi {
-  ofetch = ofetch.create({
-    baseURL: 'https://addons.mozilla.org',
-    retry: false,
-    onRequest: context => {
-      addAuthHeader(context, `JWT ${this.createJwt()}`);
-    },
-  });
-
   constructor(readonly options: AddonsApiOptions) {}
+
+  private addonDetailEndpoint(extensionId: string) {
+    return new URL(
+      `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}`,
+    );
+  }
+
+  private addonsUploadCreateEndpoint() {
+    return new URL(`https://addons.mozilla.org/api/v5/addons/upload/`);
+  }
+
+  private addonsUploadDetailsEndpoint(uploadUuid: string) {
+    return new URL(
+      `https://addons.mozilla.org/api/v5/addons/upload/${uploadUuid}`,
+    );
+  }
 
   private addonVersionCreateEndpoint(extensionId: string) {
     return new URL(
@@ -71,19 +79,27 @@ export class AddonsApi {
   /**
    * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#detail
    */
-  details(params: { extensionId: string }): Promise<AddonDetails> {
+  async details(params: { extensionId: string }): Promise<AddonDetails> {
     console.log(`Getting addon details...`);
-    return this.ofetch(`/api/v5/addons/addon/${params.extensionId}`);
+    const endpoint = this.addonDetailEndpoint(params.extensionId);
+    const res = await fetch(endpoint.href, {
+      headers: {
+        Authorization: this.getAuthHeader(),
+      },
+    });
+    await checkStatusCode(res);
+    return await res.json();
   }
 
   /**
    * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
    */
-  uploadCreate(params: {
+  async uploadCreate(params: {
     file: string;
     channel?: AddonChannel;
   }): Promise<UploadDetails> {
     console.log(`Uploading new ZIP file...`);
+    const endpoint = this.addonsUploadCreateEndpoint();
     const form = new FormData();
     form.append('channel', params.channel ?? 'unlisted');
     form.append(
@@ -92,17 +108,29 @@ export class AddonsApi {
       path.basename(params.file),
     );
 
-    return this.ofetch(`/api/v5/addons/upload`, {
+    const res = await fetch(endpoint.href, {
       method: 'POST',
       body: form,
+      headers: form.getHeaders({
+        Authorization: this.getAuthHeader(),
+      }),
     });
+    await checkStatusCode(res);
+    return await res.json();
   }
 
   /**
    * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-detail
    */
-  uploadDetail(params: { uuid: string }): Promise<UploadDetails> {
-    return this.ofetch(`/api/v5/addons/upload/${params.uuid}`);
+  async uploadDetail(params: { uuid: string }): Promise<UploadDetails> {
+    const endpoint = this.addonsUploadDetailsEndpoint(params.uuid);
+    const res = await fetch(endpoint.href, {
+      headers: {
+        Authorization: this.getAuthHeader(),
+      },
+    });
+    await checkStatusCode(res);
+    return await res.json();
   }
 
   async versionCreate(params: {
@@ -110,6 +138,7 @@ export class AddonsApi {
     uploadUuid: string;
     sourceFile?: string;
   }): Promise<AddonVersion> {
+    const endpoint = this.addonVersionCreateEndpoint(params.extensionId);
     const form = new FormData();
     form.append('upload', params.uploadUuid);
     if (params.sourceFile) {
@@ -122,13 +151,15 @@ export class AddonsApi {
       form.append('source', '');
     }
 
-    return await this.ofetch(
-      `/api/v5/addons/addon/${params.extensionId}/versions`,
-      {
-        method: 'POST',
-        body: form,
-      },
-    );
+    const res = await fetch(endpoint.href, {
+      method: 'POST',
+      body: form,
+      headers: form.getHeaders({
+        Authorization: this.getAuthHeader(),
+      }),
+    });
+    await checkStatusCode(res);
+    return await res.json();
   }
 
   /**
@@ -144,5 +175,9 @@ export class AddonsApi {
     };
     const secret = this.options.jwtSecret ?? '';
     return jwt.sign(payload, secret, { algorithm: 'HS256' });
+  }
+
+  private getAuthHeader(): string {
+    return `JWT ${this.createJwt()}`;
   }
 }
