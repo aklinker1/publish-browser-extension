@@ -1,7 +1,7 @@
+#!/usr/bin/env node
 import { publishExtension } from '.';
 import { ChromeWebStore, FirefoxAddonStore } from './stores';
 import { PublishOptions } from './types';
-import { parseFlag, parseRequiredStringFlag } from './utils/flags';
 import { Log } from './utils/log';
 import { cliFlags } from './cli-flags';
 
