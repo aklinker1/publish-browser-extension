@@ -5,7 +5,7 @@ specifiers:
   '@types/lodash.camelcase': ^4.3.7
   '@types/lodash.kebabcase': ^4.1.7
   '@types/lodash.snakecase': ^4.1.7
-  '@types/node': ^16
+  '@types/node': ^18
   '@types/node-fetch': ^2
   archiver: ^5.3.1
   cli-highlight: ^2.1.11
@@ -42,7 +42,7 @@ devDependencies:
   '@types/lodash.camelcase': 4.3.7
   '@types/lodash.kebabcase': 4.1.7
   '@types/lodash.snakecase': 4.1.7
-  '@types/node': 16.11.36
+  '@types/node': 18.15.3
   '@types/node-fetch': 2.6.1
   archiver: 5.3.1
   env-cmd: 10.1.0
@@ -284,7 +284,7 @@ packages:
   /@types/jsonwebtoken/8.5.8:
     resolution: {integrity: sha512-zm6xBQpFDIDM6o9r6HSgDeIcLy82TKWctCXEPbJJcXb5AKmi5BNNdLXneixK4lplX3PqIVcwLBCGE/kAGnlD4A==}
     dependencies:
-      '@types/node': 16.11.36
+      '@types/node': 18.15.3
     dev: true
 
   /@types/lodash.camelcase/4.3.7:
@@ -316,17 +316,17 @@ packages:
   /@types/node-fetch/2.6.1:
     resolution: {integrity: sha512-oMqjURCaxoSIsHSr1E47QHzbmzNR5rK8McHuNb11BOM9cHcIK3Avy0s/b2JlXHoQGTYS3NsvWzV1M0iK7l0wbA==}
     dependencies:
-      '@types/node': 16.11.36
+      '@types/node': 18.15.3
       form-data: 3.0.1
     dev: true
 
-  /@types/node/16.11.36:
-    resolution: {integrity: sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==}
+  /@types/node/18.15.3:
+    resolution: {integrity: sha512-p6ua9zBxz5otCmbpb5D3U4B5Nanw6Pk3PPyX05xnxbB/fRv71N7CPmORg7uAD5P70T0xmx1pzAx/FUfa5X+3cw==}
 
   /@types/yauzl/2.9.2:
     resolution: {integrity: sha512-8uALY5LTvSuHgloDVUvWP3pIauILm+8/0pDMokuDYIoNsOkSwd5AiHBTSEJjKTDcZr5z8UpgOWZkxBF4iJftoA==}
     dependencies:
-      '@types/node': 16.11.36
+      '@types/node': 18.15.3
     dev: false
     optional: true
 
