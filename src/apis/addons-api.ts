@@ -1,7 +1,7 @@
 import FormData from 'form-data';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
-import { checkStatusCode, responseBody } from '../utils/fetch';
+import { checkStatusCode } from '../utils/fetch';
 import fs from 'fs';
 import path from 'path';
 
@@ -81,7 +81,9 @@ export class AddonsApi {
    */
   async details(params: { extensionId: string }): Promise<AddonDetails> {
     console.log(`Getting extension details for id=${params.extensionId}...`);
-    const endpoint = this.addonDetailEndpoint(params.extensionId);
+    const endpoint = this.addonDetailEndpoint(
+      params.extensionId.replace(/[\{\}]/g, ''),
+    );
     const res = await fetch(endpoint.href, {
       headers: {
         Authorization: this.getAuthHeader(),
