@@ -39,7 +39,7 @@ export interface UploadDetails {
   submitted: boolean;
   url: string;
   valid: boolean;
-  validation: unknown;
+  validation: {};
   version: string;
 }
 
@@ -102,9 +102,7 @@ export class AddonsApi {
    * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-detail
    */
   async uploadDetail(params: { uuid: string }): Promise<UploadDetails> {
-    console.log(`Getting upload details uuid=${params.uuid}...`);
     const endpoint = this.addonsUploadDetailsEndpoint(params.uuid);
-
     const res = await fetch(endpoint.href, {
       headers: {
         Authorization: this.getAuthHeader(),
@@ -158,7 +156,9 @@ export class AddonsApi {
       }),
     });
     await checkStatusCode(res);
-    return await res.json();
+    const version = await res.json();
+    console.log({ version });
+    return version;
   }
 
   /**
