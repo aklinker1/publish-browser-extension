@@ -1,5 +1,5 @@
 import { Log } from '../utils/log';
-import { AddonsApi, UploadDetails } from '../apis/addons-api';
+import { AddonDetails, AddonsApi, UploadDetails } from '../apis/addons-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import { plural } from '../utils/plural';
@@ -25,8 +25,9 @@ export class FirefoxAddonStore {
   }
 
   async publish(dryRun?: boolean): Promise<void> {
-    console.log('Validating authentication via list authors endpoint...');
-    await this.api.listAuthors({ extensionId: this.wrappedExtensionId });
+    const addon = await this.api.details({
+      extensionId: this.options.extensionId,
+    });
     if (dryRun) {
       this.deps.log.warn('DRY RUN: Skipping upload and publish...');
       return;
@@ -38,11 +39,22 @@ export class FirefoxAddonStore {
     const upload = await withTimeout(uploadPromise, timeout);
 
     console.log('Submitting new version...');
-    await this.api.versionCreate({
+    const version = await this.api.versionCreate({
       extensionId: this.wrappedExtensionId,
       sourceFile: this.options.sourcesZip,
       uploadUuid: upload.uuid,
     });
+
+    const validationUrl = `https://addons.mozilla.org/en-US/developers/addon/${addon.id}/file/${version.file.id}/validation`;
+    const { errors, notices, warnings } = upload.validation;
+    console.log(
+      `Validation results: ${plural(errors, 'error')}, ${plural(
+        warnings,
+        'warning',
+      )}, ${plural(notices, 'notice')}`,
+    );
+    if (!upload.valid) throw Error(`Extension is invalid: ${validationUrl}`);
+    else console.log(`Validation results available at: ${validationUrl}`);
   }
 
   async uploadAndPollValidation(
@@ -58,18 +70,6 @@ export class FirefoxAddonStore {
       await sleep(pollIntervalMs);
       details = await this.api.uploadDetail(details);
     }
-    const { errors, notices, warnings } = details.validation;
-    console.log(
-      `Validation results: ${plural(errors, 'error')}, ${plural(
-        warnings,
-        'warning',
-      )}, ${plural(notices, 'notice')}`,
-    );
-    console.log(
-      `Validation results available at: https://addons.mozilla.org/en-US/developers/addon/${this.options.extensionId}`,
-    );
-
-    if (!details.valid) throw Error(`Extension is invalid`);
 
     return details;
   }

@@ -19,6 +19,10 @@ export interface AddonPagination<T> {
   results: T[];
 }
 
+export interface AddonDetails {
+  id: string;
+}
+
 export interface AddonVersion {
   id: number;
 }
@@ -59,6 +63,12 @@ export type AddonChannel = 'listed' | 'unlisted';
 export class AddonsApi {
   constructor(readonly options: AddonsApiOptions) {}
 
+  private addonDetailEndpoint(extensionId: string) {
+    return new URL(
+      `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}`,
+    );
+  }
+
   private addonsUploadCreateEndpoint() {
     return new URL(`https://addons.mozilla.org/api/v5/addons/upload/`);
   }
@@ -79,6 +89,21 @@ export class AddonsApi {
     return new URL(
       `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/authors/`,
     );
+  }
+
+  /**
+   * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#detail
+   */
+  async details(params: { extensionId: string }): Promise<AddonDetails> {
+    console.log(`Getting extension details for id=${params.extensionId}...`);
+    const endpoint = this.addonDetailEndpoint(params.extensionId);
+    const res = await fetch(endpoint.href, {
+      headers: {
+        Authorization: this.getAuthHeader(),
+      },
+    });
+    await checkStatusCode(res);
+    return await res.json();
   }
 
   /**
