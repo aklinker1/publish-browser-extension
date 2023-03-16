@@ -63,14 +63,13 @@ async function createExtensionZip(file, customManifest) {
 const dist = 'dist';
 const chromeZip = 'extension/chrome.zip';
 const firefoxZip = 'extension/firefox.zip';
-const sourcesZip = 'extension/sources.zip';
 const extensionManifest = 'extension/manifest.json';
 const ESBUILD_DEFAULTS = {
   sourcemap: true,
   outdir: dist,
   bundle: true,
   platform: 'node',
-  external: [...Object.keys(dependencies), ...Object.keys(peerDependencies)],
+  external: Object.keys(dependencies),
 };
 
 async function clean() {
