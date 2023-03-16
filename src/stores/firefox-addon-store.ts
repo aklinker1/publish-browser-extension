@@ -26,7 +26,7 @@ export class FirefoxAddonStore {
 
   async publish(dryRun?: boolean): Promise<void> {
     const addon = await this.api.details({
-      extensionId: this.options.extensionId,
+      extensionId: this.wrappedExtensionId,
     });
     if (dryRun) {
       this.deps.log.warn('DRY RUN: Skipping upload and publish...');

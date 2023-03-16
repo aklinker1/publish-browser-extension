@@ -81,10 +81,7 @@ export class AddonsApi {
    */
   async details(params: { extensionId: string }): Promise<AddonDetails> {
     console.log(`Getting extension details for id=${params.extensionId}...`);
-    const endpoint = this.addonDetailEndpoint(
-      params.extensionId.replace(/[\{\}]/g, ''),
-    );
-    console.log(endpoint.href);
+    const endpoint = this.addonDetailEndpoint(params.extensionId);
     const res = await fetch(endpoint.href, {
       headers: {
         Authorization: this.getAuthHeader(),
