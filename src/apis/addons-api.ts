@@ -95,7 +95,6 @@ export class AddonsApi {
     return this.ofetch(`/api/v5/addons/upload`, {
       method: 'POST',
       body: form,
-      headers: form.getHeaders(),
     });
   }
 
@@ -128,7 +127,6 @@ export class AddonsApi {
       {
         method: 'POST',
         body: form,
-        headers: form.getHeaders(),
       },
     );
   }

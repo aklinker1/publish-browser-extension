@@ -51,9 +51,9 @@ export class CwsApi {
       {
         method: 'PUT',
         body: form,
-        headers: form.getHeaders({
-          'x-goog-api-version': 2,
-        }),
+        headers: {
+          'x-goog-api-version': '2',
+        },
       },
     );
   }
