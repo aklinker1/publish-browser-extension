@@ -84,6 +84,7 @@ export class AddonsApi {
     const endpoint = this.addonDetailEndpoint(
       params.extensionId.replace(/[\{\}]/g, ''),
     );
+    console.log(endpoint.href);
     const res = await fetch(endpoint.href, {
       headers: {
         Authorization: this.getAuthHeader(),
