@@ -86,4 +86,36 @@ export const cliFlags = {
       'string',
       "What channel you would like to publish the extension to, 'listed' or 'unlisted'. Not required, defaults to 'listed'.",
     ),
+
+  // Edge
+  edgeZip: () =>
+    parseFlag(
+      'edge-zip',
+      'string',
+      'The path to the ZIP file you want to upload to the Edge Addon Store. When not passed, the Edge Addon Store is skipped.',
+    ),
+  edgeProductId: () =>
+    parseFlag(
+      'edge-product-id',
+      'string',
+      'Product ID representing your extension. Available at the bottom of the "Extension Overview" for your extension.\nYour extension list: https://partner.microsoft.com/en-us/dashboard/microsoftedge',
+    ),
+  edgeClientId: () =>
+    parseFlag(
+      'edge-client-id',
+      'string',
+      'Client ID used for authorizing requests to Microsofts addon API. Required when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
+    ),
+  edgeClientSecret: () =>
+    parseFlag(
+      'edge-client-secret',
+      'string',
+      'Client secret used for authorizing requests to Microsofts addon API. Required when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
+    ),
+  edgeAccessTokenUrl: () =>
+    parseFlag(
+      'edge-access-token-url',
+      'string',
+      'Access token URL used for authorizing requests to Microsofts addon API. Required when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
+    ),
 };

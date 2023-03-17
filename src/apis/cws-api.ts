@@ -10,7 +10,7 @@ export interface CwsApiOptions {
   refreshToken: string;
 }
 
-export interface CwsTokenDetails {
+interface CwsTokenDetails {
   access_token: string;
   expires_in: number;
   refresh_token: string;
