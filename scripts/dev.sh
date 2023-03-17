@@ -8,7 +8,8 @@ if [[ "$TARGET" == "all" ]]; then
     node dist/cli.cjs \
         --chrome-zip extension/chrome.zip \
         --firefox-zip extension/firefox.zip \
-        --firefox-sources-zip extension/firefox.zip
+        --firefox-sources-zip extension/firefox.zip \
+        --edge-zip extension/chrome.zip
 elif [[ "$TARGET" == "chrome" ]]; then
     node dist/cli.cjs --chrome-zip extension/chrome.zip
 elif [[ "$TARGET" == "firefox" ]]; then
