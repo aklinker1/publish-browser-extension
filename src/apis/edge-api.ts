@@ -69,6 +69,7 @@ export class EdgeApi {
     productId: string;
     zipFile: string;
   }): Promise<DraftResponse> {
+    console.log('Uploading new ZIP file...');
     const endpoint = `https://api.addons.microsoftedge.microsoft.com/v1/products/${params.productId}/submissions/draft/package`;
     const file = fs.createReadStream(params.zipFile);
     const res = await fetch(endpoint, {
