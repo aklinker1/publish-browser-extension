@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { publishExtension } from '.';
-import { ChromeWebStore, FirefoxAddonStore } from './stores';
+import { ChromeWebStore, EdgeAddonStore, FirefoxAddonStore } from './stores';
 import { PublishOptions } from './types';
 import { Log } from './utils/log';
 import { cliFlags } from './cli-flags';
@@ -31,6 +31,7 @@ main(async () => {
     log,
     chrome: ChromeWebStore,
     firefox: FirefoxAddonStore,
+    edge: EdgeAddonStore,
   };
 
   const options: PublishOptions = {
