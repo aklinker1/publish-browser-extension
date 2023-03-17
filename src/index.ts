@@ -4,6 +4,7 @@ import {
   FirefoxAddonStore,
   PublishFailure,
   PublishSuccess,
+  EdgeAddonStore,
 } from './stores';
 import { PublishOptions, Results } from './types';
 import { Log } from './utils/log';
@@ -15,6 +16,7 @@ export async function publishExtension(
   deps = {
     chrome: ChromeWebStore,
     firefox: FirefoxAddonStore,
+    edge: EdgeAddonStore,
     log: new Log(),
   },
 ): Promise<Results> {
@@ -37,6 +39,11 @@ export async function publishExtension(
     const store = new deps.firefox(options.firefox, { log });
     log.printStoreOptions(store.name, options.firefox);
     ops.push(['firefox', store]);
+  }
+  if (options.edge) {
+    const store = new deps.edge(options.edge, { log });
+    log.printStoreOptions(store.name, options.edge);
+    ops.push(['edge', store]);
   }
 
   // Publish
