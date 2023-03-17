@@ -11,7 +11,7 @@ export interface EdgeApiOptions {
   accessTokenUrl: string;
 }
 
-interface EdgeTokenDetails {
+export interface EdgeTokenDetails {
   access_token: string;
   expires_in: number;
   token_type: string;
@@ -24,7 +24,7 @@ export interface DraftResponse {
 /**
  * Docs: https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/addons-api-reference#response-1
  */
-export interface Operation {
+export interface DraftOperation {
   id: string;
   createdTime: string;
   lastUpdatedTime: string;
@@ -95,7 +95,7 @@ export class EdgeApi {
     token: EdgeTokenDetails;
     productId: string;
     operationId: string;
-  }): Promise<Operation> {
+  }): Promise<DraftOperation> {
     const endpoint = `https://api.addons.microsoftedge.microsoft.com/v1/products/${params.productId}/submissions/draft/package/operations/${params.operationId}`;
     const res = await fetch(endpoint, {
       headers: {
