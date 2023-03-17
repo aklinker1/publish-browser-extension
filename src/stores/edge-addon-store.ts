@@ -10,6 +10,7 @@ export interface EdgeAddonStoreOptions {
   clientId: string;
   clientSecret: string;
   accessTokenUrl: string;
+  skipSubmitReview?: boolean;
 }
 
 export class EdgeAddonStore implements IStore {
@@ -35,6 +36,11 @@ export class EdgeAddonStore implements IStore {
     const timeout = 10 * 60e3; // 10 minutes
     const uploadPromise = this.uploadAndPollValidation(token, pollInterval);
     await withTimeout(uploadPromise, timeout);
+
+    if (this.options.skipSubmitReview) {
+      this.deps.log.warn('Skipping submission (skipSubmitReview=true)');
+      return;
+    }
 
     console.log('Submitting new version...');
     await this.api.publish({

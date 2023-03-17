@@ -114,4 +114,10 @@ export const cliFlags = {
       'edge-access-token-url',
       'Access token URL used for authorizing requests to Microsofts addon API. Required when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
     ),
+  edgeSkipSubmitReview: () =>
+    parseFlag(
+      'edge-skip-submit-review',
+      'boolean',
+      "Just upload the extension zip, don't submit it for review or publish it",
+    ),
 };

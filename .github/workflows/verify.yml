@@ -76,3 +76,4 @@ jobs:
           EDGE_CLIENT_ID: ${{ secrets.TEST_EDGE_CLIENT_ID }}
           EDGE_CLIENT_SECRET: ${{ secrets.TEST_EDGE_CLIENT_SECRET }}
           EDGE_ACCESS_TOKEN_URL: ${{ secrets.TEST_EDGE_ACCESS_TOKEN_URL }}
+          EDGE_SKIP_SUBMIT_REVIEW: 'true'

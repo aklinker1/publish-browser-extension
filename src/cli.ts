@@ -64,6 +64,7 @@ main(async () => {
           clientId: cliFlags.edgeClientId().value,
           clientSecret: cliFlags.edgeClientSecret().value,
           accessTokenUrl: cliFlags.edgeAccessTokenUrl().value,
+          skipSubmitReview: cliFlags.edgeSkipSubmitReview().value,
         }
       : undefined,
   };
