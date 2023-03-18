@@ -22,22 +22,22 @@ export const cliFlags = {
   chromeExtensionId: () =>
     parseRequiredStringFlag(
       'chrome-extension-id',
-      "The ID of the chrome extension you're publishing to. You should upload the extension once by hand to get this value. Required when --chrome-zip is passed.",
+      "The ID of the chrome extension you're publishing to. You should upload the extension once by hand to get this value.\nRequired when --chrome-zip is passed.",
     ),
   chromeClientId: () =>
     parseRequiredStringFlag(
       'chrome-client-id',
-      'Client ID used for authorizing requests to the Chrome Web Store. Required when --chrome-zip is passed.\nSee https://developer.chrome.com/docs/webstore/using_webstore_api/ to get started.',
+      'Client ID used for authorizing requests to the Chrome Web Store.\nRequired when --chrome-zip is passed.\nSee https://developer.chrome.com/docs/webstore/using_webstore_api/ to get started.',
     ),
   chromeClientSecret: () =>
     parseRequiredStringFlag(
       'chrome-client-secret',
-      'Client secret used for authorizing requests to the Chrome Web Store. Required when --chrome-zip is passed.\nSee https://developer.chrome.com/docs/webstore/using_webstore_api/ to get started.',
+      'Client secret used for authorizing requests to the Chrome Web Store.\nRequired when --chrome-zip is passed.\nSee https://developer.chrome.com/docs/webstore/using_webstore_api/ to get started.',
     ),
   chromeRefreshToken: () =>
     parseRequiredStringFlag(
       'chrome-refresh-token',
-      'Refresh token used for authorizing requests to the Chrome Web Store. Required when --chrome-zip is passed.\nSee https://developer.chrome.com/docs/webstore/using_webstore_api/ to get started.',
+      'Refresh token used for authorizing requests to the Chrome Web Store.\nRequired when --chrome-zip is passed.\nSee https://developer.chrome.com/docs/webstore/using_webstore_api/ to get started.',
     ),
   chromePublishTarget: () =>
     parseFlag<'default' | 'trustedTesters'>(
@@ -68,7 +68,7 @@ export const cliFlags = {
   firefoxExtensionId: () =>
     parseRequiredStringFlag(
       'firefox-extension-id',
-      "The ID of the extension you're publishing to. You should upload the extension once by hand to get this value. Required when --firefox-zip is passed.",
+      "The ID of the extension you're publishing to. You should upload the extension once by hand to get this value.\nRequired when --firefox-zip is passed.",
     ),
   firefoxJwtIssuer: () =>
     parseRequiredStringFlag(
@@ -102,17 +102,17 @@ export const cliFlags = {
   edgeClientId: () =>
     parseRequiredStringFlag(
       'edge-client-id',
-      'Client ID used for authorizing requests to Microsofts addon API. Required when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
+      'Client ID used for authorizing requests to Microsofts addon API.\nRequired when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
     ),
   edgeClientSecret: () =>
     parseRequiredStringFlag(
       'edge-client-secret',
-      'Client secret used for authorizing requests to Microsofts addon API. Required when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
+      'Client secret used for authorizing requests to Microsofts addon API.\nRequired when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
     ),
   edgeAccessTokenUrl: () =>
     parseRequiredStringFlag(
       'edge-access-token-url',
-      'Access token URL used for authorizing requests to Microsofts addon API. Required when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
+      'Access token URL used for authorizing requests to Microsofts addon API.\nRequired when --edge-zip is passed.\nAvailable at: https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
     ),
   edgeSkipSubmitReview: () =>
     parseFlag(
