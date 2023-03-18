@@ -8,6 +8,7 @@
 - [x] Publish to the **Chrome Web Store**
 - [x] Publish to the **Firefox Addon Store**
 - [x] **Upload sources** to the Firefox Addon Store
+- [x] Publish to the **Microsoft Edge Addon Store**
 
 ###### Install
 
@@ -26,12 +27,19 @@ publish-extension \
     --chrome-client-secret "<gcp-client-secret>" \
     --chrome-refresh-token "<gcp-refresh-token>" \
     --chrome-publish-target "<default|trustedTesters>" \
+    --chrome-skip-submit-review \
     --firefox-zip "dist/firefox.zip" \
     --firefox-sources-zip "dist/sources.zip" \
     --firefox-extension-id "<addons-extension-id>" \
     --firefox-jwt-issuer "<addons-jwt-issuer>" \
     --firefox-jwt-secret "<addons-jwt-secret>" \
-    --firefox-channel "<listed|unlisted>"
+    --firefox-channel "<listed|unlisted>" \
+    --edge-zip "dist/chrome.zip" \
+    --edge-product-id "<edge-product-id>" \
+    --edge-client-id "<edge-client-id>" \
+    --edge-client-secret "<edge-client-secret>" \
+    --edge-access-token-url "<edge-access-token-url>" \
+    --edge-skip-submit-review
 ```
 
 > See `publish-extension --help` for details on generating and retrieving each of these values
@@ -51,6 +59,7 @@ publishExtension({
     clientSecret: '<gcp-client-secret>',
     refreshToken: '<gcp-refresh-token>',
     publishTarget: '<default|trustedTesters>',
+    skipSubmitReview: false,
   },
   firefox: {
     zip: 'dist/firefox.zip',
@@ -59,6 +68,14 @@ publishExtension({
     jwtIssuer: '<addons-jwt-issuer>',
     jwtSecret: '<addons-jwt-secret>',
     channel: '<listed|unlisted>',
+  },
+  edge: {
+    zip: 'dist/chrome.zip',
+    productId: "<edge-product-id>",
+    clientId: "<edge-client-id>",
+    clientSecret: "<edge-client-secret>",
+    accessTokenUrl: "<edge-access-token-url>",
+    skipSubmitReview: false,
   },
 })
   .then(results => console.log(results))
@@ -115,7 +132,7 @@ pnpm dev:chrome
 pnpm dev:firefox
 ```
 
-#### First Time Setup
+### First Time Setup
 
 Before running any of the dev commands, you have to upload a test extension to the stores. This is the extension the dev commands will publish updates for.
 
