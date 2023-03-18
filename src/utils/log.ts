@@ -100,7 +100,7 @@ export class Log {
     console.log(`
 ${this.BOLD}Usage: ${this.CODE}publish-extension [OPTIONS]${this.RESET}
 
-Publish chrome/browser extensions to different stores
+Publish web extensions to different stores
 
 ${this.CYAN}${this.BOLD}Examples${this.RESET}
 These examples assume you include all required secrets as environment variables.

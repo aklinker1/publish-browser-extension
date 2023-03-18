@@ -58,7 +58,7 @@ export class FirefoxAddonStore {
     else console.log(`Validation results available at: ${validationUrl}`);
   }
 
-  async uploadAndPollValidation(
+  private async uploadAndPollValidation(
     pollIntervalMs: number,
   ): Promise<UploadDetails> {
     let details = await this.api.uploadCreate({
