@@ -99,7 +99,7 @@ export class CwsApi {
       method: 'POST',
       body,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
       },
     })
       .then(checkStatusCode)
