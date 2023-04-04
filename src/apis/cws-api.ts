@@ -88,19 +88,19 @@ export class CwsApi {
     console.log('Getting an access token...');
     const endpoint = this.tokenEndpoint();
 
-    const body = new URLSearchParams();
-    body.set('client_id', this.options.clientId);
-    body.set('client_secret', this.options.clientSecret);
-    body.set('refresh_token', this.options.refreshToken);
-    body.set('grant_type', 'refresh_token');
-    body.set('redirect_uri', 'urn:ietf:wg:oauth:2.0:oob');
-    console.log({ body });
+    // const body = new URLSearchParams();
+    endpoint.searchParams.set('client_id', this.options.clientId);
+    endpoint.searchParams.set('client_secret', this.options.clientSecret);
+    endpoint.searchParams.set('refresh_token', this.options.refreshToken);
+    endpoint.searchParams.set('grant_type', 'refresh_token');
+    endpoint.searchParams.set('redirect_uri', 'urn:ietf:wg:oauth:2.0:oob');
+    console.log(endpoint.href);
 
     return fetch(endpoint.href, {
       method: 'POST',
-      body,
+      // body,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
     })
       .then(checkStatusCode)
