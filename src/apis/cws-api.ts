@@ -22,7 +22,7 @@ export class CwsApi {
   constructor(readonly options: CwsApiOptions) {}
 
   private tokenEndpoint() {
-    return new URL('https://oauth2.googleapis.com/token');
+    return new URL('https://accounts.google.com/o/oauth2/token');
   }
 
   private uploadEndpoint(extensionId: string) {
