@@ -94,6 +94,7 @@ export class CwsApi {
     body.set('refresh_token', this.options.refreshToken);
     body.set('grant_type', 'refresh_token');
     body.set('redirect_uri', 'urn:ietf:wg:oauth:2.0:oob');
+    console.log({ body });
 
     return fetch(endpoint.href, {
       method: 'POST',
