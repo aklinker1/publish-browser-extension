@@ -95,7 +95,6 @@ export class CwsApi {
         client_secret: this.options.clientSecret,
         refresh_token: this.options.refreshToken,
         grant_type: 'refresh_token',
-        redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
       }),
       headers: {
         'Content-Type': 'application/json',
