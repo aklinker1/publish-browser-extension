@@ -22,7 +22,7 @@ export class CwsApi {
   constructor(readonly options: CwsApiOptions) {}
 
   private tokenEndpoint() {
-    return new URL('https://oauth2.googleapis.com/token');
+    return new URL('https://www.googleapis.com/oauth2/v4/token');
   }
 
   private uploadEndpoint(extensionId: string) {
@@ -88,17 +88,15 @@ export class CwsApi {
     console.log('Getting an access token...');
     const endpoint = this.tokenEndpoint();
 
-    // const body = new URLSearchParams();
-    endpoint.searchParams.set('client_id', this.options.clientId);
-    endpoint.searchParams.set('client_secret', this.options.clientSecret);
-    endpoint.searchParams.set('refresh_token', this.options.refreshToken);
-    endpoint.searchParams.set('grant_type', 'refresh_token');
-    endpoint.searchParams.set('redirect_uri', 'urn:ietf:wg:oauth:2.0:oob');
-    console.log(endpoint.href);
-
     return fetch(endpoint.href, {
       method: 'POST',
-      // body,
+      body: JSON.stringify({
+        client_id: this.options.clientId,
+        client_secret: this.options.clientSecret,
+        refresh_token: this.options.refreshToken,
+        grant_type: 'refresh_token',
+        redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
+      }),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
