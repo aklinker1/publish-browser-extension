@@ -97,6 +97,9 @@ export class CwsApi {
         grant_type: 'refresh_token',
         redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
       }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
       .then(checkStatusCode)
       .then(responseBody<CwsTokenDetails>());
