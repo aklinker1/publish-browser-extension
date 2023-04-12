@@ -1,5 +1,5 @@
 import { Log } from '../utils/log';
-import { AddonDetails, AddonsApi, UploadDetails } from '../apis/addons-api';
+import { AddonsApi, UploadDetails } from '../apis/addons-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import { plural } from '../utils/plural';
@@ -10,7 +10,7 @@ export interface FirefoxAddonStoreOptions {
   extensionId: string;
   jwtIssuer: string;
   jwtSecret: string;
-  channel?: 'listed' | 'unlisted';
+  channel: 'listed' | 'unlisted';
 }
 
 export class FirefoxAddonStore {

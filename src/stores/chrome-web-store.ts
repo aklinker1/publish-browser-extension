@@ -7,8 +7,8 @@ export interface ChromeWebStoreOptions {
   clientId: string;
   clientSecret: string;
   refreshToken: string;
-  publishTarget?: 'default' | 'trustedTesters';
-  skipSubmitReview?: boolean;
+  publishTarget: 'default' | 'trustedTesters';
+  skipSubmitReview: boolean;
 }
 
 export class ChromeWebStore {

@@ -10,7 +10,7 @@ export interface EdgeAddonStoreOptions {
   clientId: string;
   clientSecret: string;
   accessTokenUrl: string;
-  skipSubmitReview?: boolean;
+  skipSubmitReview: boolean;
 }
 
 export class EdgeAddonStore implements IStore {

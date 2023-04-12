@@ -64,7 +64,7 @@ export class CwsApi {
 
   async submitForReview(params: {
     extensionId: string;
-    publishTarget?: 'default' | 'trustedTesters';
+    publishTarget: 'default' | 'trustedTesters';
     token: CwsTokenDetails;
   }) {
     const Authorization = await this.getAuthHeader(params.token);

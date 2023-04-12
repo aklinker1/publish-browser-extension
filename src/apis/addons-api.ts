@@ -96,12 +96,12 @@ export class AddonsApi {
    */
   async uploadCreate(params: {
     file: string;
-    channel?: AddonChannel;
+    channel: AddonChannel;
   }): Promise<UploadDetails> {
     console.log(`Uploading new ZIP file...`);
     const endpoint = this.addonsUploadCreateEndpoint();
     const form = new FormData();
-    form.append('channel', params.channel ?? 'unlisted');
+    form.append('channel', params.channel);
     form.append(
       'upload',
       fs.createReadStream(params.file),

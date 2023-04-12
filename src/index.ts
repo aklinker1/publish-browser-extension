@@ -6,18 +6,32 @@ import {
   PublishSuccess,
   EdgeAddonStore,
 } from './stores';
-import { PublishOptions, Results } from './types';
+import { PublishOptions, Results, InternalPublishOptions } from './types';
 import { Log } from './utils/log';
 
 export type { PublishOptions, Results };
 
-export async function publishExtension(
+export function publishExtension(
   options: PublishOptions,
   deps = {
     chrome: ChromeWebStore,
     firefox: FirefoxAddonStore,
     edge: EdgeAddonStore,
     log: new Log(),
+  },
+): Promise<Results> {
+  const internalOptions = mapToInternalOptions(options);
+
+  return internalPublishExtension(internalOptions, deps);
+}
+
+async function internalPublishExtension(
+  options: InternalPublishOptions,
+  deps: {
+    chrome: typeof ChromeWebStore;
+    firefox: typeof FirefoxAddonStore;
+    edge: typeof EdgeAddonStore;
+    log: Log;
   },
 ): Promise<Results> {
   const { log } = deps;
@@ -64,4 +78,23 @@ export async function publishExtension(
   }
 
   return result;
+}
+
+function mapToInternalOptions(options: PublishOptions): InternalPublishOptions {
+  return {
+    dryRun: options.dryRun,
+    chrome: options.chrome && {
+      ...options.chrome,
+      publishTarget: options.chrome.publishTarget ?? 'default',
+      skipSubmitReview: options.chrome.skipSubmitReview ?? false,
+    },
+    firefox: options.firefox && {
+      ...options.firefox,
+      channel: options.firefox.channel ?? 'listed',
+    },
+    edge: options.edge && {
+      ...options.edge,
+      skipSubmitReview: options.edge.skipSubmitReview ?? false,
+    },
+  };
 }

@@ -49,7 +49,7 @@ export const cliFlags = {
     parseFlag(
       'chrome-skip-submit-review',
       'boolean',
-      "Just upload the extension zip, don't submit it for review or publish it",
+      "Just upload the extension zip, don't submit it for review or publish it. Not required, defaults to false.",
     ),
 
   // Firefox
@@ -118,6 +118,6 @@ export const cliFlags = {
     parseFlag(
       'edge-skip-submit-review',
       'boolean',
-      "Just upload the extension zip, don't submit it for review or publish it",
+      "Just upload the extension zip, don't submit it for review or publish it. Not required, defaults to false.",
     ),
 };
