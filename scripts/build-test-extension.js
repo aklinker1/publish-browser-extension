@@ -9,10 +9,16 @@ function getUniqueVersion() {
   const year = String(date.getUTCFullYear()).substring(2);
   const monthAndDay = date.getUTCMonth() * 100 + date.getUTCDay();
 
-  const zeroDay = new Date(date);
-  zeroDay.setFullYear(1970, 0, 1);
-  // Builds will be unique if done 10s apart
-  const tenthSecondOfDay = Math.round(zeroDay.getTime() / (10 * 1000));
+  const startOfDay = new Date(date);
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+
+  // Builds are unique down to the second
+  const tenthSecondOfDay = Math.round(
+    (date.getTime() - startOfDay.getTime()) / 1e3,
+  );
   return `${year}.${monthAndDay}.${tenthSecondOfDay}`;
 }
 
