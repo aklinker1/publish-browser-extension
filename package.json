@@ -41,7 +41,7 @@
     "build:clean": "rimraf dist",
     "build:lib": "tsup src/index.ts --dts --format cjs,esm --sourcemap",
     "build:cli": "tsup src/cli.ts --sourcemap",
-    "build:chrome-refresh-token": "tsup src/chrome-refresh-token.ts --format esm --sourcemap",
+    "build:chrome-refresh-token": "tsup src/chrome-refresh-token.ts --format cjs --sourcemap",
     "build:test-extension": "node scripts/build-test-extension.js",
     "test": "echo 'TODO'",
     "test:watch": "echo 'TODO'",
