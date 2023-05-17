@@ -10,10 +10,10 @@ function getUniqueVersion() {
   const monthAndDay = date.getUTCMonth() * 100 + date.getUTCDay();
 
   const startOfDay = new Date(date);
-  date.setHours(0);
-  date.setMinutes(0);
-  date.setSeconds(0);
-  date.setMilliseconds(0);
+  startOfDay.setHours(0);
+  startOfDay.setMinutes(0);
+  startOfDay.setSeconds(0);
+  startOfDay.setMilliseconds(0);
 
   // Builds are unique down to every 10 seconds
   const tenthSecondOfDay = Math.round(
