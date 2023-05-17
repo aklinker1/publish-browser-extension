@@ -15,11 +15,13 @@ function getUniqueVersion() {
   date.setSeconds(0);
   date.setMilliseconds(0);
 
-  // Builds are unique down to the second
+  // Builds are unique down to every 10 seconds
   const tenthSecondOfDay = Math.round(
     (date.getTime() - startOfDay.getTime()) / 1e3,
   );
-  return `${year}.${monthAndDay}.${tenthSecondOfDay}`;
+  const version = `${year}.${monthAndDay}.${tenthSecondOfDay}`;
+  console.log('Using version:', version);
+  return version;
 }
 
 async function createExtensionZip(file, customManifest) {
