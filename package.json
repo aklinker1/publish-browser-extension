@@ -30,7 +30,8 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "publish-extension": "dist/cli.cjs"
+    "publish-extension": "dist/cli.cjs",
+    "chrome-refresh-token": "dist/chrome-refresh-token.cjs"
   },
   "scripts": {
     "format": "prettier --write .",
@@ -40,6 +41,7 @@
     "build:clean": "rimraf dist",
     "build:lib": "tsup src/index.ts --dts --format cjs,esm --sourcemap",
     "build:cli": "tsup src/cli.ts --sourcemap",
+    "build:chrome-refresh-token": "tsup src/chrome-refresh-token.ts --format esm --sourcemap",
     "build:test-extension": "node scripts/build-test-extension.js",
     "test": "echo 'TODO'",
     "test:watch": "echo 'TODO'",
@@ -58,7 +60,8 @@
     "lodash.camelcase": "^4.3.0",
     "lodash.kebabcase": "^4.1.1",
     "lodash.snakecase": "^4.1.1",
-    "node-fetch": "^2"
+    "node-fetch": "^2",
+    "open": "^9.1.0"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.8",
