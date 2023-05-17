@@ -5,10 +5,11 @@
 
 #### Features
 
-- [x] Publish to the **Chrome Web Store**
-- [x] Publish to the **Firefox Addon Store**
-- [x] **Upload sources** to the Firefox Addon Store
-- [x] Publish to the **Microsoft Edge Addon Store**
+- Publish to the **Chrome Web Store**
+- Helper script to generate a GCP refresh token
+- Publish to the **Firefox Addon Store**
+- **Upload sources** to the Firefox Addon Store
+- Publish to the **Microsoft Edge Addon Store**
 
 ###### Install
 
@@ -80,6 +81,15 @@ publishExtension({
 })
   .then(results => console.log(results))
   .catch(err => console.error(err));
+```
+
+### Chrome Web Store Refresh Token Generator
+
+This package also ships with a CLI tool called `chrome-refresh-token`, and it can be used to generate a refresh token. Run run it and follow the prompts; provide your client ID, client secret.
+
+```sh
+pnpm i publish-browser-extension
+pnpm chrome-refresh-token
 ```
 
 ## Documentation
