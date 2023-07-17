@@ -72,14 +72,10 @@ main(async () => {
     deps,
   );
 
-  const failureCount = Object.entries(result).reduce((count, [key, result]) => {
-    if (!result.success) {
-      logger.error(key + ':');
-      logger.error(result.err);
-      return count + 1;
-    }
-    return count;
-  }, 0);
+  const failureCount = Object.values(result).reduce(
+    (count, result) => (result.success ? count : count + 1),
+    0,
+  );
 
   process.exit(failureCount);
 });

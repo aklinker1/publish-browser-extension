@@ -78,6 +78,7 @@ async function internalPublishExtension(
     } catch (err) {
       result[key] = { success: false, err };
       spinner.fail();
+      logger.error(err);
       hasFailed = true;
     } finally {
       logger.resumeLogs();
