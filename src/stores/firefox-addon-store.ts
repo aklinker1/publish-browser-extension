@@ -62,7 +62,7 @@ export class FirefoxAddonStore implements IStore {
       )}, ${plural(notices, 'notice')}`,
     );
     if (!upload.valid) throw Error(`Extension is invalid: ${validationUrl}`);
-    else this.log(`Validation results available at: ${validationUrl}`);
+    else this.log(validationUrl);
   }
 
   private async uploadAndPollValidation(
