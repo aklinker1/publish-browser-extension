@@ -48,12 +48,12 @@ jobs:
       - uses: pnpm/action-setup@v2.0.1
         name: Install PNPM
         with:
-          version: 7.x.x
+          version: 8
 
       - name: Install Node 16
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install Dependencies
