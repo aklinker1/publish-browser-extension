@@ -88,7 +88,6 @@ async function internalPublishExtension(
     logger.info(`Published in ${Date.now() - startTime} ms`);
   }
 
-  console.log({ result });
   return result;
 }
 
