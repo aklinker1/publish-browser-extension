@@ -1,3 +1,4 @@
+import consola from 'consola';
 import { AddonsApi } from '../src/apis/addons-api';
 
 // This file is used to generate a token for Insomnia/Postman
@@ -8,4 +9,4 @@ const api = new AddonsApi({
   jwtSecret: process.env.FIREFOX_JWT_SECRET ?? '',
 });
 
-console.log(api['createJwt'](5 * 60));
+consola.info(api['createJwt'](5 * 60));

@@ -24,4 +24,6 @@ export interface InternalPublishOptions {
   edge: EdgeAddonStoreOptions | undefined;
 }
 
-export type Results = Partial<Record<keyof PublishOptions, PublishResult>>;
+export type Results = Partial<
+  Record<keyof Omit<PublishOptions, 'dryRun'>, PublishResult>
+>;

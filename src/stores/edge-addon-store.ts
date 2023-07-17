@@ -1,8 +1,9 @@
 import { DraftOperation, EdgeApi, EdgeTokenDetails } from '../apis/edge-api';
-import { Log } from '../utils/log';
+import { Logger } from '../utils/logger';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import { IStore } from './types';
+import pc from 'picocolors';
 
 export interface EdgeAddonStoreOptions {
   zip: string;
@@ -14,21 +15,26 @@ export interface EdgeAddonStoreOptions {
 }
 
 export class EdgeAddonStore implements IStore {
-  readonly name = 'Edge Addon Store';
+  readonly name = 'Edge Addons';
   private api: EdgeApi;
 
   constructor(
     private readonly options: EdgeAddonStoreOptions,
-    readonly deps: { log: Log },
+    readonly deps: { logger: Logger },
   ) {
     this.api = new EdgeApi(options);
   }
 
+  private log(message: string): void {
+    this.deps.logger.log(pc.dim(`    ${message}`));
+  }
+
   async publish(dryRun?: boolean | undefined): Promise<void> {
+    this.log('Getting an access token...');
     const token = await this.api.getToken();
 
     if (dryRun) {
-      this.deps.log.warn('DRY RUN: Skipping upload and publish...');
+      this.log('DRY RUN: Skipped upload and publishing');
       return;
     }
 
@@ -38,7 +44,7 @@ export class EdgeAddonStore implements IStore {
     await withTimeout(uploadPromise, timeout);
 
     if (this.options.skipSubmitReview) {
-      this.deps.log.warn('Skipping submission (skipSubmitReview=true)');
+      this.log('Skipping submission (skipSubmitReview=true)');
       return;
     }
 
@@ -53,13 +59,14 @@ export class EdgeAddonStore implements IStore {
     token: EdgeTokenDetails,
     pollIntervalMs: number,
   ): Promise<void> {
+    this.log('Uploading new ZIP file...');
     const { operationId } = await this.api.uploadDraft({
       token,
       productId: this.options.productId,
       zipFile: this.options.zip,
     });
 
-    console.log('Waiting for validation results...');
+    this.log('Waiting for validation results...');
     let operation: DraftOperation;
     do {
       await sleep(pollIntervalMs);
@@ -71,9 +78,9 @@ export class EdgeAddonStore implements IStore {
     } while (operation.status === 'InProgress');
 
     if (operation.status === 'Failed') {
-      this.deps.log.error(`Validation Failed: ${operation.message}`);
+      this.deps.logger.error(`Validation Failed: ${operation.message}`);
     } else {
-      console.log('Extension is valid', operation.message);
+      this.log('Extension is valid: ' + operation.message);
     }
   }
 }

@@ -1,8 +1,6 @@
-import { checkStatusCode, responseBody } from '../utils/fetch';
+import { checkStatusCode } from '../utils/fetch';
 import fetch from 'node-fetch';
-import FormData from 'form-data';
 import fs from 'fs';
-import path from 'path';
 
 export interface EdgeApiOptions {
   productId: string;
@@ -69,7 +67,6 @@ export class EdgeApi {
     productId: string;
     zipFile: string;
   }): Promise<DraftResponse> {
-    console.log('Uploading new ZIP file...');
     const endpoint = `https://api.addons.microsoftedge.microsoft.com/v1/products/${params.productId}/submissions/draft/package`;
     const file = fs.createReadStream(params.zipFile);
     const res = await fetch(endpoint, {
