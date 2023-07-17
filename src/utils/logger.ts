@@ -51,7 +51,8 @@ export function printStoreOptions(logger: Logger, name: string, options: any) {
       let v = String(value);
       const isSecret = secretKeys.includes(key);
       if (isSecret) v = v.replaceAll(/./g, '•');
-      if (v.length > maxWidth) v = v.substring(0, maxWidth - 3) + '...';
+      if (v.length > maxWidth && process.env.CI !== 'true')
+        v = v.substring(0, maxWidth - 3) + '...';
       const prefix = i === array.length - 1 ? '└─' : '├─';
       return [pc.dim(`  ${prefix} ${key}:`.padEnd(22, ' ')), pc.blue(v)];
     }),
