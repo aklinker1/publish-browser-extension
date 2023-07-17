@@ -78,7 +78,7 @@ export class EdgeAddonStore implements IStore {
     } while (operation.status === 'InProgress');
 
     if (operation.status === 'Failed') {
-      throw Error(`Validation failed: ${operation.message}`);
+      throw Error(`Validation failed: ${JSON.stringify(null, 2, operation)}`);
     } else {
       this.log('Extension is valid: ' + operation.message);
     }
