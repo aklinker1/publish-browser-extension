@@ -1,8 +1,10 @@
-import { Log } from '../utils/log';
+import { Logger } from '../utils/logger';
 import { AddonsApi, UploadDetails } from '../apis/addons-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import { plural } from '../utils/plural';
+import { IStore } from './types';
+import pc from 'picocolors';
 
 export interface FirefoxAddonStoreOptions {
   zip: string;
@@ -13,23 +15,28 @@ export interface FirefoxAddonStoreOptions {
   channel: 'listed' | 'unlisted';
 }
 
-export class FirefoxAddonStore {
+export class FirefoxAddonStore implements IStore {
   readonly name = 'Firefox Addon Store';
   private api: AddonsApi;
 
   constructor(
     readonly options: FirefoxAddonStoreOptions,
-    readonly deps: { log: Log },
+    readonly deps: { logger: Logger },
   ) {
     this.api = new AddonsApi(options);
   }
 
+  private log(message: string): void {
+    this.deps.logger.log(pc.dim(`    ${message}`));
+  }
+
   async publish(dryRun?: boolean): Promise<void> {
+    this.log('Getting addon details...');
     const addon = await this.api.details({
       extensionId: this.wrappedExtensionId,
     });
     if (dryRun) {
-      this.deps.log.warn('DRY RUN: Skipping upload and publish...');
+      this.log('DRY RUN: Skipped upload and publishing');
       return;
     }
 
@@ -39,7 +46,7 @@ export class FirefoxAddonStore {
     const uploadPromise = this.uploadAndPollValidation(pollInterval);
     const upload = await withTimeout(uploadPromise, timeout);
 
-    console.log('Submitting new version...');
+    this.log('Submitting new version...');
     const version = await this.api.versionCreate({
       extensionId: this.wrappedExtensionId,
       sourceFile: this.options.sourcesZip,
@@ -48,25 +55,26 @@ export class FirefoxAddonStore {
 
     const validationUrl = `https://addons.mozilla.org/en-US/developers/addon/${addon.id}/file/${version.file.id}/validation`;
     const { errors, notices, warnings } = upload.validation;
-    console.log(
+    this.log(
       `Validation results: ${plural(errors, 'error')}, ${plural(
         warnings,
         'warning',
       )}, ${plural(notices, 'notice')}`,
     );
     if (!upload.valid) throw Error(`Extension is invalid: ${validationUrl}`);
-    else console.log(`Validation results available at: ${validationUrl}`);
+    else this.log(validationUrl);
   }
 
   private async uploadAndPollValidation(
     pollIntervalMs: number,
   ): Promise<UploadDetails> {
+    this.log('Uploading new ZIP file...');
     let details = await this.api.uploadCreate({
       file: this.options.zip,
       channel: this.options.channel,
     });
 
-    console.log('Waiting for validation results...');
+    this.log('Waiting for validation results...');
     while (!details.processed) {
       await sleep(pollIntervalMs);
       details = await this.api.uploadDetail(details);

@@ -44,7 +44,6 @@ export class CwsApi {
   }) {
     const Authorization = await this.getAuthHeader(params.token);
 
-    console.log('Uploading new ZIP file...');
     const endpoint = this.uploadEndpoint(params.extensionId);
     const form = new FormData();
     form.append(
@@ -69,7 +68,6 @@ export class CwsApi {
   }) {
     const Authorization = await this.getAuthHeader(params.token);
 
-    console.log('Submitting for review...');
     const endpoint = this.publishEndpoint(params.extensionId);
     if (params.publishTarget)
       endpoint.searchParams.append('publishTarget', params.publishTarget);
@@ -85,7 +83,6 @@ export class CwsApi {
   }
 
   getToken(): Promise<CwsTokenDetails> {
-    console.log('Getting an access token...');
     const endpoint = this.tokenEndpoint();
 
     return fetch(endpoint.href, {

@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 import { publishExtension } from '.';
 import { ChromeWebStore, EdgeAddonStore, FirefoxAddonStore } from './stores';
-import { PublishOptions } from './types';
-import { Log } from './utils/log';
+import { printDocs } from './utils/logger';
 import { cliFlags } from './cli-flags';
+import { consola } from 'consola';
 
 async function main(exec: () => void | Promise<any>) {
   try {
     await exec();
   } catch (err) {
-    console.error(err);
+    consola.error(err);
     process.exit(1);
   }
 }
 
 main(async () => {
-  const log = new Log();
+  const logger = consola;
   const chromeZip = cliFlags.chromeZip().value;
   const firefoxZip = cliFlags.firefoxZip().value;
   const edgeZip = cliFlags.edgeZip().value;
@@ -24,69 +24,58 @@ main(async () => {
     chromeZip == null && firefoxZip == null && edgeZip == null;
   const askedForHelp = cliFlags.help().value;
   if (askedForHelp || nothingToDo) {
-    return log.printDocs();
+    return printDocs(logger);
   }
 
   const deps = {
-    log,
+    logger,
     chrome: ChromeWebStore,
     firefox: FirefoxAddonStore,
     edge: EdgeAddonStore,
   };
 
-  const options: PublishOptions = {
-    dryRun: cliFlags.dryRun().value,
-    chrome: chromeZip
-      ? {
-          zip: chromeZip,
-          extensionId: cliFlags.chromeExtensionId().value,
-          clientId: cliFlags.chromeClientId().value,
-          clientSecret: cliFlags.chromeClientSecret().value,
-          refreshToken: cliFlags.chromeRefreshToken().value,
-          publishTarget: cliFlags.chromePublishTarget().value,
-          skipSubmitReview: cliFlags.chromeSkipSubmitReview().value,
-        }
-      : undefined,
-    firefox: firefoxZip
-      ? {
-          zip: firefoxZip,
-          sourcesZip: cliFlags.firefoxSourcesZip().value,
-          extensionId: cliFlags.firefoxExtensionId().value,
-          jwtIssuer: cliFlags.firefoxJwtIssuer().value,
-          jwtSecret: cliFlags.firefoxJwtSecret().value,
-          channel: cliFlags.firefoxChannel().value,
-        }
-      : undefined,
-    edge: edgeZip
-      ? {
-          zip: edgeZip,
-          productId: cliFlags.edgeProductId().value,
-          clientId: cliFlags.edgeClientId().value,
-          clientSecret: cliFlags.edgeClientSecret().value,
-          accessTokenUrl: cliFlags.edgeAccessTokenUrl().value,
-          skipSubmitReview: cliFlags.edgeSkipSubmitReview().value,
-        }
-      : undefined,
-  };
+  const result = await publishExtension(
+    {
+      dryRun: cliFlags.dryRun().value,
+      chrome: chromeZip
+        ? {
+            zip: chromeZip,
+            extensionId: cliFlags.chromeExtensionId().value,
+            clientId: cliFlags.chromeClientId().value,
+            clientSecret: cliFlags.chromeClientSecret().value,
+            refreshToken: cliFlags.chromeRefreshToken().value,
+            publishTarget: cliFlags.chromePublishTarget().value,
+            skipSubmitReview: cliFlags.chromeSkipSubmitReview().value,
+          }
+        : undefined,
+      firefox: firefoxZip
+        ? {
+            zip: firefoxZip,
+            sourcesZip: cliFlags.firefoxSourcesZip().value,
+            extensionId: cliFlags.firefoxExtensionId().value,
+            jwtIssuer: cliFlags.firefoxJwtIssuer().value,
+            jwtSecret: cliFlags.firefoxJwtSecret().value,
+            channel: cliFlags.firefoxChannel().value,
+          }
+        : undefined,
+      edge: edgeZip
+        ? {
+            zip: edgeZip,
+            productId: cliFlags.edgeProductId().value,
+            clientId: cliFlags.edgeClientId().value,
+            clientSecret: cliFlags.edgeClientSecret().value,
+            accessTokenUrl: cliFlags.edgeAccessTokenUrl().value,
+            skipSubmitReview: cliFlags.edgeSkipSubmitReview().value,
+          }
+        : undefined,
+    },
+    deps,
+  );
 
-  const result = await publishExtension(options, deps);
+  const failureCount = Object.values(result).reduce(
+    (count, result) => (result.success ? count : count + 1),
+    0,
+  );
 
-  let failureCount = 0;
-  if (result.chrome?.success === false) failureCount++;
-  if (result.firefox?.success === false) failureCount++;
-
-  log.blankLine();
-
-  if (failureCount > 0) {
-    log.error(
-      `Publishing failed for ${failureCount} store${
-        failureCount === 1 ? '' : 's'
-      }`,
-    );
-    process.stdout.write('\n');
-    process.exit(failureCount);
-  } else {
-    log.success('Published to all stores');
-    process.stdout.write('\n');
-  }
+  process.exit(failureCount);
 });

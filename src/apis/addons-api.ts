@@ -80,7 +80,6 @@ export class AddonsApi {
    * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#detail
    */
   async details(params: { extensionId: string }): Promise<AddonDetails> {
-    console.log(`Getting addon details...`);
     const endpoint = this.addonDetailEndpoint(params.extensionId);
     const res = await fetch(endpoint.href, {
       headers: {
@@ -98,7 +97,6 @@ export class AddonsApi {
     file: string;
     channel: AddonChannel;
   }): Promise<UploadDetails> {
-    console.log(`Uploading new ZIP file...`);
     const endpoint = this.addonsUploadCreateEndpoint();
     const form = new FormData();
     form.append('channel', params.channel);
