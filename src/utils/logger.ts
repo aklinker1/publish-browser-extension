@@ -50,7 +50,7 @@ export function printStoreOptions(logger: Logger, name: string, options: any) {
     Object.entries(options).map(([key, value], i, array) => {
       let v = String(value);
       const isSecret = secretKeys.includes(key);
-      if (isSecret) v = v.replaceAll(/./g, '•');
+      if (isSecret) v = v.replaceAll(/./g, '*');
       if (v.length > maxWidth && process.env.CI !== 'true')
         v = v.substring(0, maxWidth - 3) + '...';
       const prefix = i === array.length - 1 ? '└─' : '├─';
