@@ -60,9 +60,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Publish
-        run: |
-          ./scripts/dev.sh all
-          echo $?
+        run: ./scripts/dev.sh all
         env:
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.TEST_CHROME_CLIENT_ID }}
