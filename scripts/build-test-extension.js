@@ -5,21 +5,12 @@ import archiver from 'archiver';
 // Utils
 
 function getUniqueVersion() {
-  const date = new Date();
-  const year = String(date.getUTCFullYear()).substring(2);
-  const monthAndDay = date.getUTCMonth() * 100 + date.getUTCDay();
-
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0);
-  startOfDay.setMinutes(0);
-  startOfDay.setSeconds(0);
-  startOfDay.setMilliseconds(0);
-
-  // Builds are unique down to every 10 seconds
-  const tenthSecondOfDay = Math.round(
-    (date.getTime() - startOfDay.getTime()) / 1e3,
-  );
-  const version = `${year}.${monthAndDay}.${tenthSecondOfDay}`;
+  const time = String(Date.now());
+  const major = Number(time.substring(0, 2));
+  const minor = Number(time.substring(2, 5));
+  const patch = Number(time.substring(5, 9));
+  const number = Number(time.substring(9));
+  const version = `${major}.${minor}.${patch}.${number}`;
   console.log('Using version:', version);
   return version;
 }
