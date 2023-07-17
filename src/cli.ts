@@ -75,7 +75,7 @@ main(async () => {
   const failureCount = Object.values(result).reduce((count, result) => {
     if (!result.success) {
       logger.error(result.err);
-      return count++;
+      return count + 1;
     }
     return count;
   }, 0);
