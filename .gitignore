@@ -11,3 +11,4 @@ extension/manifest.json
 extension/*.xpi
 extension/.web-extension-id
 .vscode
+.DS_Store
