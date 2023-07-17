@@ -6,6 +6,7 @@ import {
   EdgeAddonStore,
 } from './stores';
 import { PublishOptions, Results, InternalPublishOptions } from './types';
+import { ensureZipExists } from './utils/fs';
 import { Logger, printStoreOptions } from './utils/logger';
 import { plural } from './utils/plural';
 
@@ -46,16 +47,21 @@ async function internalPublishExtension(
   // Build operations
   const ops: [keyof Results, IStore][] = [];
   if (options.chrome) {
+    await ensureZipExists(options.chrome.zip);
     const store = new deps.chrome(options.chrome, { logger });
     printStoreOptions(logger, store.name, options.chrome);
     ops.push(['chrome', store]);
   }
   if (options.firefox) {
+    await ensureZipExists(options.firefox.zip);
+    if (options.firefox.sourcesZip)
+      await ensureZipExists(options.firefox.sourcesZip);
     const store = new deps.firefox(options.firefox, { logger });
     printStoreOptions(logger, store.name, options.firefox);
     ops.push(['firefox', store]);
   }
   if (options.edge) {
+    await ensureZipExists(options.edge.zip);
     const store = new deps.edge(options.edge, { logger });
     printStoreOptions(logger, store.name, options.edge);
     ops.push(['edge', store]);
