@@ -79,6 +79,7 @@ main(async () => {
     }
     return count;
   }, 0);
+  console.log({ failureCount, values: Object.values(result) });
 
   process.exit(failureCount);
 });
