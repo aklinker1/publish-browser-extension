@@ -38,10 +38,11 @@ jobs:
           output-file: 'false'
           fallback-version: '1.0.0'
 
-      - uses: JS-DevTools/npm-publish@v1
-        name: Publish to NPM
-        with:
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Publish to NPM
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
+          pnpm publish
 
       - name: Create Release
         uses: actions/create-release@v1
