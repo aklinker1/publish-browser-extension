@@ -48,7 +48,7 @@ export class EdgeAddonStore implements IStore {
       return;
     }
 
-    console.log('Submitting new version...');
+    this.log('Submitting new version...');
     await this.api.publish({
       token,
       productId: this.options.productId,
@@ -80,7 +80,7 @@ export class EdgeAddonStore implements IStore {
     if (operation.status === 'Failed') {
       throw Error(`Validation failed: ${JSON.stringify(operation, null, 2)}`);
     } else {
-      this.log('Extension is valid: ' + operation.message);
+      this.log('Extension is valid');
     }
   }
 }
