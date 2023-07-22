@@ -45,6 +45,28 @@ publish-extension \
 
 > See `publish-extension --help` for details on generating and retrieving each of these values
 
+Alternatively, you can provide any of the flags as environment variables:
+
+```
+CHROME_EXTENSION_ID="<cws-extension-id>"
+CHROME_CLIENT_ID="<gcp-client-id>"
+CHROME_CLIENT_SECRET="<gcp-client-secret>"
+CHROME_REFRESH_TOKEN="<gcp-refresh-token>"
+CHROME_PUBLISH_TARGET="<default|trustedTesters>"
+CHROME_SKIP_SUBMIT_REVIEW="true|false"
+
+FIREFOX_EXTENSION_ID="<addons-extension-id>"
+FIREFOX_JWT_ISSUER="<addons-jwt-issuer>"
+FIREFOX_JWT_SECRET="<addons-jwt-secret>"
+FIREFOX_CHANNEL="<listed|unlisted>"
+
+EDGE_PRODUCT_ID="<edge-product-id>"
+EDGE_CLIENT_ID="<edge-client-id>"
+EDGE_CLIENT_SECRET="<edge-client-secret>"
+EDGE_ACCESS_TOKEN_URL="<edge-access-token-url>"
+EDGE_SKIP_SUBMIT_REVIEW="true|false"
+```
+
 ###### JS Usage
 
 <!-- prettier-ignore -->
