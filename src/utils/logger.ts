@@ -58,5 +58,3 @@ export function printStoreOptions(logger: Logger, name: string, options: any) {
     }),
   );
 }
-
-export function printDocs(logger: Logger): void {}
