@@ -2,85 +2,49 @@
 import cac from 'cac';
 import consola from 'consola';
 import { version } from '../../package.json';
-import { loadEnv } from './loadEnv';
-import { Flags } from './flags';
+import { flags } from './flags';
 import * as commands from './commands';
 
 const cli = cac();
 
 // Global options
 
-cli.option('--env-file', '[string] the env file to read secrets from', {
+cli.option(flags.envFile.flag, flags.envFile.description, {
   default: '.env.submit',
 });
 
 cli
+  .option(flags.chromeExtensionId.flag, flags.chromeExtensionId.description)
+  .option(flags.chromeClientId.flag, flags.chromeClientId.description)
+  .option(flags.chromeClientSecret.flag, flags.chromeClientSecret.description)
+  .option(flags.chromeRefreshToken.flag, flags.chromeRefreshToken.description)
   .option(
-    '--chrome-extension-id',
-    '[string] ID of the chrome extension being published',
-  )
-  .option(
-    '--chrome-client-id',
-    '[string] client ID used for authorizing requests to the CWS',
-  )
-  .option(
-    '--chrome-client-secret',
-    '[string] client secret used for authorizing requests to the CWS',
-  )
-  .option(
-    '--chrome-refresh-token',
-    '[string] refresh token used for authorizing requests to the CWS',
-  )
-  .option(
-    '--chrome-publish-target',
-    '[default|trustedTesters] which channel you would like to publish the extension to',
+    flags.chromePublishTarget.flag,
+    flags.chromePublishTarget.description,
     { default: 'default' },
   )
   .option(
-    '--chrome-skip-submit-review',
-    "[bool] just upload the extension zip, don't submit it for review",
+    flags.chromeSkipSubmitReview.flag,
+    flags.chromeSkipSubmitReview.description,
     { default: 'false' },
   );
 
 cli
-  .option(
-    '--firefox-extension-id',
-    "[string] ID of the extension you're publishing",
-  )
-  .option(
-    '--firefox-jwt-issuer',
-    '[string] JWT issuer used for authorizing requests to the Addon Store APIs',
-  )
-  .option(
-    '--firefox-jwt-secret',
-    '[string] JWT secret used for authorizing requests to the Addon Store APIs',
-  )
-  .option(
-    '--firefox-channel',
-    '[listed|unlisted] which channel you would like to publish the extension to',
-    { default: 'listed' },
-  );
+  .option(flags.firefoxExtensionId.flag, flags.firefoxExtensionId.description)
+  .option(flags.firefoxJwtIssuer.flag, flags.firefoxJwtIssuer.description)
+  .option(flags.firefoxJwtSecret.flag, flags.firefoxJwtSecret.description)
+  .option(flags.firefoxChannel.flag, flags.firefoxChannel.description, {
+    default: 'listed',
+  });
 
 cli
+  .option(flags.edgeProductId.flag, flags.edgeProductId.description)
+  .option(flags.edgeClientId.flag, flags.edgeClientId.description)
+  .option(flags.edgeClientSecret.flag, flags.edgeClientSecret.description)
+  .option(flags.edgeAccessTokenUrl.flag, flags.edgeAccessTokenUrl.description)
   .option(
-    '--edge-product-id',
-    "[string] product ID of the extension you're publishing",
-  )
-  .option(
-    '--edge-client-id',
-    "[string] client ID used for authorizing requests to Microsoft's addon API",
-  )
-  .option(
-    '--edge-client-secret',
-    "[string] client secret used for authorizing requests to Microsoft's addon API",
-  )
-  .option(
-    '--edge-access-token-url',
-    "[string] access token URL used for authorizing requests to Microsoft's addon API",
-  )
-  .option(
-    '--edge-skip-submit-review',
-    "[bool] just upload the extension zip, don't submit it for review",
+    flags.edgeSkipSubmitReview.flag,
+    flags.edgeSkipSubmitReview.description,
     { default: 'false' },
   );
 
@@ -90,27 +54,11 @@ cli
   .command('', 'Submit an extension for review', {
     ignoreOptionDefaultValue: true,
   })
-  .option(
-    '--dry-run',
-    "[bool] when true, just test authentication and don't upload ZIP files or submit for review",
-    { default: 'false' },
-  )
-  .option(
-    '--chrome-zip',
-    '[string] the ZIP file you want to upload to the Chrome Web Store',
-  )
-  .option(
-    '--firefox-zip',
-    '[string] the ZIP file you want to upload to the Firefox Addon Store',
-  )
-  .option(
-    '--firefox-sources-zip',
-    '[string] the sources ZIP file you want to upload to the Forefox Addon Store',
-  )
-  .option(
-    '--edge-zip',
-    '[string] the ZIP file you want to upload to the Edge Addon Store',
-  )
+  .option(flags.dryRun.flag, flags.dryRun.description, { default: 'false' })
+  .option(flags.chromeZip.flag, flags.chromeZip.description)
+  .option(flags.firefoxZip.flag, flags.firefoxZip.description)
+  .option(flags.firefoxSourcesZip.flag, flags.firefoxSourcesZip.description)
+  .option(flags.edgeZip.flag, flags.edgeZip.description)
   .action(commands.submit);
 
 // INIT
@@ -120,14 +68,6 @@ cli
     ignoreOptionDefaultValue: true,
   })
   .action(commands.init);
-
-// GET CWS REFRESH TOKEN
-
-cli
-  .command('get-cws-refresh-token', 'Generate a new refresh token', {
-    ignoreOptionDefaultValue: true,
-  })
-  .action(commands.getCwsRefreshToken);
 
 // Execute CLI
 
