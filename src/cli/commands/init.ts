@@ -2,7 +2,6 @@ import { defineCommand } from '../defineCommand';
 import { camelToSnake, Flags } from '../flags';
 import consola from 'consola';
 import { createPrompts } from '../prompts';
-import open from 'open';
 import { ChildProcess } from 'child_process';
 import fetch from 'node-fetch';
 import fs from 'node:fs/promises';
@@ -10,6 +9,8 @@ import fs from 'node:fs/promises';
 export default defineCommand(async flags => {
   const original: Flags = { ...flags };
   delete original['--'];
+
+  const { default: open } = await import('open');
 
   const { stores } = await createPrompts([
     {

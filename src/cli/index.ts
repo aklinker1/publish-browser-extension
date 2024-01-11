@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import cac from 'cac';
 import consola from 'consola';
 import { version } from '../../package.json';

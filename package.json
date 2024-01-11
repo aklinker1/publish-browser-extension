@@ -34,8 +34,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "publish-extension": "dist/cli.cjs",
-    "chrome-refresh-token": "dist/chrome-refresh-token.cjs"
+    "publish-extension": "bin/publish-extension.js"
   },
   "scripts": {
     "format": "prettier --write .",
@@ -44,7 +43,7 @@
     "build": "run-s build:*",
     "build:clean": "rimraf dist",
     "build:lib": "tsup src/index.ts --dts --format cjs,esm --sourcemap",
-    "build:cli": "tsup --entry.cli src/cli/index.ts --sourcemap",
+    "build:cli": "tsup --format esm --entry.cli src/cli/index.ts --sourcemap",
     "build:test-extension": "node scripts/build-test-extension.js",
     "test": "echo 'TODO'",
     "test:watch": "echo 'TODO'",
