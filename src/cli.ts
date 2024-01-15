@@ -1,0 +1,136 @@
+import { cac } from 'cac';
+import { version } from '../package.json';
+import { submit } from './submit';
+import { InlineConfig } from './config';
+
+const cli = cac('publish-extension');
+cli.version(version);
+cli.help();
+
+// All stores
+cli.option(
+  '--dry-run',
+  "Check authentication, but don't upload the zip or submit for review",
+);
+// Chrome
+cli.option('--chrome-zip [chromeZip]', 'Path to extension zip to upload');
+cli.option(
+  '--chrome-extension-id [chromeExtensionId]',
+  'The ID of the extension to be submitted',
+);
+cli.option(
+  '--chrome-client-id [chromeClientId]',
+  'Client ID used for authorizing requests to the Chrome Web Store',
+);
+cli.option(
+  '--chrome-client-secret [chromeClientSecret]',
+  'Client secret used for authorizing requests to the Chrome Web Store',
+);
+cli.option(
+  '--chrome-refresh-token [chromeRefreshToken]',
+  'Refresh token used for authorizing requests to the Chrome Web Store',
+);
+cli.option(
+  '--chrome-publish-target [chromePublishTarget]',
+  'Group to publish to, "default" or "trustedTesters"',
+);
+cli.option(
+  '--chrome-skip-submit-review',
+  "Just upload the extension zip, don't submit it for review or publish it",
+);
+// Firefox
+cli.option('--firefox-zip [firefoxZip]', 'Path to extension zip to upload');
+cli.option(
+  '--firefox-sources-zip [firefoxSourcesZip]',
+  'Path to sources zip to upload',
+);
+cli.option(
+  '--firefox-extension-id [firefoxExtensionId]',
+  'The ID of the extension to be submitted',
+);
+cli.option(
+  '--firefox-jwt-issuer [firefoxJwtIssuer]',
+  'Issuer used for authorizing requests to Addon Store APIs',
+);
+cli.option(
+  '--firefox-jwt-secret [firefoxJwtSecret]',
+  'Secret used for authorizing requests to Addon Store APIs',
+);
+cli.option(
+  '--firefox-channel [firefoxChannel]',
+  'The channel to publish to, "listed" or "unlisted"',
+);
+// Edge
+cli.option('--edge-zip [edgeZip]', 'Path to extension zip to upload');
+cli.option(
+  '--edge-product-id [edgeProductId]',
+  'Product ID listed on the developer dashboard',
+);
+cli.option(
+  '--edge-client-id [edgeClientId]',
+  'Client ID used for authorizing requests to Microsofts addon API',
+);
+cli.option(
+  '--edge-client-secret [edgeClientSecret]',
+  'Client secret used for authorizing requests to Microsofts addon API',
+);
+cli.option(
+  '--edge-access-token-url [edgeAccessTokenUrl]',
+  'Access token URL used for authorizing requests to Microsofts addon API',
+);
+cli.option(
+  '--edge-skip-submit-review',
+  "Just upload the extension zip, don't submit it for review or publish it",
+);
+
+function configFromFlags(flags: any): InlineConfig {
+  return {
+    dryRun: flags.dryRun,
+    chrome: {
+      zip: flags.chromeZip,
+      extensionId: flags.chromeExtensionId,
+      clientId: flags.chromeClientId,
+      clientSecret: flags.chromeClientSecret,
+      refreshToken: flags.chromeRefreshToken,
+      publishTarget: flags.chromePublishTarget,
+      skipSubmitReview: flags.chromeSkipSubmitReview,
+    },
+    firefox: {
+      zip: flags.firefoxZip,
+      sourcesZip: flags.firefoxSourcesZip,
+      extensionId: flags.firefoxExtensionId,
+      jwtIssuer: flags.firefoxJwtIssuer,
+      jwtSecret: flags.firefoxJwtSecret,
+      channel: flags.firefoxChannel,
+    },
+    edge: {
+      zip: flags.edgeZip,
+      productId: flags.edgeProductId,
+      clientId: flags.edgeClientId,
+      clientSecret: flags.edgeClientSecret,
+      accessTokenUrl: flags.edgeAccessTokenUrl,
+      skipSubmitReview: flags.edgeSkipSubmitReview,
+    },
+  };
+}
+
+// SUBMIT
+
+cli
+  .command('', 'Submit an extension to multiple stores for review')
+  .action(async flags => {
+    await submit(configFromFlags(flags));
+  });
+
+// INIT - coming soon
+//
+// cli
+//   .command(
+//     'init',
+//     'Interactive walkthrough to get all the required secrets and options',
+//   )
+//   .action(async flags => {
+//     await init(configFromFlags(flags));
+//   });
+
+cli.parse();

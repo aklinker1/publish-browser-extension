@@ -1,8 +1,9 @@
-import { checkStatusCode, responseBody } from '../utils/fetch';
-import fetch from 'node-fetch';
-import FormData from 'form-data';
+import { createFetch } from 'ofetch';
+import { FormData } from 'formdata-node';
 import fs from 'fs';
 import path from 'path';
+import { fileFromPath } from 'formdata-node/file-from-path';
+import consola from 'consola';
 
 export interface CwsApiOptions {
   clientId: string;
@@ -17,6 +18,12 @@ export interface CwsTokenDetails {
   scope: string;
   token_type: string;
 }
+
+const fetch = createFetch({
+  defaults: {
+    onResponseError: consola.error,
+  },
+});
 
 export class CwsApi {
   constructor(readonly options: CwsApiOptions) {}
@@ -46,19 +53,15 @@ export class CwsApi {
 
     const endpoint = this.uploadEndpoint(params.extensionId);
     const form = new FormData();
-    form.append(
-      'image',
-      fs.createReadStream(params.zipFile),
-      path.basename(params.zipFile),
-    );
+    form.append('image', await fileFromPath(params.zipFile));
     await fetch(endpoint.href, {
       method: 'PUT',
       body: form,
-      headers: form.getHeaders({
+      headers: {
         Authorization,
-        'x-goog-api-version': 2,
-      }),
-    }).then(checkStatusCode);
+        'x-goog-api-version': '2',
+      },
+    });
   }
 
   async submitForReview(params: {
@@ -79,7 +82,7 @@ export class CwsApi {
         'x-goog-api-version': '2',
         'Content-Length': '0',
       },
-    }).then(checkStatusCode);
+    });
   }
 
   getToken(): Promise<CwsTokenDetails> {
@@ -94,9 +97,7 @@ export class CwsApi {
         grant_type: 'refresh_token',
         redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
       }),
-    })
-      .then(checkStatusCode)
-      .then(responseBody<CwsTokenDetails>());
+    });
   }
 
   private async getAuthHeader(token: CwsTokenDetails) {

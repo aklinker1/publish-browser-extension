@@ -34,7 +34,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "publish-extension": "bin/publish-extension.js"
+    "publish-extension": "bin/publish-extension.cjs"
   },
   "scripts": {
     "format": "prettier --write .",
@@ -43,18 +43,21 @@
     "build": "run-s build:*",
     "build:clean": "rimraf dist",
     "build:lib": "tsup src/index.ts --dts --format cjs,esm --sourcemap",
-    "build:cli": "tsup --format esm --entry.cli src/cli/index.ts --sourcemap",
+    "build:cli": "tsup --format cjs --entry.cli src/cli.ts",
     "build:test-extension": "node scripts/build-test-extension.js",
-    "test": "echo 'TODO'",
-    "test:watch": "echo 'TODO'",
+    "test": "vitest",
+    "lint": "run-p -c -s lint:*",
+    "lint:eslint": "echo 'ESLint: TODO'",
+    "test:coverage": "vitest --coverage",
+    "lint:package": "publint",
     "dev:all": "./scripts/dev.sh all",
     "dev:chrome": "./scripts/dev.sh chrome",
     "dev:firefox": "./scripts/dev.sh firefox",
     "dev:edge": "./scripts/dev.sh edge",
     "dev:help": "./scripts/dev.sh help",
-    "publish-extension": "tsx src/cli/index.ts",
+    "publish-extension": "tsx src/cli.ts",
     "prepack": "pnpm build",
-    "prepare": "husky install"
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
     "cac": "^6.7.14",
@@ -62,14 +65,16 @@
     "consola": "^3.2.3",
     "dotenv": "^16.3.1",
     "extract-zip": "^2.0.1",
+    "formdata-node": "^6.0.3",
+    "listr2": "^8.0.1",
     "lodash.camelcase": "^4.3.0",
     "lodash.kebabcase": "^4.1.1",
     "lodash.snakecase": "^4.1.1",
-    "node-fetch": "^2",
+    "ofetch": "^1.3.3",
     "open": "^9.1.0",
     "ora": "^6.3.1",
-    "picocolors": "^1.0.0",
-    "prompts": "^2.4.2"
+    "prompts": "^2.4.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.8",
@@ -79,18 +84,21 @@
     "@types/node": "^18",
     "@types/node-fetch": "^2",
     "@types/prompts": "^2.4.4",
+    "@vitest/coverage-v8": "^1.2.0",
     "archiver": "^5.3.1",
-    "form-data": "^4.0.0",
-    "husky": "^8.0.1",
+    "env-cmd": "^10.1.0",
     "jsonwebtoken": "^8.5.1",
+    "lint-staged": "^15.2.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.6.2",
-    "pretty-quick": "^3.1.3",
+    "prettier": "^3.2.2",
+    "publint": "^0.2.7",
     "rimraf": "^4.4.0",
     "run-all": "^1.0.1",
-    "tsup": "^6.6.3",
+    "simple-git-hooks": "^2.9.0",
+    "tsup": "^8.0.1",
     "tsx": "^3.12.5",
-    "typescript": "^4.7.2"
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
   },
   "pnpm": {
     "peerDependencyRules": {
@@ -102,5 +110,16 @@
         "body-parser"
       ]
     }
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "prettier --ignore-unknown --write"
+  },
+  "changelog": {
+    "excludeAuthors": [
+      "aaronklinker1@gmail.com"
+    ]
   }
 }

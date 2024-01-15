@@ -1,9 +1,10 @@
-import FormData from 'form-data';
+import { FormData } from 'formdata-node';
+import { fileFromPath } from 'formdata-node/file-from-path';
 import jwt from 'jsonwebtoken';
-import fetch from 'node-fetch';
-import { checkStatusCode } from '../utils/fetch';
 import fs from 'fs';
 import path from 'path';
+import { createFetch } from 'ofetch';
+import consola from 'consola';
 
 export interface AddonsApiOptions {
   jwtIssuer: string;
@@ -51,6 +52,12 @@ export interface AddonVersion {
 
 export type AddonChannel = 'listed' | 'unlisted';
 
+const fetch = createFetch({
+  defaults: {
+    onResponseError: consola.error,
+  },
+});
+
 export class AddonsApi {
   constructor(readonly options: AddonsApiOptions) {}
 
@@ -79,15 +86,13 @@ export class AddonsApi {
   /**
    * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#detail
    */
-  async details(params: { extensionId: string }): Promise<AddonDetails> {
+  details(params: { extensionId: string }): Promise<AddonDetails> {
     const endpoint = this.addonDetailEndpoint(params.extensionId);
-    const res = await fetch(endpoint.href, {
+    return fetch(endpoint.href, {
       headers: {
         Authorization: this.getAuthHeader(),
       },
     });
-    await checkStatusCode(res);
-    return await res.json();
   }
 
   /**
@@ -99,36 +104,29 @@ export class AddonsApi {
   }): Promise<UploadDetails> {
     const endpoint = this.addonsUploadCreateEndpoint();
     const form = new FormData();
-    form.append('channel', params.channel);
-    form.append(
-      'upload',
-      fs.createReadStream(params.file),
-      path.basename(params.file),
-    );
 
-    const res = await fetch(endpoint.href, {
+    form.append('channel', params.channel);
+    form.append('upload', await fileFromPath(params.file));
+
+    return await fetch(endpoint.href, {
       method: 'POST',
       body: form,
-      headers: form.getHeaders({
+      headers: {
         Authorization: this.getAuthHeader(),
-      }),
+      },
     });
-    await checkStatusCode(res);
-    return await res.json();
   }
 
   /**
    * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-detail
    */
-  async uploadDetail(params: { uuid: string }): Promise<UploadDetails> {
+  uploadDetail(params: { uuid: string }): Promise<UploadDetails> {
     const endpoint = this.addonsUploadDetailsEndpoint(params.uuid);
-    const res = await fetch(endpoint.href, {
+    return fetch(endpoint.href, {
       headers: {
         Authorization: this.getAuthHeader(),
       },
     });
-    await checkStatusCode(res);
-    return await res.json();
   }
 
   async versionCreate(params: {
@@ -140,24 +138,18 @@ export class AddonsApi {
     const form = new FormData();
     form.append('upload', params.uploadUuid);
     if (params.sourceFile) {
-      form.append(
-        'source',
-        fs.createReadStream(params.sourceFile),
-        path.basename(params.sourceFile),
-      );
+      form.append('source', await fileFromPath(params.sourceFile));
     } else {
       form.append('source', '');
     }
 
-    const res = await fetch(endpoint.href, {
+    return await fetch(endpoint.href, {
       method: 'POST',
       body: form,
-      headers: form.getHeaders({
+      headers: {
         Authorization: this.getAuthHeader(),
-      }),
+      },
     });
-    await checkStatusCode(res);
-    return await res.json();
   }
 
   /**

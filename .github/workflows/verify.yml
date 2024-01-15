@@ -29,6 +29,9 @@ jobs:
       - name: Type Check
         run: pnpm compile
 
+      - name: Lint
+        run: pnpm lint
+
       - name: Build
         run: pnpm build
 
@@ -36,7 +39,7 @@ jobs:
         run: pnpm test
 
       - name: Check CLI
-        run: node dist/cli.cjs --help
+        run: node bin/publish-extension.cjs --help
 
   e2e-test:
     name: E2E Publish Test
