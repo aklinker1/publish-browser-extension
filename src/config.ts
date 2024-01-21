@@ -118,6 +118,7 @@ export type InternalConfig = z.infer<typeof InternalConfig>;
 
 interface CustomEnv {
   DRY_RUN: string | undefined;
+
   CHROME_CLIENT_ID: string | undefined;
   CHROME_CLIENT_SECRET: string | undefined;
   CHROME_EXTENSION_ID: string | undefined;

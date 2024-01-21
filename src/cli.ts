@@ -2,6 +2,7 @@ import { cac } from 'cac';
 import { version } from '../package.json';
 import { submit } from './submit';
 import { InlineConfig } from './config';
+import { init } from './init';
 
 const cli = cac('publish-extension');
 cli.version(version);
@@ -122,15 +123,24 @@ cli
     await submit(configFromFlags(flags));
   });
 
-// INIT - coming soon
-//
-// cli
-//   .command(
-//     'init',
-//     'Interactive walkthrough to get all the required secrets and options',
-//   )
-//   .action(async flags => {
-//     await init(configFromFlags(flags));
-//   });
+// INIT
+
+cli
+  .command(
+    'init',
+    'Interactive walkthrough to initialize or update secrets and options for each store',
+  )
+  .action(async flags => {
+    await init(
+      configFromFlags({
+        // Apply some placeholder flags so all the options resolve correctly (if zip doesn't exist,
+        // none of the related options are included, and init always things you haven't entered anything yet)
+        chromeZip: '...',
+        firefoxZip: '...',
+        edgeZip: '...',
+        ...flags,
+      }),
+    );
+  });
 
 cli.parse();
