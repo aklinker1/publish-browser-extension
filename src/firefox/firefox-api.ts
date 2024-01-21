@@ -54,7 +54,10 @@ export type AddonChannel = 'listed' | 'unlisted';
 
 const fetch = createFetch({
   defaults: {
-    onResponseError: consola.error,
+    onResponseError: ctx => {
+      console.log('Reqeust:', ctx.request);
+      console.log('Response:', JSON.stringify(ctx.response, null, 2));
+    },
   },
 });
 
