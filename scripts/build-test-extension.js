@@ -1,6 +1,7 @@
 import { writeFile } from 'fs/promises';
 import { createWriteStream } from 'fs';
 import archiver from 'archiver';
+import consola from 'consola';
 
 // Utils
 
@@ -11,7 +12,7 @@ function getUniqueVersion() {
   const patch = Number(time.substring(5, 9));
   const number = Number(time.substring(9));
   const version = `${major}.${minor}.${patch}.${number}`;
-  console.log('Using version:', version);
+  consola.info('Using version:', version);
   return version;
 }
 
@@ -32,7 +33,6 @@ async function createExtensionZip(file, customManifest) {
 
   const manifest = {
     name: 'CI/CD Test',
-    version: getUniqueVersion(),
     ...customManifest,
   };
   await writeFile(extensionManifest, JSON.stringify(manifest, null, 2));
@@ -44,19 +44,25 @@ async function createExtensionZip(file, customManifest) {
   return done;
 }
 
+consola.start('Creating extension ZIPs to upload...');
+
 const chromeZip = 'extension/chrome.zip';
 const firefoxZip = 'extension/firefox.zip';
 const extensionManifest = 'extension/manifest.json';
+const version = getUniqueVersion();
 
 await createExtensionZip(chromeZip, {
+  version,
   manifest_version: 3,
   background: {
     service_worker: 'background.js',
   },
 });
 await createExtensionZip(firefoxZip, {
+  version,
   manifest_version: 2,
   background: {
     scripts: ['background.js'],
   },
 });
+consola.success('Done');

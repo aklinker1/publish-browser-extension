@@ -11,7 +11,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
 
   const internalConfig = resolveConfig(config);
 
-  consola.log('');
+  console.log('');
   consola.info('Publishing Extension');
   if (internalConfig.dryRun) {
     consola.warn('Dry run, skipping submission');
@@ -62,7 +62,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
       async task(_ctx, task) {
         try {
           const setStatus = (text: string) => {
-            task.output = text + '...';
+            task.output = text;
           };
           const store = getStore(setStatus);
 
