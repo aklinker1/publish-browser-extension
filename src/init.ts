@@ -59,7 +59,7 @@ async function prompt<T>(
   });
   // When canceling, a symbol is returned instead of the value.
   if (typeof result === 'symbol') {
-    process.exit(1);
+    throw Error('Canceled');
   }
   return result as T;
 }

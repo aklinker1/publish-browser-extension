@@ -80,6 +80,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     {
       exitOnError: false,
       collectErrors: 'minimal',
+      concurrent: true,
     },
   );
   await tasks.run();

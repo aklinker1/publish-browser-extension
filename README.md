@@ -9,7 +9,7 @@ https://github.com/aklinker1/publish-browser-extension/assets/10101283/654e2dd2-
 - Helper script to generate secrets and configure options
 - **Upload sources ZIP** to the Firefox Addon Store
 
-> [Warning!]
+> [!IMPORTANT]
 >
 > You are responsible for uploading and submitting an extension for the first time by hand. `publish-browser-extension` does not provide tools for creating a new extension.
 
@@ -40,7 +40,7 @@ publish-extension \
   --edge-zip dist/chrome.zip
 ```
 
-> [Note!]
+> [!NOTE]
 >
 > `publish-extension` does not load any `.env` files, you're responsible for making sure the environment varaibles are set while running the command. In CI, this is easy, but to run the command locally, you'll need to use something like the `env-cmd` package:
 >
@@ -107,7 +107,7 @@ publishExtension({
    ```sh
    pnpm publish-extension init
    ```
-   > [Warning!]
+   > [!WARNING]
    >
    > Make sure to set the Firefox channel to "unlisted", chrome's publish target to "trustedTesters", and don't submit the extension for review for Chrome or Edge. This will prevent you from accidentally releasing one of the test extensions publically.
 5. Run the dev commands to upload a test extension to the stores:
