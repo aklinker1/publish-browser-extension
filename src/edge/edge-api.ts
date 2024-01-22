@@ -1,6 +1,7 @@
-import { checkStatusCode } from '../utils/fetch';
-import fetch from 'node-fetch';
+import { createFetch } from 'ofetch';
 import fs from 'fs';
+import consola from 'consola';
+import { fetch } from '../utils/fetch';
 
 export interface EdgeApiOptions {
   productId: string;
@@ -38,7 +39,7 @@ export class EdgeApi {
   /**
    * Docs: https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api#sample-request
    */
-  async getToken(): Promise<EdgeTokenDetails> {
+  getToken(): Promise<EdgeTokenDetails> {
     const form = new URLSearchParams();
     form.set('client_id', this.options.clientId);
     form.set(
@@ -48,15 +49,13 @@ export class EdgeApi {
     form.set('client_secret', this.options.clientSecret);
     form.set('grant_type', 'client_credentials');
 
-    const res = await fetch(this.options.accessTokenUrl, {
+    return fetch(this.options.accessTokenUrl, {
       method: 'POST',
       body: form,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
-    await checkStatusCode(res);
-    return await res.json();
   }
 
   /**
@@ -69,7 +68,7 @@ export class EdgeApi {
   }): Promise<DraftResponse> {
     const endpoint = `https://api.addons.microsoftedge.microsoft.com/v1/products/${params.productId}/submissions/draft/package`;
     const file = fs.createReadStream(params.zipFile);
-    const res = await fetch(endpoint, {
+    const res = await fetch.raw(endpoint, {
       method: 'POST',
       body: file,
       headers: {
@@ -77,7 +76,6 @@ export class EdgeApi {
         'Content-Type': 'application/zip',
       },
     });
-    await checkStatusCode(res);
     const operationId = res.headers.get('Location');
     if (!operationId)
       throw Error(
@@ -89,19 +87,17 @@ export class EdgeApi {
   /**
    * Docs: https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api#checking-the-status-of-a-package-upload
    */
-  async uploadDraftOperation(params: {
+  uploadDraftOperation(params: {
     token: EdgeTokenDetails;
     productId: string;
     operationId: string;
   }): Promise<DraftOperation> {
     const endpoint = `https://api.addons.microsoftedge.microsoft.com/v1/products/${params.productId}/submissions/draft/package/operations/${params.operationId}`;
-    const res = await fetch(endpoint, {
+    return fetch(endpoint, {
       headers: {
         Authorization: this.getAuthHeader(params.token),
       },
     });
-    await checkStatusCode(res);
-    return await res.json();
   }
 
   /**
@@ -119,7 +115,6 @@ export class EdgeApi {
         Authorization: this.getAuthHeader(params.token),
       },
     });
-    await checkStatusCode(res);
   }
 
   private getAuthHeader(token: EdgeTokenDetails): string {

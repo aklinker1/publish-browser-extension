@@ -1,73 +1,54 @@
 <h1 align="center">Publish Browser Extension</h1>
 <p align="center">Publish an extension to all the extension stores in a single command!</p>
 
-![Demo](.github/assets/demo.png)
+https://github.com/aklinker1/publish-browser-extension/assets/10101283/b0e856ca-4e26-4c7e-9ff8-c900e203cab5
 
-#### Features
+## Features
 
-- Publish to the **Chrome Web Store**
-- Helper script to generate a GCP refresh token
-- Publish to the **Firefox Addon Store**
-- **Upload sources** to the Firefox Addon Store
-- Publish to the **Microsoft Edge Addon Store**
+- Publish to the **Chrome Web Store**, **Firefox Addon Store**, and **Edge Addon Store**
+- Helper script to generate secrets and configure options
+- **Upload sources ZIP** to the Firefox Addon Store
 
-###### Install
+> [!IMPORTANT]
+>
+> You are responsible for uploading and submitting an extension for the first time by hand. `publish-browser-extension` does not provide tools for creating a new extension.
 
-```bash
+## Install
+
+```sh
 npm i -D publish-browser-extension
+pnpm i -D publish-browser-extension
+yarn add -D publish-browser-extension
 ```
 
-###### CLI Usage
+## CLI Usage
 
-```bash
+To get started, run the init command. It will walk you through generating all the necessary environment variables/CLI flags, saving them to a `.env.submit` file:
+
+```sh
+publish-extension init
+```
+
+> All CLI flags can be passed as environment variables instead. For example, setting the `CHROME_CLIENT_ID` environment variable is equivalent to passing `--chrome-client-id`. Just convert the flag to UPPER_SNAKE_CASE.
+
+Then, just run the submit command, passing the ZIP files you want to submit:
+
+```sh
 publish-extension \
-    --dry-run \
-    --chrome-zip "dist/chrome.zip" \
-    --chrome-extension-id "<cws-extension-id>" \
-    --chrome-client-id "<gcp-client-id>" \
-    --chrome-client-secret "<gcp-client-secret>" \
-    --chrome-refresh-token "<gcp-refresh-token>" \
-    --chrome-publish-target "<default|trustedTesters>" \
-    --chrome-skip-submit-review \
-    --firefox-zip "dist/firefox.zip" \
-    --firefox-sources-zip "dist/sources.zip" \
-    --firefox-extension-id "<addons-extension-id>" \
-    --firefox-jwt-issuer "<addons-jwt-issuer>" \
-    --firefox-jwt-secret "<addons-jwt-secret>" \
-    --firefox-channel "<listed|unlisted>" \
-    --edge-zip "dist/chrome.zip" \
-    --edge-product-id "<edge-product-id>" \
-    --edge-client-id "<edge-client-id>" \
-    --edge-client-secret "<edge-client-secret>" \
-    --edge-access-token-url "<edge-access-token-url>" \
-    --edge-skip-submit-review
+  --chrome-zip dist/chrome.zip \
+  --firefox-zip dist/firefox.zip --firefox-sources-zip dist/sources.zip \
+  --edge-zip dist/chrome.zip
 ```
 
-> See `publish-extension --help` for details on generating and retrieving each of these values
+> [!NOTE]
+>
+> `publish-extension` does not load any `.env` files, you're responsible for making sure the environment varaibles are set while running the command. In CI, this is easy, but to run the command locally, you'll need to use something like the `env-cmd` package:
+>
+> ```sh
+> pnpm env-cmd -f .env.submit publish-extension ...
+> ```
 
-Alternatively, you can provide any of the flags as environment variables:
-
-```
-CHROME_EXTENSION_ID="<cws-extension-id>"
-CHROME_CLIENT_ID="<gcp-client-id>"
-CHROME_CLIENT_SECRET="<gcp-client-secret>"
-CHROME_REFRESH_TOKEN="<gcp-refresh-token>"
-CHROME_PUBLISH_TARGET="<default|trustedTesters>"
-CHROME_SKIP_SUBMIT_REVIEW="true|false"
-
-FIREFOX_EXTENSION_ID="<addons-extension-id>"
-FIREFOX_JWT_ISSUER="<addons-jwt-issuer>"
-FIREFOX_JWT_SECRET="<addons-jwt-secret>"
-FIREFOX_CHANNEL="<listed|unlisted>"
-
-EDGE_PRODUCT_ID="<edge-product-id>"
-EDGE_CLIENT_ID="<edge-client-id>"
-EDGE_CLIENT_SECRET="<edge-client-secret>"
-EDGE_ACCESS_TOKEN_URL="<edge-access-token-url>"
-EDGE_SKIP_SUBMIT_REVIEW="true|false"
-```
-
-###### JS Usage
+## JS Usage
 
 <!-- prettier-ignore -->
 ```js
@@ -105,99 +86,34 @@ publishExtension({
   .catch(err => console.error(err));
 ```
 
-### Chrome Web Store Refresh Token Generator
-
-This package also ships with a CLI tool called `chrome-refresh-token`, and it can be used to generate a refresh token. Run run it and follow the prompts; provide your client ID, client secret.
-
-```sh
-pnpm i publish-browser-extension
-pnpm chrome-refresh-token
-```
-
-## Documentation
-
-For docs, run `publish-extension --help`. It includes everything you'll need: examples, flags, environment variables, steps to retrieve secrets, etc.
-
 ## Contributing
 
 <a href="https://github.com/aklinker1/publish-browser-extension/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=aklinker1/publish-browser-extension" />
 </a>
 
-### Setup
+### Contributor Setup
 
 1. Install [node](https://nodejs.org)
 2. Install [`pnpm`](https://pnpm.io/)
-   ```bash
-   npm i -g pnpm
+   ```sh
+   corepack enable
    ```
 3. Install dependencies
-   ```bash
+   ```sh
    pnpm i
    ```
-4. Copy `.env.template` &rarr; `.env` and fill it out
-   ```bash
-   cp .env.template .env
+4. Run the `init` command to generate a `.env.submit` file for testing
+   ```sh
+   pnpm publish-extension init
    ```
-
-### Scripts
-
-Checkout the scripts in the `package.json`, they're all self-explanatory, but here are some examples:
-
-```bash
-pnpm format  # Run prettier to format source code
-pnpm test    # Run unit tests
-```
-
-### Manual Testing
-
-The `dev` scripts are going to be the main way of manually testing the tool.
-
-```sh
-# Firefox and Chrome
-pnpm dev:all
-
-# Just Chrome
-pnpm dev:chrome
-
-# Just Firefox
-pnpm dev:firefox
-```
-
-### First Time Setup
-
-Before running any of the dev commands, you have to upload a test extension to the stores. This is the extension the dev commands will publish updates for.
-
-1. Run `pnpm build`. This will build the library, but also create a test extension for you to upload
-1. In the Chrome Web Store, create a new extension using `extension/chrome.zip`, but don't submit it for review
-1. In the Firefox Addon Store, create a new extension using `extension/firefox.zip`, and set it as unlisted
-
-Next, you'll need to setup a `.env` file that contains all the secrets
-
-```env
-# Your extension's ID is listed under the extension name at the top of the store listing page
-CHROME_EXTENSION_ID=<chrome.runtime.id>
-# Follow Google's docs to get these secrets:
-# https://developer.chrome.com/docs/webstore/using_webstore_api/
-CHROME_CLIENT_ID=...
-CHROME_CLIENT_SECRET=...
-CHROME_REFRESH_TOKEN=...
-
-# Your extension's UUID listed under the "technical details" section of the addon developer hub's page
-FIREFOX_EXTENSION_ID=...
-# Follow Mozilla docs for getting your credentials for the addon-server API
-# https://addons-server.readthedocs.io/en/latest/topics/api/auth.html#access-credentials
-FIREFOX_JWT_ISSUER=...
-FIREFOX_JWT_SECRET=...
-
-# Make sure you don't submit either extension for review or publish to production
-CHROME_SKIP_SUBMIT_REVIEW=true
-CHROME_PUBLISH_TARGET=trustedTesters
-FIREFOX_CHANNEL=unlisted
-```
-
-Then you can run the `dev` scripts to test out the publish CLI tool.
-
-```bash
-pnpm dev:all
-```
+   > [!WARNING]
+   >
+   > Make sure to set the Firefox channel to "unlisted", chrome's publish target to "trustedTesters", and don't submit the extension for review for Chrome or Edge. This will prevent you from accidentally releasing one of the test extensions publically.
+5. Run the dev commands to upload a test extension to the stores:
+   ```sh
+   pnpm env-cmd -f .env.submit pnpm dev:all
+   pnpm env-cmd -f .env.submit pnpm dev:chrome
+   pnpm env-cmd -f .env.submit pnpm dev:firefox
+   pnpm env-cmd -f .env.submit pnpm dev:edge
+   ```

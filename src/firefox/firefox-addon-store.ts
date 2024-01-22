@@ -1,42 +1,46 @@
-import { Logger } from '../utils/logger';
-import { AddonsApi, UploadDetails } from '../apis/addons-api';
+import { AddonsApi, UploadDetails } from './firefox-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import { plural } from '../utils/plural';
-import { IStore } from './types';
-import pc from 'picocolors';
+import { Store } from '../utils/store';
+import { z } from 'zod';
+import { ensureZipExists } from '../utils/fs';
+import consola from 'consola';
 
-export interface FirefoxAddonStoreOptions {
-  zip: string;
-  sourcesZip?: string;
-  extensionId: string;
-  jwtIssuer: string;
-  jwtSecret: string;
-  channel: 'listed' | 'unlisted';
-}
+export const FirefoxAddonStoreOptions = z.object({
+  zip: z.string().min(1),
+  sourcesZip: z.string().min(1).optional(),
+  extensionId: z.string().min(1),
+  jwtIssuer: z.string().min(1),
+  jwtSecret: z.string().min(1),
+  channel: z.enum(['listed', 'unlisted']).default('listed'),
+});
+export type FirefoxAddonStoreOptions = z.infer<typeof FirefoxAddonStoreOptions>;
 
-export class FirefoxAddonStore implements IStore {
-  readonly name = 'Firefox Addon Store';
+export class FirefoxAddonStore implements Store {
   private api: AddonsApi;
 
   constructor(
     readonly options: FirefoxAddonStoreOptions,
-    readonly deps: { logger: Logger },
+    readonly setStatus: (text: string) => void,
   ) {
     this.api = new AddonsApi(options);
   }
 
-  private log(message: string): void {
-    this.deps.logger.log(pc.dim(`    ${message}`));
+  async ensureZipsExist(): Promise<void> {
+    await ensureZipExists(this.options.zip);
+    if (this.options.sourcesZip) {
+      await ensureZipExists(this.options.sourcesZip);
+    }
   }
 
-  async publish(dryRun?: boolean): Promise<void> {
-    this.log('Getting addon details...');
+  async submit(dryRun?: boolean): Promise<void> {
+    this.setStatus('Getting addon details');
     const addon = await this.api.details({
       extensionId: this.wrappedExtensionId,
     });
     if (dryRun) {
-      this.log('DRY RUN: Skipped upload and publishing');
+      this.setStatus('DRY RUN: Skipped upload and publishing');
       return;
     }
 
@@ -46,7 +50,7 @@ export class FirefoxAddonStore implements IStore {
     const uploadPromise = this.uploadAndPollValidation(pollInterval);
     const upload = await withTimeout(uploadPromise, timeout);
 
-    this.log('Submitting new version...');
+    this.setStatus('Submitting new version');
     const version = await this.api.versionCreate({
       extensionId: this.wrappedExtensionId,
       sourceFile: this.options.sourcesZip,
@@ -55,26 +59,26 @@ export class FirefoxAddonStore implements IStore {
 
     const validationUrl = `https://addons.mozilla.org/en-US/developers/addon/${addon.id}/file/${version.file.id}/validation`;
     const { errors, notices, warnings } = upload.validation;
-    this.log(
+    this.setStatus(
       `Validation results: ${plural(errors, 'error')}, ${plural(
         warnings,
         'warning',
       )}, ${plural(notices, 'notice')}`,
     );
     if (!upload.valid) throw Error(`Extension is invalid: ${validationUrl}`);
-    else this.log(validationUrl);
+    else console.log('Firefox validation results: ' + validationUrl);
   }
 
   private async uploadAndPollValidation(
     pollIntervalMs: number,
   ): Promise<UploadDetails> {
-    this.log('Uploading new ZIP file...');
+    this.setStatus('Uploading new ZIP file');
     let details = await this.api.uploadCreate({
       file: this.options.zip,
       channel: this.options.channel,
     });
 
-    this.log('Waiting for validation results...');
+    this.setStatus('Waiting for validation results');
     while (!details.processed) {
       await sleep(pollIntervalMs);
       details = await this.api.uploadDetail(details);

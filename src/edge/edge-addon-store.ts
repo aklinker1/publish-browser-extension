@@ -1,40 +1,41 @@
-import { DraftOperation, EdgeApi, EdgeTokenDetails } from '../apis/edge-api';
-import { Logger } from '../utils/logger';
+import { DraftOperation, EdgeApi, EdgeTokenDetails } from './edge-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
-import { IStore } from './types';
-import pc from 'picocolors';
+import { Store } from '../utils/store';
+import { z } from 'zod';
+import { ensureZipExists } from '../utils/fs';
+import consola from 'consola';
 
-export interface EdgeAddonStoreOptions {
-  zip: string;
-  productId: string;
-  clientId: string;
-  clientSecret: string;
-  accessTokenUrl: string;
-  skipSubmitReview: boolean;
-}
+export const EdgeAddonStoreOptions = z.object({
+  zip: z.string().min(1),
+  productId: z.string().min(1),
+  clientId: z.string().min(1),
+  clientSecret: z.string().min(1),
+  accessTokenUrl: z.string().min(1),
+  skipSubmitReview: z.boolean().default(false),
+});
+export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptions>;
 
-export class EdgeAddonStore implements IStore {
-  readonly name = 'Edge Addons';
+export class EdgeAddonStore implements Store {
   private api: EdgeApi;
 
   constructor(
     private readonly options: EdgeAddonStoreOptions,
-    readonly deps: { logger: Logger },
+    readonly setStatus: (text: string) => void,
   ) {
     this.api = new EdgeApi(options);
   }
 
-  private log(message: string): void {
-    this.deps.logger.log(pc.dim(`    ${message}`));
+  async ensureZipsExist(): Promise<void> {
+    await ensureZipExists(this.options.zip);
   }
 
-  async publish(dryRun?: boolean | undefined): Promise<void> {
-    this.log('Getting an access token...');
+  async submit(dryRun?: boolean | undefined): Promise<void> {
+    this.setStatus('Getting an access token');
     const token = await this.api.getToken();
 
     if (dryRun) {
-      this.log('DRY RUN: Skipped upload and publishing');
+      this.setStatus('DRY RUN: Skipped upload and publishing');
       return;
     }
 
@@ -44,11 +45,11 @@ export class EdgeAddonStore implements IStore {
     await withTimeout(uploadPromise, timeout);
 
     if (this.options.skipSubmitReview) {
-      this.log('Skipping submission (skipSubmitReview=true)');
+      this.setStatus('Skipping submission (skipSubmitReview=true)');
       return;
     }
 
-    this.log('Submitting new version...');
+    this.setStatus('Submitting new version');
     await this.api.publish({
       token,
       productId: this.options.productId,
@@ -59,14 +60,14 @@ export class EdgeAddonStore implements IStore {
     token: EdgeTokenDetails,
     pollIntervalMs: number,
   ): Promise<void> {
-    this.log('Uploading new ZIP file...');
+    this.setStatus('Uploading new ZIP file');
     const { operationId } = await this.api.uploadDraft({
       token,
       productId: this.options.productId,
       zipFile: this.options.zip,
     });
 
-    this.log('Waiting for validation results...');
+    this.setStatus('Waiting for validation results');
     let operation: DraftOperation;
     do {
       await sleep(pollIntervalMs);
@@ -80,7 +81,7 @@ export class EdgeAddonStore implements IStore {
     if (operation.status === 'Failed') {
       throw Error(`Validation failed: ${JSON.stringify(operation, null, 2)}`);
     } else {
-      this.log('Extension is valid');
+      this.setStatus('Extension is valid');
     }
   }
 }
