@@ -1,9 +1,8 @@
 import { createFetch } from 'ofetch';
 import { FormData } from 'formdata-node';
-import fs from 'fs';
-import path from 'path';
 import { fileFromPath } from 'formdata-node/file-from-path';
 import consola from 'consola';
+import { fetch } from '../utils/fetch';
 
 export interface CwsApiOptions {
   clientId: string;
@@ -18,12 +17,6 @@ export interface CwsTokenDetails {
   scope: string;
   token_type: string;
 }
-
-const fetch = createFetch({
-  defaults: {
-    onResponseError: consola.error,
-  },
-});
 
 export class CwsApi {
   constructor(readonly options: CwsApiOptions) {}

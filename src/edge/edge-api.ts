@@ -1,6 +1,7 @@
 import { createFetch } from 'ofetch';
 import fs from 'fs';
 import consola from 'consola';
+import { fetch } from '../utils/fetch';
 
 export interface EdgeApiOptions {
   productId: string;
@@ -31,12 +32,6 @@ export interface DraftOperation {
   errorCode: string | null;
   errors: string[] | null;
 }
-
-const fetch = createFetch({
-  defaults: {
-    onResponseError: consola.error,
-  },
-});
 
 export class EdgeApi {
   constructor(readonly options: EdgeApiOptions) {}

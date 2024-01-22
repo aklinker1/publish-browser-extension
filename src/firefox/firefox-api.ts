@@ -1,10 +1,7 @@
 import { FormData } from 'formdata-node';
 import { fileFromPath } from 'formdata-node/file-from-path';
 import jwt from 'jsonwebtoken';
-import fs from 'fs';
-import path from 'path';
-import { createFetch } from 'ofetch';
-import consola from 'consola';
+import { fetch } from '../utils/fetch';
 
 export interface AddonsApiOptions {
   jwtIssuer: string;
@@ -51,15 +48,6 @@ export interface AddonVersion {
 }
 
 export type AddonChannel = 'listed' | 'unlisted';
-
-const fetch = createFetch({
-  defaults: {
-    onResponseError: ctx => {
-      console.log('Reqeust:', ctx.request);
-      console.log('Response:', JSON.stringify(ctx.response, null, 2));
-    },
-  },
-});
 
 export class AddonsApi {
   constructor(readonly options: AddonsApiOptions) {}

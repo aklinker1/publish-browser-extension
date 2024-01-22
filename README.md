@@ -1,7 +1,7 @@
 <h1 align="center">Publish Browser Extension</h1>
 <p align="center">Publish an extension to all the extension stores in a single command!</p>
 
-https://github.com/aklinker1/publish-browser-extension/assets/10101283/654e2dd2-d36a-48dc-9730-2ca1464da677
+https://github.com/aklinker1/publish-browser-extension/assets/10101283/b0e856ca-4e26-4c7e-9ff8-c900e203cab5
 
 ## Features
 
@@ -112,8 +112,8 @@ publishExtension({
    > Make sure to set the Firefox channel to "unlisted", chrome's publish target to "trustedTesters", and don't submit the extension for review for Chrome or Edge. This will prevent you from accidentally releasing one of the test extensions publically.
 5. Run the dev commands to upload a test extension to the stores:
    ```sh
-   pnpm dev:all
-   pnpm dev:chrome
-   pnpm dev:firefox
-   pnpm dev:edge
+   pnpm env-cmd -f .env.submit pnpm dev:all
+   pnpm env-cmd -f .env.submit pnpm dev:chrome
+   pnpm env-cmd -f .env.submit pnpm dev:firefox
+   pnpm env-cmd -f .env.submit pnpm dev:edge
    ```
