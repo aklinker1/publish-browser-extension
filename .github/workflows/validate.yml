@@ -1,4 +1,4 @@
-name: Verify
+name: Validate
 on: [push, workflow_call]
 
 jobs:
@@ -6,64 +6,36 @@ jobs:
     name: Verify Code
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-
-      - uses: pnpm/action-setup@v2.0.1
-        name: Install PNPM
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
         with:
           version: 8
-
-      - name: Install Node
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Formatting
-        run: pnpm format:check
-
-      - name: Type Check
-        run: pnpm compile
-
-      - name: Build
-        run: pnpm build
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Test
-        run: pnpm test
-
-      - name: Check CLI
-        run: node bin/publish-extension.cjs --help
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm format:check
+      - run: pnpm compile
+      - run: pnpm build
+      - run: pnpm lint
+      - run: pnpm test
+      - run: node bin/publish-extension.cjs --help
 
   e2e-test:
     name: E2E Publish Test
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-
-      - uses: pnpm/action-setup@v2.0.1
-        name: Install PNPM
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
         with:
           version: 8
-
-      - name: Install Node 16
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Publish
-        run: ./scripts/dev.sh all
+          cache: pnpm
+      - run: pnpm install
+      - run: ./scripts/dev.sh all
         env:
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.TEST_CHROME_CLIENT_ID }}
