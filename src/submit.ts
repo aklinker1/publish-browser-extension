@@ -62,7 +62,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
       async task(_ctx, task) {
         try {
           const setStatus = (text: string) => {
-            task.output = text;
+            task.output = `[${name}] ${text}`;
           };
           const store = getStore(setStatus);
 
