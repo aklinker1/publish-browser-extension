@@ -4,6 +4,9 @@ import { submit } from './submit';
 import { InlineConfig } from './config';
 import { init } from './init';
 import consola from 'consola';
+import { config } from 'dotenv';
+
+config({ path: '.env.submit' });
 
 const cli = cac('publish-extension');
 cli.version(version);
