@@ -40,13 +40,7 @@ publish-extension \
   --edge-zip dist/chrome.zip
 ```
 
-> [!NOTE]
->
-> `publish-extension` does not load any `.env` files, you're responsible for making sure the environment varaibles are set while running the command. In CI, this is easy, but to run the command locally, you'll need to use something like the `env-cmd` package:
->
-> ```sh
-> pnpm env-cmd -f .env.submit publish-extension ...
-> ```
+`publish-extesion` will automatically look for a `.env.submit` file and load it if it exists.
 
 ## JS Usage
 
@@ -112,8 +106,8 @@ publishExtension({
    > Make sure to set the Firefox channel to "unlisted", chrome's publish target to "trustedTesters", and don't submit the extension for review for Chrome or Edge. This will prevent you from accidentally releasing one of the test extensions publically.
 5. Run the dev commands to upload a test extension to the stores:
    ```sh
-   pnpm env-cmd -f .env.submit pnpm dev:all
-   pnpm env-cmd -f .env.submit pnpm dev:chrome
-   pnpm env-cmd -f .env.submit pnpm dev:firefox
-   pnpm env-cmd -f .env.submit pnpm dev:edge
+   pnpm dev:all
+   pnpm dev:chrome
+   pnpm dev:firefox
+   pnpm dev:edge
    ```
