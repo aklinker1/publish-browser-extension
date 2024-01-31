@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.1.0
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.0.0...v2.1.0)
+
+### 🚀 Enhancements
+
+- Read variables from `.env.submit` automatically ([#15](https://github.com/aklinker1/publish-browser-extension/pull/15))
+
 ## v2.0.0
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v1.4.1...v2.0.0)
