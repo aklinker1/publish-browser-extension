@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.1.1
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.1.0...v2.1.1)
+
+### 🩹 Fixes
+
+- Remove log ([d0a4723](https://github.com/aklinker1/publish-browser-extension/commit/d0a4723))
+- Don't require all config to run `init` command ([89bfe5d](https://github.com/aklinker1/publish-browser-extension/commit/89bfe5d))
+
 ## v2.1.0
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.0.0...v2.1.0)
