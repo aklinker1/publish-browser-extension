@@ -286,7 +286,6 @@ async function updateEnvFile(entries: Entry[]) {
   consola.start(`Writing to \`${envFile}\`...`);
   let template = await readFile(envFile, 'utf-8').catch(() => '');
 
-  consola.log(entries);
   for (const [name, value] of entries) {
     const formattedValue = typeof value === 'string' ? `"${value}"` : value;
     const replacement = `${name}=${formattedValue}`;
