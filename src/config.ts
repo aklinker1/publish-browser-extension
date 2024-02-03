@@ -2,20 +2,22 @@ import { z } from 'zod';
 import { ChromeWebStoreOptions } from './chrome';
 import { EdgeAddonStoreOptions } from './edge';
 import { FirefoxAddonStoreOptions } from './firefox';
-import consola from 'consola';
+import { DeepPartial } from './utils/types';
 
 /**
  * Given inline config, read environment varaibles and apply defaults. Throws an error if any config
  * is missing.
  */
-export function resolveConfig(config: InlineConfig): InternalConfig {
+export function resolveConfig(
+  config: InlineConfig,
+): DeepPartial<InternalConfig> {
   const dryRun = config.dryRun ?? booleanEnv('DRY_RUN') ?? false;
 
   const chromeZip = config.chrome?.zip ?? stringEnv('CHROME_ZIP');
   const firefoxZip = config.firefox?.zip ?? stringEnv('FIREFOX_ZIP');
   const edgeZip = config.edge?.zip ?? stringEnv('EDGE_ZIP');
 
-  const result = InternalConfig.safeParse({
+  return {
     dryRun,
     chrome:
       chromeZip == null
@@ -72,7 +74,11 @@ export function resolveConfig(config: InlineConfig): InternalConfig {
               booleanEnv('EDGE_SKIP_SUBMIT_REVIEW') ??
               false,
           },
-  });
+  };
+}
+
+export function validateConfig(config: any): InternalConfig {
+  const result = InternalConfig.safeParse(config);
 
   if (!result.success) {
     throw Error('Missing required config', { cause: result.error });
@@ -84,8 +90,10 @@ function booleanEnv(name: keyof CustomEnv): boolean | undefined {
   return !process.env[name] ? undefined : process.env[name] === 'true';
 }
 
-function stringEnv(name: keyof CustomEnv): string | undefined {
-  return !process.env[name] ? undefined : process.env[name];
+function stringEnv<T extends string = string>(
+  name: keyof CustomEnv,
+): T | undefined {
+  return !process.env[name] ? undefined : (process.env[name] as T);
 }
 
 export const InlineConfig = z.object({

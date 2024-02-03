@@ -65,7 +65,7 @@ async function prompt<T>(
 }
 
 async function initChrome(
-  previousOptions: ChromeWebStoreOptions | undefined,
+  previousOptions: Partial<ChromeWebStoreOptions> | undefined,
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 
@@ -166,7 +166,7 @@ async function initChrome(
 }
 
 async function initFirefox(
-  previousOptions: FirefoxAddonStoreOptions | undefined,
+  previousOptions: Partial<FirefoxAddonStoreOptions> | undefined,
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 
@@ -226,7 +226,7 @@ async function initFirefox(
 }
 
 async function initEdge(
-  previousOptions: EdgeAddonStoreOptions | undefined,
+  previousOptions: Partial<EdgeAddonStoreOptions> | undefined,
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 

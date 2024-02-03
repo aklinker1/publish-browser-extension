@@ -1,6 +1,6 @@
 import { Listr } from 'listr2';
 import { ChromeWebStore } from './chrome';
-import { InlineConfig, resolveConfig } from './config';
+import { InlineConfig, resolveConfig, validateConfig } from './config';
 import { EdgeAddonStore } from './edge';
 import { FirefoxAddonStore } from './firefox';
 import { Store, SubmitResult } from './utils/store';
@@ -9,7 +9,7 @@ import consola from 'consola';
 export async function submit(config: InlineConfig): Promise<SubmitResults> {
   // Setup
 
-  const internalConfig = resolveConfig(config);
+  const internalConfig = validateConfig(resolveConfig(config));
 
   console.log('');
   consola.info('Publishing Extension');
