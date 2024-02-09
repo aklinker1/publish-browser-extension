@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.1.2
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.1.1...v2.1.2)
+
+### 🩹 Fixes
+
+- Support node 20 in `engines` field in `package.json` ([#17](https://github.com/aklinker1/publish-browser-extension/pull/17))
+
 ## v2.1.1
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.1.0...v2.1.1)
