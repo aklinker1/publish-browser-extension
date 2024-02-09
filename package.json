@@ -3,8 +3,7 @@
   "description": "Easily publish web extensions to their stores",
   "version": "2.1.0",
   "engines": {
-    "node": "^18",
-    "pnpm": "8"
+    "node": "^18.0.0 || >=20.0.0"
   },
   "license": "MIT",
   "keywords": [
