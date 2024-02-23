@@ -35,8 +35,8 @@
   "bin": {
     "publish-extension": "bin/publish-extension.cjs"
   },
-  "exports": [
-    {
+  "exports": {
+    ".": {
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
@@ -45,8 +45,12 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
+    },
+    "./cli": {
+      "require": "./dist/cli.cjs",
+      "import": "./dist/cli.js"
     }
-  ],
+  },
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -54,7 +58,7 @@
     "build": "run-s build:*",
     "build:clean": "rimraf dist",
     "build:lib": "tsup src/index.ts --dts --format cjs,esm --sourcemap",
-    "build:cli": "tsup --format cjs --entry.cli src/cli.ts",
+    "build:cli": "tsup --format cjs,esm --entry.cli src/cli.ts",
     "build:test-extension": "node scripts/build-test-extension.js",
     "test": "vitest",
     "lint": "run-p -c -s lint:*",
