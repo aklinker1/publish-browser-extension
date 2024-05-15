@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { InlineConfig, InternalConfig, resolveConfig } from './config';
+import {
+  InlineConfig,
+  InternalConfig,
+  resolveConfig,
+  validateConfig,
+} from './config';
 
 const RESET_ENV_NAMES = /(^CHROME_|^FIREFOX_|^EDGE_|^DRY_RUN$)/;
 
@@ -182,5 +187,19 @@ describe('resolveConfig', () => {
     const actual = resolveConfig(config);
 
     expect(actual).toEqual(expected);
+  });
+});
+
+describe.only('validateConfig', () => {
+  it('should report an error if a required option is missing, error message should report the missing option', () => {
+    const config: InlineConfig = {
+      dryRun: true,
+      chrome: {
+        clientId: 'clientId',
+      },
+    };
+    expect(() => validateConfig(config)).toThrowError(
+      'Missing required config: CHROME_ZIP, CHROME_EXTENSION_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN',
+    );
   });
 });
