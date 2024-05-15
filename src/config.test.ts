@@ -190,7 +190,7 @@ describe('resolveConfig', () => {
   });
 });
 
-describe.only('validateConfig', () => {
+describe('validateConfig', () => {
   it('should report an error if a required config is missing, error message should report the missing config', () => {
     const config: InlineConfig = {
       dryRun: true,
