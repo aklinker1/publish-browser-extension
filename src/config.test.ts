@@ -191,7 +191,7 @@ describe('resolveConfig', () => {
 });
 
 describe.only('validateConfig', () => {
-  it('should report an error if a required option is missing, error message should report the missing option', () => {
+  it('should report an error if a required config is missing, error message should report the missing config', () => {
     const config: InlineConfig = {
       dryRun: true,
       chrome: {
