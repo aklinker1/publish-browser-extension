@@ -77,11 +77,24 @@ export function resolveConfig(
   };
 }
 
+function toScreamingSnakeCase(str: string): string {
+  return str
+    .replace(/([A-Z])/g, '_$1')
+    .replace(/-/g, '_')
+    .toUpperCase();
+}
+
 export function validateConfig(config: any): InternalConfig {
   const result = InternalConfig.safeParse(config);
 
   if (!result.success) {
-    throw Error('Missing required config', { cause: result.error });
+    throw Error(
+      'Missing required config: ' +
+        result.error.errors
+          .map(i => i.path.map(j => toScreamingSnakeCase(String(j))).join('_'))
+          .join(', '),
+      { cause: result.error },
+    );
   }
   return result.data;
 }
