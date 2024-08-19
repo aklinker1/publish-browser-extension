@@ -52,19 +52,14 @@
     }
   },
   "scripts": {
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "compile": "tsc --noEmit",
+    "check": "check",
     "build": "run-s build:*",
     "build:clean": "rimraf dist",
     "build:lib": "tsup src/index.ts --dts --format cjs,esm --sourcemap",
     "build:cli": "tsup --format cjs,esm --entry.cli src/cli.ts",
     "build:test-extension": "node scripts/build-test-extension.js",
     "test": "vitest",
-    "lint": "run-p -c -s lint:*",
-    "lint:eslint": "echo 'ESLint: TODO'",
     "test:coverage": "vitest --coverage",
-    "lint:package": "publint",
     "dev:all": "./scripts/dev.sh all",
     "dev:chrome": "./scripts/dev.sh chrome",
     "dev:firefox": "./scripts/dev.sh firefox",
@@ -92,6 +87,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@aklinker1/check": "^1.3.1",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/lodash.camelcase": "^4.3.7",
     "@types/lodash.kebabcase": "^4.1.7",
@@ -135,5 +131,6 @@
     "excludeAuthors": [
       "aaronklinker1@gmail.com"
     ]
-  }
+  },
+  "packageManager": "pnpm@9.7.1"
 }
