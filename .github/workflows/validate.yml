@@ -15,10 +15,8 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install
-      - run: pnpm format:check
-      - run: pnpm compile
       - run: pnpm build
-      - run: pnpm lint
+      - run: pnpm check
       - run: pnpm test
       - run: node bin/publish-extension.cjs --help
 
