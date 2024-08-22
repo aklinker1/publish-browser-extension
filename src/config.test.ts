@@ -24,9 +24,11 @@ describe('resolveConfig', () => {
       chrome: {
         clientId: 'clientId',
         clientSecret: 'clientSecret',
+        deployPercentage: 50,
         extensionId: 'extensionId',
         publishTarget: 'trustedTesters',
         refreshToken: 'refreshToken',
+        reviewExemption: true,
         skipSubmitReview: true,
         zip: 'zip',
       },
@@ -66,6 +68,10 @@ describe('resolveConfig', () => {
     process.env.CHROME_PUBLISH_TARGET = chromePublishTarget;
     const chromeSkipSubmitReview = true;
     process.env.CHROME_SKIP_SUBMIT_REVIEW = String(chromeSkipSubmitReview);
+    const chromeReviewExemption = true;
+    process.env.CHROME_REVIEW_EXEMPTION = String(chromeReviewExemption);
+    const chromeDeployPercentage = 75;
+    process.env.CHROME_DEPLOY_PERCENTAGE = String(chromeDeployPercentage);
 
     process.env.FIREFOX_ZIP = 'FIREFOX_ZIP';
     process.env.FIREFOX_SOURCES_ZIP = 'FIREFOX_SOURCES_ZIP';
@@ -91,6 +97,8 @@ describe('resolveConfig', () => {
         clientId: process.env.CHROME_CLIENT_ID!,
         clientSecret: process.env.CHROME_CLIENT_SECRET!,
         refreshToken: process.env.CHROME_REFRESH_TOKEN!,
+        reviewExemption: chromeReviewExemption,
+        deployPercentage: chromeDeployPercentage,
         publishTarget: chromePublishTarget,
         skipSubmitReview: chromeSkipSubmitReview,
       },
@@ -147,6 +155,8 @@ describe('resolveConfig', () => {
       chrome: {
         ...config.chrome,
         skipSubmitReview: false,
+        reviewExemption: false,
+        deployPercentage: undefined,
         publishTarget: 'default',
       },
       firefox: {
