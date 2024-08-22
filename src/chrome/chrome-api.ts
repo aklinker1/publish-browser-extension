@@ -1,7 +1,5 @@
-import { createFetch } from 'ofetch';
 import { FormData } from 'formdata-node';
 import { fileFromPath } from 'formdata-node/file-from-path';
-import consola from 'consola';
 import { fetch } from '../utils/fetch';
 
 export interface CwsApiOptions {
@@ -61,12 +59,24 @@ export class CwsApi {
     extensionId: string;
     publishTarget: 'default' | 'trustedTesters';
     token: CwsTokenDetails;
+    deployPercentage?: number;
+    reviewExemption?: boolean;
   }) {
     const Authorization = await this.getAuthHeader(params.token);
 
     const endpoint = this.publishEndpoint(params.extensionId);
     if (params.publishTarget)
       endpoint.searchParams.append('publishTarget', params.publishTarget);
+    if (params.deployPercentage != null)
+      endpoint.searchParams.set(
+        'deployPercentage',
+        String(params.deployPercentage),
+      );
+    if (params.reviewExemption != null)
+      endpoint.searchParams.set(
+        'reviewExemption',
+        String(params.reviewExemption),
+      );
 
     await fetch(endpoint.href, {
       method: 'POST',

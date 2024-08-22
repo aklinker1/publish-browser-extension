@@ -35,6 +35,13 @@ export function resolveConfig(
               config.chrome?.publishTarget ??
               stringEnv('CHROME_PUBLISH_TARGET') ??
               'default',
+            deployPercentage:
+              config.chrome?.deployPercentage ??
+              intEnv('CHROME_DEPLOY_PERCENTAGE'),
+            reviewExemption:
+              config.chrome?.reviewExemption ??
+              booleanEnv('CHROME_REVIEW_EXEMPTION') ??
+              false,
             skipSubmitReview:
               config.chrome?.skipSubmitReview ??
               booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
@@ -109,6 +116,10 @@ function stringEnv<T extends string = string>(
   return !process.env[name] ? undefined : (process.env[name] as T);
 }
 
+function intEnv(name: keyof CustomEnv): number | undefined {
+  return !process.env[name] ? undefined : parseInt(process.env[name]!);
+}
+
 export const InlineConfig = z.object({
   /**
    * When true, just check authentication, don't upload any zip files or submit any updates.
@@ -142,9 +153,11 @@ interface CustomEnv {
 
   CHROME_CLIENT_ID: string | undefined;
   CHROME_CLIENT_SECRET: string | undefined;
+  CHROME_DEPLOY_PERCENTAGE: string | undefined;
   CHROME_EXTENSION_ID: string | undefined;
   CHROME_PUBLISH_TARGET: string | undefined;
   CHROME_REFRESH_TOKEN: string | undefined;
+  CHROME_REVIEW_EXEMPTION: string | undefined;
   CHROME_SKIP_SUBMIT_REVIEW: string | undefined;
   CHROME_ZIP: string | undefined;
 

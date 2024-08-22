@@ -11,6 +11,8 @@ export const ChromeWebStoreOptions = z.object({
   clientSecret: z.string().min(1),
   refreshToken: z.string().min(1),
   publishTarget: z.enum(['default', 'trustedTesters']).default('default'),
+  deployPercentage: z.number().int().min(1).max(100).optional(),
+  reviewExemption: z.boolean().default(false),
   skipSubmitReview: z.boolean().default(false),
 });
 export type ChromeWebStoreOptions = z.infer<typeof ChromeWebStoreOptions>;
