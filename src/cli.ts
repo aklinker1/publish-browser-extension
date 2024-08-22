@@ -40,6 +40,14 @@ cli.option(
   'Group to publish to, "default" or "trustedTesters"',
 );
 cli.option(
+  '--chrome-deploy-percentage [chromeDeployPercentage]',
+  'An integer from 1-100',
+);
+cli.option(
+  '--chrome-review-exemption',
+  'Submit update using expidited review process',
+);
+cli.option(
   '--chrome-skip-submit-review',
   "Just upload the extension zip, don't submit it for review or publish it",
 );
@@ -98,6 +106,8 @@ function configFromFlags(flags: any): InlineConfig {
       clientSecret: flags.chromeClientSecret,
       refreshToken: flags.chromeRefreshToken,
       publishTarget: flags.chromePublishTarget,
+      deployPercentage: flags.chromeDeployPercentage,
+      reviewExemption: flags.chromeReviewExemption,
       skipSubmitReview: flags.chromeSkipSubmitReview,
     },
     firefox: {
