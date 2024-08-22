@@ -31,10 +31,12 @@ jobs:
           pnpx changelogen@latest --release
           git push
           git push --tags
+          git status
 
       - name: NPM
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
+          git status
           pnpm publish
 
       - name: GitHub Release
