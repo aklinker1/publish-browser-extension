@@ -1,5 +1,28 @@
 # Changelog
 
+## v2.2.0
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.1.3...v2.2.0)
+
+### 🚀 Enhancements
+
+- Support chrome's new `deployPercentage` and `reviewExemption` options ([#27](https://github.com/aklinker1/publish-browser-extension/pull/27))
+
+### 🩹 Fixes
+
+- Report specific missing configurations ([#19](https://github.com/aklinker1/publish-browser-extension/pull/19))
+- Fetch error typo ([#20](https://github.com/aklinker1/publish-browser-extension/pull/20))
+
+### 🏡 Chore
+
+- Upgrade repo setup ([#25](https://github.com/aklinker1/publish-browser-extension/pull/25))
+- Upgrade repo setup ([#26](https://github.com/aklinker1/publish-browser-extension/pull/26))
+
+### ❤️ Contributors
+
+- Uncenter ([@uncenter](http://github.com/uncenter))
+- Stephen Zhou ([@hyoban](http://github.com/hyoban))
+
 ## v2.1.3
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.1.2...v2.1.3)
