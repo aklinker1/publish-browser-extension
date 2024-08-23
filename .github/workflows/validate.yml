@@ -6,8 +6,8 @@ jobs:
     name: Verify Code
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
           version: 8
       - uses: actions/setup-node@v4
@@ -24,8 +24,8 @@ jobs:
     name: E2E Publish Test
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
           version: 8
       - uses: actions/setup-node@v4
