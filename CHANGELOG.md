@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.2.1
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.2.0...v2.2.1)
+
+### 🩹 Fixes
+
+- Add missing CLI flags for new chrome features ([ebf32d6](https://github.com/aklinker1/publish-browser-extension/commit/ebf32d6))
+
+### 🤖 CI
+
+- Log git status for debugging ([af90e4d](https://github.com/aklinker1/publish-browser-extension/commit/af90e4d))
+
 ## v2.2.0
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.1.3...v2.2.0)

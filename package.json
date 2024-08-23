@@ -1,7 +1,7 @@
 {
   "name": "publish-browser-extension",
   "description": "Easily publish web extensions to their stores",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "engines": {
     "node": "^18.0.0 || >=20.0.0"
   },
