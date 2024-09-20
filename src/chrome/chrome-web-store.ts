@@ -6,10 +6,10 @@ import { ensureZipExists } from '../utils/fs';
 
 export const ChromeWebStoreOptions = z.object({
   zip: z.string().min(1),
-  extensionId: z.string().min(1),
-  clientId: z.string().min(1),
-  clientSecret: z.string().min(1),
-  refreshToken: z.string().min(1),
+  extensionId: z.string().min(1).trim(),
+  clientId: z.string().min(1).trim(),
+  clientSecret: z.string().min(1).trim(),
+  refreshToken: z.string().min(1).trim(),
   publishTarget: z.enum(['default', 'trustedTesters']).default('default'),
   deployPercentage: z.number().int().min(1).max(100).optional(),
   reviewExemption: z.boolean().default(false),

@@ -8,10 +8,10 @@ import consola from 'consola';
 
 export const EdgeAddonStoreOptions = z.object({
   zip: z.string().min(1),
-  productId: z.string().min(1),
-  clientId: z.string().min(1),
-  clientSecret: z.string().min(1),
-  accessTokenUrl: z.string().min(1),
+  productId: z.string().min(1).trim(),
+  clientId: z.string().min(1).trim(),
+  clientSecret: z.string().min(1).trim(),
+  accessTokenUrl: z.string().min(1).trim(),
   skipSubmitReview: z.boolean().default(false),
 });
 export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptions>;

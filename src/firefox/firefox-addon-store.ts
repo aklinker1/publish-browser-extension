@@ -10,9 +10,9 @@ import consola from 'consola';
 export const FirefoxAddonStoreOptions = z.object({
   zip: z.string().min(1),
   sourcesZip: z.string().min(1).optional(),
-  extensionId: z.string().min(1),
-  jwtIssuer: z.string().min(1),
-  jwtSecret: z.string().min(1),
+  extensionId: z.string().min(1).trim(),
+  jwtIssuer: z.string().min(1).trim(),
+  jwtSecret: z.string().min(1).trim(),
   channel: z.enum(['listed', 'unlisted']).default('listed'),
 });
 export type FirefoxAddonStoreOptions = z.infer<typeof FirefoxAddonStoreOptions>;
