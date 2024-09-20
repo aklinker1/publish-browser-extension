@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.2.2
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.2.1...v2.2.2)
+
+### 🩹 Fixes
+
+- Trim spaces from secret values ([70d8aa0](https://github.com/aklinker1/publish-browser-extension/commit/70d8aa0))
+
+### 🏡 Chore
+
+- Upgrade to node 20 ([8a4cfaf](https://github.com/aklinker1/publish-browser-extension/commit/8a4cfaf))
+
+### 🤖 CI
+
+- Upgrade github actions and fix failing release flow ([460a475](https://github.com/aklinker1/publish-browser-extension/commit/460a475))
+- Fix validation workflow ([9cc260c](https://github.com/aklinker1/publish-browser-extension/commit/9cc260c))
+
 ## v2.2.1
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.2.0...v2.2.1)
