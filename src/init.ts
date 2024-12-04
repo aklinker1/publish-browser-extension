@@ -278,8 +278,6 @@ async function initEdge(
         : undefined,
     );
     entries.push(['EDGE_API_KEY', apiKey]);
-    entries.push(['EDGE_CLIENT_SECRET', '']);
-    entries.push(['EDGE_ACCESS_TOKEN_URL', '']);
   } else {
     const clientSecret = await prompt<string>(
       'Enter your client secret:',
@@ -295,7 +293,6 @@ async function initEdge(
         ? previousOptions?.accessTokenUrl
         : undefined,
     );
-    entries.push(['EDGE_API_KEY', '']);
     entries.push(['EDGE_CLIENT_SECRET', clientSecret]);
     entries.push(['EDGE_ACCESS_TOKEN_URL', accessTokenUrl]);
   }

@@ -5,7 +5,7 @@ import { FirefoxAddonStoreOptions } from './firefox';
 import { DeepPartial } from './utils/types';
 
 /**
- * Given inline config, read environment varaibles and apply defaults. Throws an error if any config
+ * Given inline config, read environment variables and apply defaults. Throws an error if any config
  * is missing.
  */
 export function resolveConfig(
@@ -173,10 +173,10 @@ interface CustomEnv {
 
   EDGE_ZIP: string | undefined;
   EDGE_PRODUCT_ID: string | undefined;
-  /** @deprecated since Edge API v1.1 release */
   EDGE_CLIENT_ID: string | undefined;
   /** @deprecated since Edge API v1.1 release */
   EDGE_CLIENT_SECRET: string | undefined;
+  /** @deprecated since Edge API v1.1 release */
   EDGE_ACCESS_TOKEN_URL: string | undefined;
   EDGE_API_KEY: string | undefined;
   EDGE_API_VERSION: '1.0' | '1.1' | undefined;

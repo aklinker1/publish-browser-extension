@@ -41,10 +41,8 @@ describe('resolveConfig', () => {
         sourcesZip: 'sourcesZip',
       },
       edge: {
-        clientId: 'clientId',
-        clientSecret: 'clientSecret',
         productId: 'productId',
-        accessTokenUrl: 'accessTokenUrl',
+        clientId: 'clientId',
         apiKey: 'apiKey',
         apiVersion: '1.1',
         skipSubmitReview: true,
@@ -117,9 +115,7 @@ describe('resolveConfig', () => {
       edge: {
         zip: process.env.EDGE_ZIP,
         productId: process.env.EDGE_PRODUCT_ID,
-        accessTokenUrl: process.env.EDGE_ACCESS_TOKEN_URL,
         clientId: process.env.EDGE_CLIENT_ID,
-        clientSecret: process.env.EDGE_CLIENT_SECRET,
         apiKey: process.env.EDGE_API_KEY,
         apiVersion: process.env.EDGE_API_VERSION,
         skipSubmitReview: edgeSkipSubmitReview,

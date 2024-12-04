@@ -12,28 +12,28 @@ const EdgeAddonBaseOptions = z.object({
   skipSubmitReview: z.boolean().default(false),
 });
 
+const EdgeAddonStore1_0Options = {
+  apiVersion: z.literal('1.0').default('1.0'),
+  clientSecret: z.string().min(1).trim(),
+  accessTokenUrl: z.string().min(1).trim(),
+};
+const EdgeAddonStore1_1Options = {
+  apiVersion: z.literal('1.1'),
+  apiKey: z.string().min(1).trim(),
+};
+
 export const EdgeAddonStoreOptions = EdgeAddonBaseOptions.extend({
+  ...EdgeAddonStore1_0Options,
+  ...EdgeAddonStore1_1Options,
   apiVersion: z.enum(['1.0', '1.1']).default('1.0'),
-  apiKey: z.string().trim(),
-  clientSecret: z.string().trim(),
-  accessTokenUrl: z.string().trim(),
 });
 
 // FIXME: zod does not support calling .partial() on discriminated unions, so
 // we can't export this as EdgeAddonStoreOptions
 export const EdgeAddonStoreOptionsStrict = EdgeAddonBaseOptions.and(
   z.discriminatedUnion('apiVersion', [
-    z.object({
-      apiVersion: z.literal('1.0').default('1.0'),
-      clientSecret: z.string().min(1).trim(),
-      accessTokenUrl: z.string().min(1).trim(),
-    }),
-    z.object({
-      apiVersion: z.literal('1.1'),
-      apiKey: z.string().min(1).trim(),
-      clientSecret: z.string().trim().default(''),
-      accessTokenUrl: z.string().trim().default(''),
-    }),
+    z.object(EdgeAddonStore1_0Options),
+    z.object(EdgeAddonStore1_1Options),
   ]),
 );
 

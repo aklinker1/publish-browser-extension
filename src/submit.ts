@@ -17,6 +17,18 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     consola.warn('Dry run, skipping submission');
   }
 
+  if (internalConfig.edge?.apiVersion === '1.0') {
+    consola.warn(
+      [
+        'Edge API v1.0 will stop working Jan 1, 2025. To upgrade to v1.1:',
+        '  1. Pass the new CLI flag (`--edge-api-version 1.1`) or set the environment variable (`EDGE_API_VERSION=1.1`) to opt into the new version',
+        '  2. Replace the client secret/access token URL with an API key (`--edge-api-key` flag or `EDGE_API_KEY` environment variable)',
+        '  3. Stop passing in a client secret and access token URL',
+        'Or run `publish-extension init` and re-initialize the edge store for API v1.1.',
+      ].join('\n'),
+    );
+  }
+
   // Get list of stores that need released
 
   const stores: Array<{
