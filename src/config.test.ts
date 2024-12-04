@@ -124,6 +124,36 @@ describe('resolveConfig', () => {
     expect(actual).toEqual(expected);
   });
 
+  it('should support deprecated Edge API config', () => {
+    const dryRun = true;
+    process.env.DRY_RUN = String(dryRun);
+
+    process.env.EDGE_ZIP = 'EDGE_ZIP';
+    process.env.EDGE_PRODUCT_ID = 'EDGE_PRODUCT_ID';
+    process.env.EDGE_CLIENT_ID = 'EDGE_CLIENT_ID';
+    process.env.EDGE_CLIENT_SECRET = 'EDGE_CLIENT_SECRET';
+    process.env.EDGE_ACCESS_TOKEN_URL = 'EDGE_ACCESS_TOKEN_URL';
+    // process.env.EDGE_API_VERSION = '1.0'; // Not set, should default to 1.0
+    const edgeSkipSubmitReview = true;
+    process.env.EDGE_SKIP_SUBMIT_REVIEW = String(edgeSkipSubmitReview);
+
+    const expected: InternalConfig = {
+      dryRun,
+      edge: {
+        zip: process.env.EDGE_ZIP,
+        productId: process.env.EDGE_PRODUCT_ID,
+        clientId: process.env.EDGE_CLIENT_ID,
+        clientSecret: process.env.EDGE_CLIENT_SECRET,
+        accessTokenUrl: process.env.EDGE_ACCESS_TOKEN_URL,
+        apiVersion: '1.0',
+        skipSubmitReview: edgeSkipSubmitReview,
+      },
+    };
+
+    const actual = resolveConfig({});
+    expect(actual).toEqual(expected);
+  });
+
   it('should apply defaults', () => {
     const config: InlineConfig = {
       chrome: {
