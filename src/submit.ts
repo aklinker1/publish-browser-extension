@@ -25,6 +25,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
         '  2. Replace the client secret/access token URL with an API key (`--edge-api-key` flag or `EDGE_API_KEY` environment variable)',
         '  3. Stop passing in a client secret and access token URL',
         'Or run `publish-extension init` and re-initialize the edge store for API v1.1.',
+        'https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api?tabs=v1-1',
       ].join('\n'),
     );
   }
