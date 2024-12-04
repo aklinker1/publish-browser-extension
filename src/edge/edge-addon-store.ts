@@ -4,17 +4,40 @@ import { withTimeout } from '../utils/withTimeout';
 import { Store } from '../utils/store';
 import { z } from 'zod';
 import { ensureZipExists } from '../utils/fs';
-import consola from 'consola';
 
-export const EdgeAddonStoreOptions = z.object({
+const EdgeAddonBaseOptions = z.object({
   zip: z.string().min(1),
   productId: z.string().min(1).trim(),
   clientId: z.string().min(1).trim(),
-  clientSecret: z.string().min(1).trim(),
-  accessTokenUrl: z.string().min(1).trim(),
   skipSubmitReview: z.boolean().default(false),
 });
-export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptions>;
+
+export const EdgeAddonStoreOptions = EdgeAddonBaseOptions.extend({
+  apiVersion: z.enum(['1.0', '1.1']).default('1.0'),
+  apiKey: z.string().trim(),
+  clientSecret: z.string().trim(),
+  accessTokenUrl: z.string().trim(),
+});
+
+// FIXME: zod does not support calling .partial() on discriminated unions, so
+// we can't export this as EdgeAddonStoreOptions
+export const EdgeAddonStoreOptionsStrict = EdgeAddonBaseOptions.and(
+  z.discriminatedUnion('apiVersion', [
+    z.object({
+      apiVersion: z.literal('1.0').default('1.0'),
+      clientSecret: z.string().min(1).trim(),
+      accessTokenUrl: z.string().min(1).trim(),
+    }),
+    z.object({
+      apiVersion: z.literal('1.1'),
+      apiKey: z.string().min(1).trim(),
+      clientSecret: z.string().trim().default(''),
+      accessTokenUrl: z.string().trim().default(''),
+    }),
+  ]),
+);
+
+export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptionsStrict>;
 
 export class EdgeAddonStore implements Store {
   private api: EdgeApi;
@@ -31,7 +54,7 @@ export class EdgeAddonStore implements Store {
   }
 
   async submit(dryRun?: boolean | undefined): Promise<void> {
-    this.setStatus('Getting an access token');
+    this.setStatus('Getting authorization token');
     const token = await this.api.getToken();
 
     if (dryRun) {

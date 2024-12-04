@@ -45,6 +45,8 @@ describe('resolveConfig', () => {
         clientSecret: 'clientSecret',
         productId: 'productId',
         accessTokenUrl: 'accessTokenUrl',
+        apiKey: 'apiKey',
+        apiVersion: '1.1',
         skipSubmitReview: true,
         zip: 'zip',
       },
@@ -86,6 +88,8 @@ describe('resolveConfig', () => {
     process.env.EDGE_CLIENT_ID = 'EDGE_CLIENT_ID';
     process.env.EDGE_CLIENT_SECRET = 'EDGE_CLIENT_SECRET';
     process.env.EDGE_ACCESS_TOKEN_URL = 'EDGE_ACCESS_TOKEN_URL';
+    process.env.EDGE_API_KEY = 'EDGE_API_KEY';
+    process.env.EDGE_API_VERSION = '1.1';
     const edgeSkipSubmitReview = true;
     process.env.EDGE_SKIP_SUBMIT_REVIEW = String(edgeSkipSubmitReview);
 
@@ -116,6 +120,8 @@ describe('resolveConfig', () => {
         accessTokenUrl: process.env.EDGE_ACCESS_TOKEN_URL,
         clientId: process.env.EDGE_CLIENT_ID,
         clientSecret: process.env.EDGE_CLIENT_SECRET,
+        apiKey: process.env.EDGE_API_KEY,
+        apiVersion: process.env.EDGE_API_VERSION,
         skipSubmitReview: edgeSkipSubmitReview,
       },
     };
@@ -145,6 +151,7 @@ describe('resolveConfig', () => {
         clientSecret: 'clientSecret',
         productId: 'productId',
         accessTokenUrl: 'accessTokenUrl',
+        apiKey: 'apiKey',
         zip: 'zip',
       },
     };
@@ -165,6 +172,7 @@ describe('resolveConfig', () => {
       },
       edge: {
         ...config.edge,
+        apiVersion: '1.0',
         skipSubmitReview: false,
       },
     };
