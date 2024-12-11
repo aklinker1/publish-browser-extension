@@ -88,7 +88,7 @@ export class EdgeApi {
       body: file,
       headers: {
         Authorization: this.getAuthHeader(params.token),
-        'X-Client-ID': this.options.clientId,
+        'X-ClientID': this.options.clientId,
         'Content-Type': 'application/zip',
       },
     });
@@ -112,7 +112,7 @@ export class EdgeApi {
     return fetch(endpoint, {
       headers: {
         Authorization: this.getAuthHeader(params.token),
-        'X-Client-ID': this.options.clientId,
+        'X-ClientID': this.options.clientId,
       },
     });
   }
@@ -130,7 +130,7 @@ export class EdgeApi {
       body: JSON.stringify({}),
       headers: {
         Authorization: this.getAuthHeader(params.token),
-        'X-Client-ID': this.options.clientId,
+        'X-ClientID': this.options.clientId,
       },
     });
   }

@@ -28,8 +28,9 @@ export const EdgeAddonStoreOptions = EdgeAddonBaseOptions.extend({
   apiVersion: z.enum(['1.0', '1.1']).default('1.0'),
 });
 
-// FIXME: zod does not support calling .partial() on discriminated unions, so
-// we can't export this as EdgeAddonStoreOptions
+// Zod does not support calling .partial() on discriminated unions, so we have
+// to create two types. One containing all options and one discriminated union
+// between versions.
 export const EdgeAddonStoreOptionsStrict = EdgeAddonBaseOptions.and(
   z.discriminatedUnion('apiVersion', [
     z.object(EdgeAddonStore1_0Options),
@@ -58,6 +59,7 @@ export class EdgeAddonStore implements Store {
     const token = await this.api.getToken();
 
     if (dryRun) {
+      // TODO: Validate v1.1 API key before returning. v1.0 token is validated inside `this.api.getToken()` above.
       this.setStatus('DRY RUN: Skipped upload and publishing');
       return;
     }
