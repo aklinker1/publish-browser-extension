@@ -1,5 +1,26 @@
 # Changelog
 
+## v2.3.0
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.2.2...v2.3.0)
+
+### 🚀 Enhancements
+
+- Add Edge API v1.1 support ([#29](https://github.com/aklinker1/publish-browser-extension/pull/29))
+
+### 🩹 Fixes
+
+- **edge:** Remove new X-ClientID header from v1.0 requests ([5446ac0](https://github.com/aklinker1/publish-browser-extension/commit/5446ac0))
+
+### 🤖 CI
+
+- Fix workflow for forks ([9c305a9](https://github.com/aklinker1/publish-browser-extension/commit/9c305a9))
+- Fix workflow for forks ([c7bc76d](https://github.com/aklinker1/publish-browser-extension/commit/c7bc76d))
+
+### ❤️ Contributors
+
+- Mezannic ([@mezannic](http://github.com/mezannic))
+
 ## v2.2.2
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.2.1...v2.2.2)
