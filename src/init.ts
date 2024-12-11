@@ -248,7 +248,7 @@ async function initEdge(
 
   console.log();
   consola.log(
-    '`--edge-client-id`, `--edge-client-secret` and `--edge-access-token-url` can be created following:',
+    '`--edge-client-id` and either `--edge-api-key` (API v1.1) or `--edge-client-secret` and `--edge-access-token-url` (API v1.0) can be created following:',
   );
   console.log(
     'https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api#before-you-begin',
@@ -259,18 +259,43 @@ async function initEdge(
     previousOptions?.clientId,
   );
   entries.push(['EDGE_CLIENT_ID', clientId]);
-  const clientSecret = await prompt<string>(
-    'Enter your client secret:',
-    { type: 'text' },
-    previousOptions?.clientSecret,
+  const apiVersion = await prompt<string>(
+    'Enter the API version you will use:',
+    {
+      type: 'select',
+      options: ['1.1', '1.0'],
+    },
+    previousOptions?.apiVersion,
   );
-  entries.push(['EDGE_CLIENT_SECRET', clientSecret]);
-  const accessTokenUrl = await prompt<string>(
-    'Enter your access token URL:',
-    { type: 'text' },
-    previousOptions?.accessTokenUrl,
-  );
-  entries.push(['EDGE_ACCESS_TOKEN_URL', accessTokenUrl]);
+  entries.push(['EDGE_API_VERSION', apiVersion]);
+
+  if (apiVersion === '1.1') {
+    const apiKey = await prompt<string>(
+      'Enter your API key:',
+      { type: 'text' },
+      previousOptions?.apiVersion === '1.1'
+        ? previousOptions.apiKey
+        : undefined,
+    );
+    entries.push(['EDGE_API_KEY', apiKey]);
+  } else {
+    const clientSecret = await prompt<string>(
+      'Enter your client secret:',
+      { type: 'text' },
+      previousOptions?.apiVersion === '1.0'
+        ? previousOptions?.clientSecret
+        : undefined,
+    );
+    const accessTokenUrl = await prompt<string>(
+      'Enter your access token URL:',
+      { type: 'text' },
+      previousOptions?.apiVersion === '1.0'
+        ? previousOptions?.accessTokenUrl
+        : undefined,
+    );
+    entries.push(['EDGE_CLIENT_SECRET', clientSecret]);
+    entries.push(['EDGE_ACCESS_TOKEN_URL', accessTokenUrl]);
+  }
 
   const submitForReview = await prompt<boolean>(
     'When uploading, automatically submit new update for review?',

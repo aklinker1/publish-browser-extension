@@ -41,10 +41,10 @@ describe('resolveConfig', () => {
         sourcesZip: 'sourcesZip',
       },
       edge: {
-        clientId: 'clientId',
-        clientSecret: 'clientSecret',
         productId: 'productId',
-        accessTokenUrl: 'accessTokenUrl',
+        clientId: 'clientId',
+        apiKey: 'apiKey',
+        apiVersion: '1.1',
         skipSubmitReview: true,
         zip: 'zip',
       },
@@ -84,8 +84,8 @@ describe('resolveConfig', () => {
     process.env.EDGE_ZIP = 'EDGE_ZIP';
     process.env.EDGE_PRODUCT_ID = 'EDGE_PRODUCT_ID';
     process.env.EDGE_CLIENT_ID = 'EDGE_CLIENT_ID';
-    process.env.EDGE_CLIENT_SECRET = 'EDGE_CLIENT_SECRET';
-    process.env.EDGE_ACCESS_TOKEN_URL = 'EDGE_ACCESS_TOKEN_URL';
+    process.env.EDGE_API_KEY = 'EDGE_API_KEY';
+    process.env.EDGE_API_VERSION = '1.1';
     const edgeSkipSubmitReview = true;
     process.env.EDGE_SKIP_SUBMIT_REVIEW = String(edgeSkipSubmitReview);
 
@@ -113,9 +113,39 @@ describe('resolveConfig', () => {
       edge: {
         zip: process.env.EDGE_ZIP,
         productId: process.env.EDGE_PRODUCT_ID,
-        accessTokenUrl: process.env.EDGE_ACCESS_TOKEN_URL,
+        clientId: process.env.EDGE_CLIENT_ID,
+        apiKey: process.env.EDGE_API_KEY,
+        apiVersion: process.env.EDGE_API_VERSION,
+        skipSubmitReview: edgeSkipSubmitReview,
+      },
+    };
+
+    const actual = resolveConfig({});
+    expect(actual).toEqual(expected);
+  });
+
+  it('should support deprecated Edge API config', () => {
+    const dryRun = true;
+    process.env.DRY_RUN = String(dryRun);
+
+    process.env.EDGE_ZIP = 'EDGE_ZIP';
+    process.env.EDGE_PRODUCT_ID = 'EDGE_PRODUCT_ID';
+    process.env.EDGE_CLIENT_ID = 'EDGE_CLIENT_ID';
+    process.env.EDGE_CLIENT_SECRET = 'EDGE_CLIENT_SECRET';
+    process.env.EDGE_ACCESS_TOKEN_URL = 'EDGE_ACCESS_TOKEN_URL';
+    // process.env.EDGE_API_VERSION = '1.0'; // Not set, should default to 1.0
+    const edgeSkipSubmitReview = true;
+    process.env.EDGE_SKIP_SUBMIT_REVIEW = String(edgeSkipSubmitReview);
+
+    const expected: InternalConfig = {
+      dryRun,
+      edge: {
+        zip: process.env.EDGE_ZIP,
+        productId: process.env.EDGE_PRODUCT_ID,
         clientId: process.env.EDGE_CLIENT_ID,
         clientSecret: process.env.EDGE_CLIENT_SECRET,
+        accessTokenUrl: process.env.EDGE_ACCESS_TOKEN_URL,
+        apiVersion: '1.0',
         skipSubmitReview: edgeSkipSubmitReview,
       },
     };
@@ -145,6 +175,7 @@ describe('resolveConfig', () => {
         clientSecret: 'clientSecret',
         productId: 'productId',
         accessTokenUrl: 'accessTokenUrl',
+        apiKey: 'apiKey',
         zip: 'zip',
       },
     };
@@ -165,6 +196,7 @@ describe('resolveConfig', () => {
       },
       edge: {
         ...config.edge,
+        apiVersion: '1.0',
         skipSubmitReview: false,
       },
     };

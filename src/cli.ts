@@ -45,7 +45,7 @@ cli.option(
 );
 cli.option(
   '--chrome-review-exemption',
-  'Submit update using expidited review process',
+  'Submit update using expedited review process',
 );
 cli.option(
   '--chrome-skip-submit-review',
@@ -84,12 +84,20 @@ cli.option(
   'Client ID used for authorizing requests to Microsofts addon API',
 );
 cli.option(
+  '--edge-api-version [edgeApiVersion]',
+  'API version (1.0 or 1.1) to use',
+);
+cli.option(
+  '--edge-api-key [edgeApiKey]',
+  'API key used for authorizing requests to Microsofts addon API v1.1',
+);
+cli.option(
   '--edge-client-secret [edgeClientSecret]',
-  'Client secret used for authorizing requests to Microsofts addon API',
+  'Client secret used for authorizing requests to Microsofts addon API v1.0',
 );
 cli.option(
   '--edge-access-token-url [edgeAccessTokenUrl]',
-  'Access token URL used for authorizing requests to Microsofts addon API',
+  'Access token URL used for authorizing requests to Microsofts addon API v1.0',
 );
 cli.option(
   '--edge-skip-submit-review',
@@ -122,6 +130,8 @@ function configFromFlags(flags: any): InlineConfig {
       zip: flags.edgeZip,
       productId: flags.edgeProductId,
       clientId: flags.edgeClientId,
+      apiVersion: flags.edgeApiVersion,
+      apiKey: flags.edgeApiKey,
       clientSecret: flags.edgeClientSecret,
       accessTokenUrl: flags.edgeAccessTokenUrl,
       skipSubmitReview: flags.edgeSkipSubmitReview,

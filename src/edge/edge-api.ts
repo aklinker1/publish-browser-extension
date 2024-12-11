@@ -1,14 +1,20 @@
-import { createFetch } from 'ofetch';
 import fs from 'fs';
-import consola from 'consola';
 import { fetch } from '../utils/fetch';
 
-export interface EdgeApiOptions {
+export type EdgeApiOptions = {
   productId: string;
   clientId: string;
-  clientSecret: string;
-  accessTokenUrl: string;
-}
+} & (
+  | {
+      apiVersion: '1.0';
+      clientSecret: string;
+      accessTokenUrl: string;
+    }
+  | {
+      apiVersion: '1.1';
+      apiKey: string;
+    }
+);
 
 export interface EdgeTokenDetails {
   access_token: string;
@@ -40,6 +46,15 @@ export class EdgeApi {
    * Docs: https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api#sample-request
    */
   getToken(): Promise<EdgeTokenDetails> {
+    // Edge API requires an API key instead of an access token since version 1.1
+    if (this.options.apiVersion !== '1.0') {
+      return Promise.resolve({
+        access_token: this.options.apiKey,
+        expires_in: 0,
+        token_type: 'ApiKey',
+      });
+    }
+
     const form = new URLSearchParams();
     form.set('client_id', this.options.clientId);
     form.set(
@@ -73,6 +88,7 @@ export class EdgeApi {
       body: file,
       headers: {
         Authorization: this.getAuthHeader(params.token),
+        'X-ClientID': this.options.clientId,
         'Content-Type': 'application/zip',
       },
     });
@@ -96,6 +112,7 @@ export class EdgeApi {
     return fetch(endpoint, {
       headers: {
         Authorization: this.getAuthHeader(params.token),
+        'X-ClientID': this.options.clientId,
       },
     });
   }
@@ -113,6 +130,7 @@ export class EdgeApi {
       body: JSON.stringify({}),
       headers: {
         Authorization: this.getAuthHeader(params.token),
+        'X-ClientID': this.options.clientId,
       },
     });
   }

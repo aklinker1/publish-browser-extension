@@ -4,17 +4,41 @@ import { withTimeout } from '../utils/withTimeout';
 import { Store } from '../utils/store';
 import { z } from 'zod';
 import { ensureZipExists } from '../utils/fs';
-import consola from 'consola';
 
-export const EdgeAddonStoreOptions = z.object({
+const EdgeAddonBaseOptions = z.object({
   zip: z.string().min(1),
   productId: z.string().min(1).trim(),
   clientId: z.string().min(1).trim(),
-  clientSecret: z.string().min(1).trim(),
-  accessTokenUrl: z.string().min(1).trim(),
   skipSubmitReview: z.boolean().default(false),
 });
-export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptions>;
+
+const EdgeAddonStore1_0Options = {
+  apiVersion: z.literal('1.0').default('1.0'),
+  clientSecret: z.string().min(1).trim(),
+  accessTokenUrl: z.string().min(1).trim(),
+};
+const EdgeAddonStore1_1Options = {
+  apiVersion: z.literal('1.1'),
+  apiKey: z.string().min(1).trim(),
+};
+
+export const EdgeAddonStoreOptions = EdgeAddonBaseOptions.extend({
+  ...EdgeAddonStore1_0Options,
+  ...EdgeAddonStore1_1Options,
+  apiVersion: z.enum(['1.0', '1.1']).default('1.0'),
+});
+
+// Zod does not support calling .partial() on discriminated unions, so we have
+// to create two types. One containing all options and one discriminated union
+// between versions.
+export const EdgeAddonStoreOptionsStrict = EdgeAddonBaseOptions.and(
+  z.discriminatedUnion('apiVersion', [
+    z.object(EdgeAddonStore1_0Options),
+    z.object(EdgeAddonStore1_1Options),
+  ]),
+);
+
+export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptionsStrict>;
 
 export class EdgeAddonStore implements Store {
   private api: EdgeApi;
@@ -31,10 +55,11 @@ export class EdgeAddonStore implements Store {
   }
 
   async submit(dryRun?: boolean | undefined): Promise<void> {
-    this.setStatus('Getting an access token');
+    this.setStatus('Getting authorization token');
     const token = await this.api.getToken();
 
     if (dryRun) {
+      // TODO: Validate v1.1 API key before returning. v1.0 token is validated inside `this.api.getToken()` above.
       this.setStatus('DRY RUN: Skipped upload and publishing');
       return;
     }
