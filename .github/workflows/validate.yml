@@ -54,7 +54,7 @@ jobs:
     name: E2E Publish Test (Edge v1.0)
     runs-on: ubuntu-22.04
     # If PR is from a fork, secrets aren't available, so skip this job.
-    if: ${{ !secrets.TEST_CHROME_EXTENSION_ID }}
+    if: github.event.pull_request.head.repo.fork != true
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
