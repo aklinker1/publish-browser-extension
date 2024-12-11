@@ -87,8 +87,7 @@ export class EdgeApi {
       method: 'POST',
       body: file,
       headers: {
-        Authorization: this.getAuthHeader(params.token),
-        'X-ClientID': this.options.clientId,
+        ...this.getAuthHeaders(params.token),
         'Content-Type': 'application/zip',
       },
     });
@@ -110,10 +109,7 @@ export class EdgeApi {
   }): Promise<DraftOperation> {
     const endpoint = `https://api.addons.microsoftedge.microsoft.com/v1/products/${params.productId}/submissions/draft/package/operations/${params.operationId}`;
     return fetch(endpoint, {
-      headers: {
-        Authorization: this.getAuthHeader(params.token),
-        'X-ClientID': this.options.clientId,
-      },
+      headers: this.getAuthHeaders(params.token),
     });
   }
 
@@ -128,14 +124,16 @@ export class EdgeApi {
     const res = await fetch(endpoint, {
       method: 'POST',
       body: JSON.stringify({}),
-      headers: {
-        Authorization: this.getAuthHeader(params.token),
-        'X-ClientID': this.options.clientId,
-      },
+      headers: this.getAuthHeaders(params.token),
     });
   }
 
-  private getAuthHeader(token: EdgeTokenDetails): string {
-    return `${token.token_type} ${token.access_token}`;
+  private getAuthHeaders(token: EdgeTokenDetails): Record<string, string> {
+    return {
+      Authorization: `${token.token_type} ${token.access_token}`,
+      ...(token.token_type === 'ApiKey'
+        ? { 'X-ClientID': this.options.clientId }
+        : {}),
+    };
   }
 }
