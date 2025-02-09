@@ -52,7 +52,7 @@ async function prompt<T>(
   options: Parameters<typeof consola.prompt>[1],
   previousValue?: any,
 ): Promise<T> {
-  const result = await consola.prompt(message, {
+  let result = await consola.prompt(message, {
     default: previousValue,
     placeholder: previousValue,
     ...options,
@@ -60,6 +60,9 @@ async function prompt<T>(
   // When canceling, a symbol is returned instead of the value.
   if (typeof result === 'symbol') {
     throw Error('Canceled');
+  }
+  if (typeof result === 'string') {
+    result = result.trim();
   }
   return result as T;
 }
