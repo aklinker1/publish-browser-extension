@@ -5,40 +5,19 @@ import { Store } from '../utils/store';
 import { z } from 'zod';
 import { ensureZipExists } from '../utils/fs';
 
-const EdgeAddonBaseOptions = z.object({
+export const EdgeAddonStoreOptions = z.object({
   zip: z.string().min(1),
   productId: z.string().min(1).trim(),
   clientId: z.string().min(1).trim(),
   skipSubmitReview: z.boolean().default(false),
-});
-
-const EdgeAddonStore1_0Options = {
-  apiVersion: z.literal('1.0').default('1.0'),
-  clientSecret: z.string().min(1).trim(),
-  accessTokenUrl: z.string().min(1).trim(),
-};
-const EdgeAddonStore1_1Options = {
-  apiVersion: z.literal('1.1'),
   apiKey: z.string().min(1).trim(),
-};
-
-export const EdgeAddonStoreOptions = EdgeAddonBaseOptions.extend({
-  ...EdgeAddonStore1_0Options,
-  ...EdgeAddonStore1_1Options,
-  apiVersion: z.enum(['1.0', '1.1']).default('1.0'),
+  /** @deprecated: API v1.0 authorization field no longer in use. */
+  clientSecret: z.string(),
+  /** @deprecated: API v1.0 authorization field no longer in use. */
+  accessTokenUrl: z.string(),
 });
 
-// Zod does not support calling .partial() on discriminated unions, so we have
-// to create two types. One containing all options and one discriminated union
-// between versions.
-export const EdgeAddonStoreOptionsStrict = EdgeAddonBaseOptions.and(
-  z.discriminatedUnion('apiVersion', [
-    z.object(EdgeAddonStore1_0Options),
-    z.object(EdgeAddonStore1_1Options),
-  ]),
-);
-
-export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptionsStrict>;
+export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptions>;
 
 export class EdgeAddonStore implements Store {
   private api: EdgeApi;

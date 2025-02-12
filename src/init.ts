@@ -262,43 +262,13 @@ async function initEdge(
     previousOptions?.clientId,
   );
   entries.push(['EDGE_CLIENT_ID', clientId]);
-  const apiVersion = await prompt<string>(
-    'Enter the API version you will use:',
-    {
-      type: 'select',
-      options: ['1.1', '1.0'],
-    },
-    previousOptions?.apiVersion,
-  );
-  entries.push(['EDGE_API_VERSION', apiVersion]);
 
-  if (apiVersion === '1.1') {
-    const apiKey = await prompt<string>(
-      'Enter your API key:',
-      { type: 'text' },
-      previousOptions?.apiVersion === '1.1'
-        ? previousOptions.apiKey
-        : undefined,
-    );
-    entries.push(['EDGE_API_KEY', apiKey]);
-  } else {
-    const clientSecret = await prompt<string>(
-      'Enter your client secret:',
-      { type: 'text' },
-      previousOptions?.apiVersion === '1.0'
-        ? previousOptions?.clientSecret
-        : undefined,
-    );
-    const accessTokenUrl = await prompt<string>(
-      'Enter your access token URL:',
-      { type: 'text' },
-      previousOptions?.apiVersion === '1.0'
-        ? previousOptions?.accessTokenUrl
-        : undefined,
-    );
-    entries.push(['EDGE_CLIENT_SECRET', clientSecret]);
-    entries.push(['EDGE_ACCESS_TOKEN_URL', accessTokenUrl]);
-  }
+  const apiKey = await prompt<string>(
+    'Enter your API key:',
+    { type: 'text' },
+    previousOptions?.apiKey,
+  );
+  entries.push(['EDGE_API_KEY', apiKey]);
 
   const submitForReview = await prompt<boolean>(
     'When uploading, automatically submit new update for review?',

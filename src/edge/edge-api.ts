@@ -4,17 +4,8 @@ import { fetch } from '../utils/fetch';
 export type EdgeApiOptions = {
   productId: string;
   clientId: string;
-} & (
-  | {
-      apiVersion: '1.0';
-      clientSecret: string;
-      accessTokenUrl: string;
-    }
-  | {
-      apiVersion: '1.1';
-      apiKey: string;
-    }
-);
+  apiKey: string;
+};
 
 export interface EdgeTokenDetails {
   access_token: string;
@@ -46,30 +37,10 @@ export class EdgeApi {
    * Docs: https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api#sample-request
    */
   getToken(): Promise<EdgeTokenDetails> {
-    // Edge API requires an API key instead of an access token since version 1.1
-    if (this.options.apiVersion !== '1.0') {
-      return Promise.resolve({
-        access_token: this.options.apiKey,
-        expires_in: 0,
-        token_type: 'ApiKey',
-      });
-    }
-
-    const form = new URLSearchParams();
-    form.set('client_id', this.options.clientId);
-    form.set(
-      'scope',
-      'https://api.addons.microsoftedge.microsoft.com/.default',
-    );
-    form.set('client_secret', this.options.clientSecret);
-    form.set('grant_type', 'client_credentials');
-
-    return fetch(this.options.accessTokenUrl, {
-      method: 'POST',
-      body: form,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+    return Promise.resolve({
+      access_token: this.options.apiKey,
+      expires_in: 0,
+      token_type: 'ApiKey',
     });
   }
 

@@ -17,19 +17,22 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     consola.warn('Dry run, skipping submission');
   }
 
-  if (internalConfig.edge?.apiVersion === '1.0') {
+  if (
+    internalConfig.edge?.clientSecret ||
+    internalConfig.edge?.accessTokenUrl
+  ) {
     consola.warn(
       [
-        'Edge API v1.0 will stop working Jan 1, 2025. To upgrade to v1.1:',
-        '  1. Pass the new CLI flag (`--edge-api-version 1.1`) or set the environment variable (`EDGE_API_VERSION=1.1`) to opt into the new version',
-        '  2. Replace the client secret/access token URL with an API key (`--edge-api-key` flag or `EDGE_API_KEY` environment variable)',
-        '  3. Stop passing in a client secret and access token URL',
-        'Or run `publish-extension init` and re-initialize the edge store for API v1.1.',
+        'Edge API v1.0 was deprecated Jan 1, 2025. v1.1 of the API requires different authentication. To upgrade:',
+        '  1. Remove the `--edge-client-secret` or `EDGE_CLIENT_SECRET` environment variable',
+        '  2. Remove the `--edge-access-token-url` or `EDGE_ACCESS_TOKEN_URL` environment variable',
+        '  3. Follow the instructions below to add the `--edge-api-key` flag or `EDGE_API_KEY` environment variable',
+        'Or run `publish-extension init` and re-initialize the edge store.',
         '',
         'To generate an API key:',
-        '1. Visit https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
-        '2. Enable the v1.1 API if necessary.',
-        '3. Create an new API key',
+        '  1. Visit https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
+        '  2. Enable the v1.1 API if necessary',
+        '  3. Create an new API key',
         '',
         'Refer to Microsoft API reference for more details: https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api?tabs=v1-1#overview-of-using-the-update-rest-api',
       ].join('\n'),

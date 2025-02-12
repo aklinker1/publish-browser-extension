@@ -26,7 +26,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -48,26 +47,4 @@ jobs:
           EDGE_API_VERSION: '1.1'
           EDGE_CLIENT_ID: ${{ secrets.TEST_EDGE_CLIENT_ID_1_1 }}
           EDGE_API_KEY: ${{ secrets.TEST_EDGE_API_KEY }}
-          EDGE_SKIP_SUBMIT_REVIEW: 'true'
-
-  e2e-test-edge-1_0:
-    name: E2E Publish Test (Edge v1.0)
-    runs-on: ubuntu-22.04
-    # If PR is from a fork, secrets aren't available, so skip this job.
-    if: github.event.pull_request.head.repo.fork != true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install
-      - run: ./scripts/dev.sh edge
-        env:
-          EDGE_PRODUCT_ID: ${{ secrets.TEST_EDGE_PRODUCT_ID }}
-          EDGE_CLIENT_ID: ${{ secrets.TEST_EDGE_CLIENT_ID_1_0 }}
-          EDGE_CLIENT_SECRET: ${{ secrets.TEST_EDGE_CLIENT_SECRET }}
-          EDGE_ACCESS_TOKEN_URL: ${{ secrets.TEST_EDGE_ACCESS_TOKEN_URL }}
           EDGE_SKIP_SUBMIT_REVIEW: 'true'
