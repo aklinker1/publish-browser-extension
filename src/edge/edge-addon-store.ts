@@ -12,9 +12,9 @@ export const EdgeAddonStoreOptions = z.object({
   skipSubmitReview: z.boolean().default(false),
   apiKey: z.string().min(1).trim(),
   /** @deprecated: API v1.0 authorization field no longer in use. */
-  clientSecret: z.string(),
+  clientSecret: z.string().optional(),
   /** @deprecated: API v1.0 authorization field no longer in use. */
-  accessTokenUrl: z.string(),
+  accessTokenUrl: z.string().optional(),
 });
 
 export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptions>;

@@ -7,8 +7,8 @@ on:
       - main
 
 jobs:
-  verify:
-    name: Verify Code
+  checks:
+    name: Checks
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -23,8 +23,8 @@ jobs:
       - run: pnpm test
       - run: node bin/publish-extension.cjs --help
 
-  e2e-test:
-    name: E2E Publish Test
+  e2e-tests:
+    name: E2E Tests
     runs-on: ubuntu-22.04
     # If PR is from a fork, secrets aren't available, so skip this job.
     if: github.event.pull_request.head.repo.fork != true
