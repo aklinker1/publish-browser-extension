@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.0.0
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.3.0...v3.0.0)
+
+#### ⚠️ Breaking Changes
+
+- ⚠️ **edge**: Drop support for v1.0 API authentication ([#32](https://github.com/aklinker1/publish-browser-extension/pull/32))
+
+  Re-run `publish-extension init` or `wxt submit init` and select the "Edge" store. Follow instructions to get new API key required for the Edge API v1.1.
+
 ## v2.3.1
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.3.0...v2.3.1)
