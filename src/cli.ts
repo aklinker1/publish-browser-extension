@@ -84,10 +84,6 @@ cli.option(
   'Client ID used for authorizing requests to Microsofts addon API',
 );
 cli.option(
-  '--edge-api-version [edgeApiVersion]',
-  'API version (1.0 or 1.1) to use (DEPRECATED: 1.0 is no longer available, so 1.1 is always used)',
-);
-cli.option(
   '--edge-api-key [edgeApiKey]',
   'API key used for authorizing requests to Microsofts addon API v1.1',
 );

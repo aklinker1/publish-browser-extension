@@ -71,8 +71,7 @@ publishExtension({
     zip: 'dist/chrome.zip',
     productId: "<edge-product-id>",
     clientId: "<edge-client-id>",
-    clientSecret: "<edge-client-secret>",
-    accessTokenUrl: "<edge-access-token-url>",
+    apiKey: "<edge-api-key>",
     skipSubmitReview: false,
   },
 })
