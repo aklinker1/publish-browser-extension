@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.3.1
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.3.0...v2.3.1)
+
+### 🩹 Fixes
+
+- **init:** Trim whitespace ([#31](https://github.com/aklinker1/publish-browser-extension/pull/31))
+
+### 🤖 CI
+
+- Fix validate workflow triggers ([c7f8508](https://github.com/aklinker1/publish-browser-extension/commit/c7f8508))
+
+### ❤️ Contributors
+
+- Gabriel Miranda ([@gabrielmfern](http://github.com/gabrielmfern))
+
 ## v2.3.0
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.2.2...v2.3.0)
