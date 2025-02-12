@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ChromeWebStoreOptions } from './chrome';
-import { EdgeAddonStoreOptions, EdgeAddonStoreOptionsStrict } from './edge';
+import { EdgeAddonStoreOptions } from './edge';
 import { FirefoxAddonStoreOptions } from './firefox';
 import { DeepPartial } from './utils/types';
 
@@ -72,8 +72,6 @@ export function resolveConfig(
             zip: edgeZip,
             productId: config.edge?.productId ?? stringEnv('EDGE_PRODUCT_ID'),
             clientId: config.edge?.clientId ?? stringEnv('EDGE_CLIENT_ID'),
-            apiVersion:
-              config.edge?.apiVersion ?? stringEnv('EDGE_API_VERSION') ?? '1.0',
             apiKey: config.edge?.apiKey ?? stringEnv('EDGE_API_KEY'),
             clientSecret:
               config.edge?.clientSecret ?? stringEnv('EDGE_CLIENT_SECRET'),
@@ -147,7 +145,7 @@ export const InternalConfig = z.object({
   dryRun: z.boolean(),
   chrome: ChromeWebStoreOptions.optional(),
   firefox: FirefoxAddonStoreOptions.optional(),
-  edge: EdgeAddonStoreOptionsStrict.optional(),
+  edge: EdgeAddonStoreOptions.optional(),
 });
 export type InternalConfig = z.infer<typeof InternalConfig>;
 
@@ -179,7 +177,6 @@ interface CustomEnv {
   /** @deprecated since Edge API v1.1 release */
   EDGE_ACCESS_TOKEN_URL: string | undefined;
   EDGE_API_KEY: string | undefined;
-  EDGE_API_VERSION: '1.0' | '1.1' | undefined;
   EDGE_SKIP_SUBMIT_REVIEW: string | undefined;
 }
 

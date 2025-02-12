@@ -85,7 +85,7 @@ cli.option(
 );
 cli.option(
   '--edge-api-version [edgeApiVersion]',
-  'API version (1.0 or 1.1) to use',
+  'API version (1.0 or 1.1) to use (DEPRECATED: 1.0 is no longer available, so 1.1 is always used)',
 );
 cli.option(
   '--edge-api-key [edgeApiKey]',
@@ -93,11 +93,11 @@ cli.option(
 );
 cli.option(
   '--edge-client-secret [edgeClientSecret]',
-  'Client secret used for authorizing requests to Microsofts addon API v1.0',
+  'DEPRECATED: Client secret used for authorizing requests to Microsofts addon API v1.0 (no longer available)',
 );
 cli.option(
   '--edge-access-token-url [edgeAccessTokenUrl]',
-  'Access token URL used for authorizing requests to Microsofts addon API v1.0',
+  'DEPRECATED: Access token URL used for authorizing requests to Microsofts addon API v1.0 (no longer available)',
 );
 cli.option(
   '--edge-skip-submit-review',
@@ -130,7 +130,6 @@ function configFromFlags(flags: any): InlineConfig {
       zip: flags.edgeZip,
       productId: flags.edgeProductId,
       clientId: flags.edgeClientId,
-      apiVersion: flags.edgeApiVersion,
       apiKey: flags.edgeApiKey,
       clientSecret: flags.edgeClientSecret,
       accessTokenUrl: flags.edgeAccessTokenUrl,
