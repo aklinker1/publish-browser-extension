@@ -105,9 +105,6 @@ cli.option(
 );
 
 function configFromFlags(flags: any): InlineConfig {
-  if (flags.edgeClientSecret || flags.edgeAccessTokenUrl) {
-    throw Error();
-  }
   return {
     dryRun: flags.dryRun,
     chrome: {

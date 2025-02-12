@@ -44,7 +44,6 @@ jobs:
           FIREFOX_JWT_SECRET: ${{ secrets.TEST_FIREFOX_JWT_SECRET }}
           FIREFOX_CHANNEL: unlisted
           EDGE_PRODUCT_ID: ${{ secrets.TEST_EDGE_PRODUCT_ID }}
-          EDGE_API_VERSION: '1.1'
-          EDGE_CLIENT_ID: ${{ secrets.TEST_EDGE_CLIENT_ID_1_1 }}
+          EDGE_CLIENT_ID: ${{ secrets.TEST_EDGE_CLIENT_ID }}
           EDGE_API_KEY: ${{ secrets.TEST_EDGE_API_KEY }}
           EDGE_SKIP_SUBMIT_REVIEW: 'true'
