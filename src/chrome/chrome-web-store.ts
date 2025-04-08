@@ -51,6 +51,8 @@ export class ChromeWebStore implements Store {
       extensionId: this.options.extensionId,
       publishTarget: this.options.publishTarget,
       token,
+      deployPercentage: this.options.deployPercentage,
+      reviewExemption: this.options.reviewExemption,
     });
   }
 
