@@ -1,5 +1,19 @@
 # Changelog
 
+## v3.0.1
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v3.0.0...v3.0.1)
+
+### 🩹 Fixes
+
+- Upgrade package version ([30cc59f](https://github.com/aklinker1/publish-browser-extension/commit/30cc59f))
+- Remove unused CLI flags ([f59eef9](https://github.com/aklinker1/publish-browser-extension/commit/f59eef9))
+- **cws:** Properly provide the `deployPercentage` and `reviewExemption` options ([#37](https://github.com/aklinker1/publish-browser-extension/pull/37))
+
+### 🏡 Chore
+
+- Update changelog ([1d4b579](https://github.com/aklinker1/publish-browser-extension/commit/1d4b579))
+
 ## v3.0.0
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v2.3.0...v3.0.0)
