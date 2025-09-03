@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.2
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v3.0.1...v3.0.2)
+
 ## v3.0.1
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v3.0.0...v3.0.1)
