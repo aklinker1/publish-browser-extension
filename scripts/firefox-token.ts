@@ -1,4 +1,4 @@
-import consola from 'consola';
+import { consola } from 'consola';
 import { AddonsApi } from '../src/firefox/firefox-api';
 
 // This file is used to generate a token for Insomnia/Postman

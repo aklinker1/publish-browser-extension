@@ -1,7 +1,7 @@
 import { writeFile } from 'fs/promises';
 import { createWriteStream } from 'fs';
 import archiver from 'archiver';
-import consola from 'consola';
+import { consola } from 'consola';
 
 // Utils
 

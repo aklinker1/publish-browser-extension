@@ -1,4 +1,4 @@
-import consola from 'consola';
+import { consola } from 'consola';
 import { InlineConfig, resolveConfig } from './config';
 import { copyFile, writeFile, readFile } from 'node:fs/promises';
 import { ChromeWebStoreOptions } from './chrome';

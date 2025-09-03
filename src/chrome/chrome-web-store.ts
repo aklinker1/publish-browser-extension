@@ -1,7 +1,7 @@
 import { CwsApi } from './chrome-api';
 import { Store } from '../utils/store';
 import { z } from 'zod';
-import consola from 'consola';
+import { consola } from 'consola';
 import { ensureZipExists } from '../utils/fs';
 
 export const ChromeWebStoreOptions = z.object({

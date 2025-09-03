@@ -5,7 +5,7 @@ import { plural } from '../utils/plural';
 import { Store } from '../utils/store';
 import { z } from 'zod';
 import { ensureZipExists } from '../utils/fs';
-import consola from 'consola';
+import { consola } from 'consola';
 
 export const FirefoxAddonStoreOptions = z.object({
   zip: z.string().min(1),

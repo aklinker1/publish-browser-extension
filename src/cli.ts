@@ -3,7 +3,7 @@ import { version } from '../package.json';
 import { submit } from './submit';
 import { InlineConfig } from './config';
 import { init } from './init';
-import consola from 'consola';
+import { consola } from 'consola';
 import { config } from 'dotenv';
 
 config({ path: '.env.submit' });
