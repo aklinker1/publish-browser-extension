@@ -9,3 +9,6 @@ peerDependencyRules:
 ignoredBuiltDependencies:
   - esbuild
   - simple-git-hooks
+
+nodeVersion: 18.12.0
+engineStrict: true
