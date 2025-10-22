@@ -3,9 +3,8 @@ import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import { plural } from '../utils/plural';
 import { Store } from '../utils/store';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
-import { consola } from 'consola';
 
 export const FirefoxAddonStoreOptions = z.object({
   zip: z.string().min(1),

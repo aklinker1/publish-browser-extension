@@ -5,6 +5,15 @@
   "engines": {
     "node": "^18.0.0 || >=20.0.0"
   },
+  "devEngines": {
+    "runtime": [
+      {
+        "name": "node",
+        "version": "20.17.0",
+        "onFail": "download"
+      }
+    ]
+  },
   "license": "MIT",
   "keywords": [
     "chrome-web-store",
@@ -71,30 +80,17 @@
   },
   "dependencies": {
     "cac": "^6.7.14",
-    "cli-highlight": "^2.1.11",
     "consola": "^3.4.2",
-    "dotenv": "^16.6.1",
-    "extract-zip": "^2.0.1",
+    "dotenv": "^17.2.3",
     "formdata-node": "^6.0.3",
     "listr2": "^8.3.3",
-    "lodash.camelcase": "^4.3.0",
-    "lodash.kebabcase": "^4.1.1",
-    "lodash.snakecase": "^4.1.1",
     "ofetch": "^1.4.1",
-    "open": "^10.2.0",
-    "ora": "^6.3.1",
-    "prompts": "^2.4.2",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76 || ^4.0.0"
   },
   "devDependencies": {
     "@aklinker1/check": "^1.4.5",
     "@types/jsonwebtoken": "^8.5.9",
-    "@types/lodash.camelcase": "^4.3.9",
-    "@types/lodash.kebabcase": "^4.1.9",
-    "@types/lodash.snakecase": "^4.1.9",
     "@types/node": "^18.19.123",
-    "@types/node-fetch": "^2.6.13",
-    "@types/prompts": "^2.4.9",
     "@vitest/coverage-v8": "^1.6.1",
     "archiver": "^5.3.2",
     "jsonwebtoken": "^8.5.1",
@@ -103,23 +99,11 @@
     "prettier": "^3.6.2",
     "publint": "^0.2.12",
     "rimraf": "^4.4.1",
-    "run-all": "^1.0.1",
     "simple-git-hooks": "^2.13.1",
     "tsup": "^8.5.0",
-    "tsx": "^3.14.0",
-    "typescript": "^5.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
     "vitest": "^1.6.1"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@types/download",
-        "download",
-        "express",
-        "safe-compare",
-        "body-parser"
-      ]
-    }
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
@@ -132,5 +116,5 @@
       "aaronklinker1@gmail.com"
     ]
   },
-  "packageManager": "pnpm@9.15.9"
+  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8"
 }

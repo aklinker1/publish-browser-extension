@@ -6,7 +6,7 @@ import { init } from './init';
 import { consola } from 'consola';
 import { config } from 'dotenv';
 
-config({ path: '.env.submit' });
+config({ path: '.env.submit', quiet: true });
 
 const cli = cac('publish-extension');
 cli.version(version);
