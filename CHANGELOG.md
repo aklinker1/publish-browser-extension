@@ -1,5 +1,27 @@
 # Changelog
 
+## v4.0.0
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v3.0.3...v4.0.0)
+
+### 🩹 Fixes
+
+- Require selecting at least one store during init command ([e6469de](https://github.com/aklinker1/publish-browser-extension/commit/e6469de))
+- Add `oxlint` and handle uncaught API error for Edge ([#44](https://github.com/aklinker1/publish-browser-extension/pull/44))
+
+### 🏡 Chore
+
+- Use `bun:test` instead of `vitest` ([#43](https://github.com/aklinker1/publish-browser-extension/pull/43))
+- ⚠️ Drop CJS support and build package with `tsdown` ([#45](https://github.com/aklinker1/publish-browser-extension/pull/45))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️ Drop CJS support and build package with `tsdown` ([#45](https://github.com/aklinker1/publish-browser-extension/pull/45))
+
+### ❤️ Contributors
+
+- Aaron ([@aklinker1](https://github.com/aklinker1))
+
 ## v3.0.3
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v3.0.2...v3.0.3)
