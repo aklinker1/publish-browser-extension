@@ -3,59 +3,12 @@
   "description": "Easily publish web extensions to their stores",
   "version": "3.0.3",
   "packageManager": "bun@1.3.1",
-  "license": "MIT",
-  "keywords": [
-    "chrome-web-store",
-    "firefox-addon-store",
-    "chrome",
-    "firefox",
-    "addon",
-    "store",
-    "extension",
-    "browser"
-  ],
-  "author": {
-    "name": "Aaron Klinker",
-    "url": "https://github.com/aklinker1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/aklinker1/publish-browser-extension.git"
-  },
-  "homepage": "https://github.com/aklinker1/publish-browser-extension#readme",
-  "files": [
-    "dist"
-  ],
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "publish-extension": "bin/publish-extension.cjs"
-  },
-  "exports": {
-    ".": {
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      },
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
-    },
-    "./cli": {
-      "require": "./dist/cli.cjs",
-      "import": "./dist/cli.js"
-    }
-  },
   "scripts": {
     "check": "check",
     "build": "run-s build:*",
-    "build:clean": "rimraf dist",
-    "build:lib": "tsup src/index.ts --dts --format cjs,esm --sourcemap",
-    "build:cli": "tsup --format cjs,esm --entry.cli src/cli.ts",
-    "build:test-extension": "node scripts/build-test-extension.js",
+    "build:lib": "tsdown src/index.ts src/cli.ts",
+    "build:test-extension": "bun scripts/build-test-extension.js",
     "dev:all": "./scripts/dev.sh all",
     "dev:chrome": "./scripts/dev.sh chrome",
     "dev:firefox": "./scripts/dev.sh firefox",
@@ -87,8 +40,8 @@
     "oxlint": "^1.24.0",
     "prettier": "^3.6.2",
     "publint": "^0.2.12",
-    "rimraf": "^4.4.1",
     "simple-git-hooks": "^2.13.1",
+    "tsdown": "^0.15.9",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3"
   },
@@ -98,9 +51,38 @@
   "lint-staged": {
     "*": "prettier --ignore-unknown --write"
   },
-  "changelog": {
-    "excludeAuthors": [
-      "aaronklinker1@gmail.com"
-    ]
+  "license": "MIT",
+  "keywords": [
+    "chrome-web-store",
+    "firefox-addon-store",
+    "chrome",
+    "firefox",
+    "addon",
+    "store",
+    "extension",
+    "browser"
+  ],
+  "author": {
+    "name": "Aaron Klinker",
+    "url": "https://github.com/aklinker1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aklinker1/publish-browser-extension.git"
+  },
+  "homepage": "https://github.com/aklinker1/publish-browser-extension#readme",
+  "files": [
+    "dist"
+  ],
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "publish-extension": "bin/publish-extension.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   }
 }
