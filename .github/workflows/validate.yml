@@ -1,7 +1,8 @@
 name: Validate
 on:
-  workflow_call:
   pull_request:
+  workflow_call:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -9,33 +10,22 @@ on:
 jobs:
   checks:
     name: Checks
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install
-      - run: pnpm build
-      - run: pnpm check
-      - run: pnpm test
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: ./.github/actions/setup
+      - run: bun run build
+      - run: bun check
+      - run: bun run test
       - run: node bin/publish-extension.cjs --help
-
   e2e-tests:
     name: E2E Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     # If PR is from a fork, secrets aren't available, so skip this job.
     if: github.event.pull_request.head.repo.fork != true
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: ./.github/actions/setup
       - run: ./scripts/dev.sh all
         env:
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}

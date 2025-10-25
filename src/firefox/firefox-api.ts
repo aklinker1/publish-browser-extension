@@ -2,6 +2,8 @@ import { FormData } from 'formdata-node';
 import { fileFromPath } from 'formdata-node/file-from-path';
 import jwt from 'jsonwebtoken';
 import { fetch } from '../utils/fetch';
+import { FormDataEncoder } from 'form-data-encoder';
+import { Readable } from 'node:stream';
 
 export interface AddonsApiOptions {
   jwtIssuer: string;
@@ -96,13 +98,15 @@ export class AddonsApi {
     const endpoint = this.addonsUploadCreateEndpoint();
     const form = new FormData();
 
-    form.append('channel', params.channel);
-    form.append('upload', await fileFromPath(params.file));
+    form.set('channel', params.channel);
+    form.set('upload', await fileFromPath(params.file));
+    const encoder = new FormDataEncoder(form);
 
     return await fetch(endpoint.href, {
       method: 'POST',
-      body: form,
+      body: Readable.from(encoder),
       headers: {
+        ...encoder.headers,
         Authorization: this.getAuthHeader(),
       },
     });
@@ -127,17 +131,19 @@ export class AddonsApi {
   }): Promise<AddonVersion> {
     const endpoint = this.addonVersionCreateEndpoint(params.extensionId);
     const form = new FormData();
-    form.append('upload', params.uploadUuid);
+    form.set('upload', params.uploadUuid);
     if (params.sourceFile) {
-      form.append('source', await fileFromPath(params.sourceFile));
+      form.set('source', await fileFromPath(params.sourceFile));
     } else {
-      form.append('source', '');
+      form.set('source', '');
     }
+    const encoder = new FormDataEncoder(form);
 
     return await fetch(endpoint.href, {
       method: 'POST',
-      body: form,
+      body: Readable.from(encoder),
       headers: {
+        ...encoder.headers,
         Authorization: this.getAuthHeader(),
       },
     });

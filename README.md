@@ -18,7 +18,7 @@ https://github.com/aklinker1/publish-browser-extension/assets/10101283/b0e856ca-
 ```sh
 npm i -D publish-browser-extension
 pnpm i -D publish-browser-extension
-yarn add -D publish-browser-extension
+bun i -D publish-browser-extension
 ```
 
 ## CLI Usage
@@ -40,7 +40,7 @@ publish-extension \
   --edge-zip dist/chrome.zip
 ```
 
-`publish-extesion` will automatically look for a `.env.submit` file and load it if it exists.
+`publish-extension` will automatically look for a `.env.submit` file and load it if it exists.
 
 ## JS Usage
 
@@ -102,7 +102,7 @@ publishExtension({
    ```
    > [!WARNING]
    >
-   > Make sure to set the Firefox channel to "unlisted", chrome's publish target to "trustedTesters", and don't submit the extension for review for Chrome or Edge. This will prevent you from accidentally releasing one of the test extensions publically.
+   > Make sure to set the Firefox channel to "unlisted", chrome's publish target to "trustedTesters", and don't submit the extension for review for Chrome or Edge. This will prevent you from accidentally releasing one of the test extensions publicly.
 5. Run the dev commands to upload a test extension to the stores:
    ```sh
    pnpm dev:all

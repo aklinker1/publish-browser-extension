@@ -1,25 +1,25 @@
 #!/bin/bash
 set -e
-pnpm build
+bun run build
 
 TARGET="$1"
 
 if [[ "$TARGET" == "all" ]]; then
-    node bin/publish-extension.cjs \
+    bun bin/publish-extension.cjs \
         --chrome-zip extension/chrome.zip \
         --firefox-zip extension/firefox.zip \
         --firefox-sources-zip extension/firefox.zip \
         --edge-zip extension/chrome.zip
 elif [[ "$TARGET" == "chrome" ]]; then
-    node bin/publish-extension.cjs --chrome-zip extension/chrome.zip
+    bun bin/publish-extension.cjs --chrome-zip extension/chrome.zip
 elif [[ "$TARGET" == "firefox" ]]; then
-    node bin/publish-extension.cjs --firefox-zip extension/firefox.zip --firefox-sources-zip extension/firefox.zip
+    bun bin/publish-extension.cjs --firefox-zip extension/firefox.zip --firefox-sources-zip extension/firefox.zip
 elif [[ "$TARGET" == "edge" ]]; then
-    node bin/publish-extension.cjs --edge-zip extension/chrome.zip
+    bun bin/publish-extension.cjs --edge-zip extension/chrome.zip
 elif [[ "$TARGET" == "help" ]]; then
-    node bin/publish-extension.cjs --help
+    bun bin/publish-extension.cjs --help
 else
     echo
-    echo "Run 'pnpm dev:chrome' or 'pnpm dev:firefox' or 'pnpm dev:edge' or 'pnpm dev:all'"
-    node bin/publish-extension.cjs
+    echo "Run 'bun dev:chrome' or 'bun dev:firefox' or 'bun dev:edge' or 'bun dev:all'"
+    bun bin/publish-extension.cjs
 fi
