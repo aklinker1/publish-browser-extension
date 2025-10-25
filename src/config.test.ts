@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'bun:test';
 import {
   InlineConfig,
   InternalConfig,
@@ -161,11 +161,11 @@ describe('resolveConfig', () => {
         skipSubmitReview: false,
         reviewExemption: false,
         deployPercentage: undefined,
-        publishTarget: 'default',
+        publishTarget: 'default' as const,
       },
       firefox: {
         ...config.firefox,
-        channel: 'listed',
+        channel: 'listed' as const,
       },
       edge: {
         ...config.edge,

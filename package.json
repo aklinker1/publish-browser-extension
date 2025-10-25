@@ -56,8 +56,6 @@
     "build:lib": "tsup src/index.ts --dts --format cjs,esm --sourcemap",
     "build:cli": "tsup --format cjs,esm --entry.cli src/cli.ts",
     "build:test-extension": "node scripts/build-test-extension.js",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
     "dev:all": "./scripts/dev.sh all",
     "dev:chrome": "./scripts/dev.sh chrome",
     "dev:firefox": "./scripts/dev.sh firefox",
@@ -79,9 +77,9 @@
   },
   "devDependencies": {
     "@aklinker1/check": "^2.1.2",
+    "@types/bun": "^1.3.1",
     "@types/jsonwebtoken": "^8.5.9",
     "@types/node": "^18.19.123",
-    "@vitest/coverage-v8": "^1.6.1",
     "archiver": "^5.3.2",
     "jsonwebtoken": "^8.5.1",
     "lint-staged": "^15.5.2",
@@ -91,8 +89,7 @@
     "rimraf": "^4.4.1",
     "simple-git-hooks": "^2.13.1",
     "tsup": "^8.5.0",
-    "typescript": "^5.9.3",
-    "vitest": "^1.6.1"
+    "typescript": "^5.9.3"
   },
   "simple-git-hooks": {
     "pre-commit": "bun lint-staged"

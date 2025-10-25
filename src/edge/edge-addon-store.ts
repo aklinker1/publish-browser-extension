@@ -1,7 +1,11 @@
-import { DraftOperation, EdgeApi, EdgeTokenDetails } from './edge-api';
+import {
+  type DraftOperation,
+  EdgeApi,
+  type EdgeTokenDetails,
+} from './edge-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
-import { Store } from '../utils/store';
+import type { Store } from '../utils/store';
 import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 
