@@ -1,8 +1,8 @@
-import { AddonsApi, UploadDetails } from './firefox-api';
+import { AddonsApi, type UploadDetails } from './firefox-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import { plural } from '../utils/plural';
-import { Store } from '../utils/store';
+import type { Store } from '../utils/store';
 import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 

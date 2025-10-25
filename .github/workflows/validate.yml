@@ -16,7 +16,7 @@ jobs:
       - uses: ./.github/actions/setup
       - run: bun run build
       - run: bun check
-      - run: bun run test
+      - run: bun test
       - run: node bin/publish-extension.cjs --help
   e2e-tests:
     name: E2E Tests

@@ -1,5 +1,5 @@
 import { CwsApi } from './chrome-api';
-import { Store } from '../utils/store';
+import type { Store } from '../utils/store';
 import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 

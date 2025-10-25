@@ -2,7 +2,7 @@ import { z } from 'zod/v4';
 import { ChromeWebStoreOptions } from './chrome';
 import { EdgeAddonStoreOptions } from './edge';
 import { FirefoxAddonStoreOptions } from './firefox';
-import { DeepPartial } from './utils/types';
+import type { DeepPartial } from './utils/types';
 
 /**
  * Given inline config, read environment variables and apply defaults. Throws an error if any config
