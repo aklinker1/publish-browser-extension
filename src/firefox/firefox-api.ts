@@ -99,12 +99,14 @@ export class AddonsApi {
     form.append('channel', params.channel);
     form.append('upload', await fileFromPath(params.file));
 
+    console.log('PARAMS:', params);
+    console.log('FORM:', form);
+
     return await fetch(endpoint.href, {
       method: 'POST',
       body: form,
       headers: {
         Authorization: this.getAuthHeader(),
-        'Content-Type': 'multipart/form-data',
       },
     });
   }
