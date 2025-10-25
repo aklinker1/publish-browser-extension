@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.0.3
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v3.0.2...v3.0.3)
+
+### 🏡 Chore
+
+- Migrate to bun for development + NPM OIDC publish flow ([#42](https://github.com/aklinker1/publish-browser-extension/pull/42))
+
 ## v3.0.2
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v3.0.1...v3.0.2)
