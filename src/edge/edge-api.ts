@@ -97,6 +97,12 @@ export class EdgeApi {
       body: JSON.stringify({}),
       headers: this.getAuthHeaders(params.token),
     });
+    if (!res.ok) {
+      console.log(await res.text());
+      throw Error(
+        `Edge API returned ${res.status} ${res.statusText} for ${endpoint}.`,
+      );
+    }
   }
 
   private getAuthHeaders(token: EdgeTokenDetails): Record<string, string> {
