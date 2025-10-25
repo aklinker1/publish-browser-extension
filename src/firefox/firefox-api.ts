@@ -104,6 +104,7 @@ export class AddonsApi {
       body: form,
       headers: {
         Authorization: this.getAuthHeader(),
+        'Content-Type': 'multipart/form-data',
       },
     });
   }
