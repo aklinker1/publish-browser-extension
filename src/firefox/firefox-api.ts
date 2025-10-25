@@ -2,6 +2,7 @@ import { FormData } from 'formdata-node';
 import { fileFromPath } from 'formdata-node/file-from-path';
 import jwt from 'jsonwebtoken';
 import { fetch } from '../utils/fetch';
+import { FormDataEncoder } from 'form-data-encoder';
 
 export interface AddonsApiOptions {
   jwtIssuer: string;
@@ -98,14 +99,17 @@ export class AddonsApi {
 
     form.append('channel', params.channel);
     form.append('upload', await fileFromPath(params.file));
+    const encoder = new FormDataEncoder(form);
 
     console.log('PARAMS:', params);
     console.log('FORM:', form);
+    console.log('HEADERS:', encoder.headers);
 
     return await fetch(endpoint.href, {
       method: 'POST',
       body: form,
       headers: {
+        ...encoder.headers,
         Authorization: this.getAuthHeader(),
       },
     });
