@@ -1,7 +1,6 @@
 import { CwsApi } from './chrome-api';
 import { Store } from '../utils/store';
-import { z } from 'zod';
-import { consola } from 'consola';
+import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 
 export const ChromeWebStoreOptions = z.object({
@@ -11,7 +10,7 @@ export const ChromeWebStoreOptions = z.object({
   clientSecret: z.string().min(1).trim(),
   refreshToken: z.string().min(1).trim(),
   publishTarget: z.enum(['default', 'trustedTesters']).default('default'),
-  deployPercentage: z.number().int().min(1).max(100).optional(),
+  deployPercentage: z.int().min(1).max(100).optional(),
   reviewExemption: z.boolean().default(false),
   skipSubmitReview: z.boolean().default(false),
 });

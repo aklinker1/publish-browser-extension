@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { ChromeWebStoreOptions } from './chrome';
 import { EdgeAddonStoreOptions } from './edge';
 import { FirefoxAddonStoreOptions } from './firefox';
@@ -98,7 +98,7 @@ export function validateConfig(config: any): InternalConfig {
   if (!result.success) {
     throw Error(
       'Missing required config: ' +
-        result.error.errors
+        result.error.issues
           .map(i => i.path.map(j => toScreamingSnakeCase(String(j))).join('_'))
           .join(', '),
       { cause: result.error },

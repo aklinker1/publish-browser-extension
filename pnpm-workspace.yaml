@@ -1,0 +1,14 @@
+peerDependencyRules:
+  ignoreMissing:
+    - '@types/download'
+    - download
+    - express
+    - safe-compare
+    - body-parse
+
+ignoredBuiltDependencies:
+  - esbuild
+  - simple-git-hooks
+
+nodeVersion: 18.12.0
+engineStrict: true
