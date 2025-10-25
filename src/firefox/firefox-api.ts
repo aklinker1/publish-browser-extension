@@ -102,10 +102,6 @@ export class AddonsApi {
     form.set('upload', await fileFromPath(params.file));
     const encoder = new FormDataEncoder(form);
 
-    console.log('PARAMS:', params);
-    console.log('FORM:', form);
-    console.log('HEADERS:', encoder.headers);
-
     return await fetch(endpoint.href, {
       method: 'POST',
       body: Readable.from(encoder),
