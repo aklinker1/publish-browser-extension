@@ -131,17 +131,19 @@ export class AddonsApi {
   }): Promise<AddonVersion> {
     const endpoint = this.addonVersionCreateEndpoint(params.extensionId);
     const form = new FormData();
-    form.append('upload', params.uploadUuid);
+    form.set('upload', params.uploadUuid);
     if (params.sourceFile) {
-      form.append('source', await fileFromPath(params.sourceFile));
+      form.set('source', await fileFromPath(params.sourceFile));
     } else {
-      form.append('source', '');
+      form.set('source', '');
     }
+    const encoder = new FormDataEncoder(form);
 
     return await fetch(endpoint.href, {
       method: 'POST',
-      body: form,
+      body: Readable.from(encoder),
       headers: {
+        ...encoder.headers,
         Authorization: this.getAuthHeader(),
       },
     });
