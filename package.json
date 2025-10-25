@@ -3,52 +3,7 @@
   "description": "Easily publish web extensions to their stores",
   "version": "3.0.3",
   "packageManager": "bun@1.3.1",
-  "license": "MIT",
-  "keywords": [
-    "chrome-web-store",
-    "firefox-addon-store",
-    "chrome",
-    "firefox",
-    "addon",
-    "store",
-    "extension",
-    "browser"
-  ],
-  "author": {
-    "name": "Aaron Klinker",
-    "url": "https://github.com/aklinker1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/aklinker1/publish-browser-extension.git"
-  },
-  "homepage": "https://github.com/aklinker1/publish-browser-extension#readme",
-  "files": [
-    "dist"
-  ],
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "publish-extension": "bin/publish-extension.cjs"
-  },
-  "exports": {
-    ".": {
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      },
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
-    },
-    "./cli": {
-      "require": "./dist/cli.cjs",
-      "import": "./dist/cli.js"
-    }
-  },
   "scripts": {
     "check": "check",
     "build": "run-s build:*",
@@ -96,9 +51,39 @@
   "lint-staged": {
     "*": "prettier --ignore-unknown --write"
   },
-  "changelog": {
-    "excludeAuthors": [
-      "aaronklinker1@gmail.com"
-    ]
+  "license": "MIT",
+  "keywords": [
+    "chrome-web-store",
+    "firefox-addon-store",
+    "chrome",
+    "firefox",
+    "addon",
+    "store",
+    "extension",
+    "browser"
+  ],
+  "author": {
+    "name": "Aaron Klinker",
+    "url": "https://github.com/aklinker1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aklinker1/publish-browser-extension.git"
+  },
+  "homepage": "https://github.com/aklinker1/publish-browser-extension#readme",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "publish-extension": "bin/publish-extension.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   }
 }
