@@ -25,7 +25,7 @@ export async function init(config: InlineConfig) {
         { value: 'firefox', label: 'Firefox Addon Store' },
         { value: 'edge', label: 'Edge Addon Store' },
       ],
-      required: false,
+      required: true,
     },
   );
 
