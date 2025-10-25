@@ -51,7 +51,6 @@ export class CwsApi {
       headers: {
         Authorization,
         'x-goog-api-version': '2',
-        'Content-Type': 'multipart/form-data',
       },
     });
   }
