@@ -87,26 +87,22 @@ publishExtension({
 
 ### Contributor Setup
 
-1. Install [node](https://nodejs.org)
-2. Install [`pnpm`](https://pnpm.io/)
+1. Install [bun](https://bun.sh/)
+2. Install dependencies
    ```sh
-   corepack enable
+   bun i
    ```
-3. Install dependencies
+3. Run the `init` command to generate a `.env.submit` file for testing
    ```sh
-   pnpm i
-   ```
-4. Run the `init` command to generate a `.env.submit` file for testing
-   ```sh
-   pnpm publish-extension init
+   bun publish-extension init
    ```
    > [!WARNING]
    >
    > Make sure to set the Firefox channel to "unlisted", chrome's publish target to "trustedTesters", and don't submit the extension for review for Chrome or Edge. This will prevent you from accidentally releasing one of the test extensions publicly.
-5. Run the dev commands to upload a test extension to the stores:
+4. Run the dev commands to upload a test extension to the stores:
    ```sh
-   pnpm dev:all
-   pnpm dev:chrome
-   pnpm dev:firefox
-   pnpm dev:edge
+   bun dev:all
+   bun dev:chrome
+   bun dev:firefox
+   bun dev:edge
    ```
