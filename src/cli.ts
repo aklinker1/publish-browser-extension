@@ -3,6 +3,8 @@ import { version } from '../package.json';
 import { submit } from './submit';
 import { InlineConfig } from './config';
 import { init } from './init';
+import { chromeStatus } from './chrome/chrome-status';
+import { chromeSetDeployPercentage } from './chrome/chrome-set-deploy-percentage';
 import { consola } from 'consola';
 import { config } from 'dotenv';
 
@@ -178,6 +180,148 @@ cli
 
     try {
       await init(config);
+    } catch (err) {
+      consola.error(err);
+      process.exit(1);
+    }
+  });
+
+// STATUS
+
+cli
+  .command('status', 'Fetch the status of a Chrome extension')
+  .option(
+    '--chrome-extension-id [chromeExtensionId]',
+    'The ID of the extension',
+  )
+  .option(
+    '--chrome-publisher-id [chromePublisherId]',
+    'The publisher ID from the Chrome Web Store Developer Dashboard',
+  )
+  .option(
+    '--chrome-client-id [chromeClientId]',
+    'Client ID used for authorizing requests',
+  )
+  .option(
+    '--chrome-client-secret [chromeClientSecret]',
+    'Client secret used for authorizing requests',
+  )
+  .option(
+    '--chrome-refresh-token [chromeRefreshToken]',
+    'Refresh token used for authorizing requests',
+  )
+  .action(async flags => {
+    const extensionId =
+      flags.chromeExtensionId ?? process.env.CHROME_EXTENSION_ID;
+    const publisherId =
+      flags.chromePublisherId ?? process.env.CHROME_PUBLISHER_ID;
+    const clientId = flags.chromeClientId ?? process.env.CHROME_CLIENT_ID;
+    const clientSecret =
+      flags.chromeClientSecret ?? process.env.CHROME_CLIENT_SECRET;
+    const refreshToken =
+      flags.chromeRefreshToken ?? process.env.CHROME_REFRESH_TOKEN;
+
+    if (
+      !extensionId ||
+      !publisherId ||
+      !clientId ||
+      !clientSecret ||
+      !refreshToken
+    ) {
+      consola.error(
+        'Missing required options: --chrome-extension-id, --chrome-publisher-id, --chrome-client-id, --chrome-client-secret, --chrome-refresh-token',
+      );
+      process.exit(1);
+    }
+
+    try {
+      await chromeStatus({
+        extensionId,
+        publisherId,
+        clientId,
+        clientSecret,
+        refreshToken,
+      });
+    } catch (err) {
+      consola.error(err);
+      process.exit(1);
+    }
+  });
+
+// SET DEPLOY PERCENTAGE
+
+cli
+  .command(
+    'set-deploy-percentage',
+    'Update deployment percentage for a published Chrome extension',
+  )
+  .option(
+    '--chrome-extension-id [chromeExtensionId]',
+    'The ID of the extension',
+  )
+  .option(
+    '--chrome-publisher-id [chromePublisherId]',
+    'The publisher ID from the Chrome Web Store Developer Dashboard',
+  )
+  .option(
+    '--chrome-client-id [chromeClientId]',
+    'Client ID used for authorizing requests',
+  )
+  .option(
+    '--chrome-client-secret [chromeClientSecret]',
+    'Client secret used for authorizing requests',
+  )
+  .option(
+    '--chrome-refresh-token [chromeRefreshToken]',
+    'Refresh token used for authorizing requests',
+  )
+  .option(
+    '--chrome-deploy-percentage <chromeDeployPercentage>',
+    'Deploy percentage (1-100)',
+  )
+  .action(async flags => {
+    const extensionId =
+      flags.chromeExtensionId ?? process.env.CHROME_EXTENSION_ID;
+    const publisherId =
+      flags.chromePublisherId ?? process.env.CHROME_PUBLISHER_ID;
+    const clientId = flags.chromeClientId ?? process.env.CHROME_CLIENT_ID;
+    const clientSecret =
+      flags.chromeClientSecret ?? process.env.CHROME_CLIENT_SECRET;
+    const refreshToken =
+      flags.chromeRefreshToken ?? process.env.CHROME_REFRESH_TOKEN;
+    const deployPercentage = flags.chromeDeployPercentage
+      ? parseInt(flags.chromeDeployPercentage, 10)
+      : undefined;
+
+    if (
+      !extensionId ||
+      !publisherId ||
+      !clientId ||
+      !clientSecret ||
+      !refreshToken
+    ) {
+      consola.error(
+        'Missing required options: --chrome-extension-id, --chrome-publisher-id, --chrome-client-id, --chrome-client-secret, --chrome-refresh-token',
+      );
+      process.exit(1);
+    }
+
+    if (!deployPercentage || deployPercentage < 1 || deployPercentage > 100) {
+      consola.error(
+        'Missing or invalid --chrome-deploy-percentage (must be 1-100)',
+      );
+      process.exit(1);
+    }
+
+    try {
+      await chromeSetDeployPercentage({
+        extensionId,
+        publisherId,
+        clientId,
+        clientSecret,
+        refreshToken,
+        deployPercentage,
+      });
     } catch (err) {
       consola.error(err);
       process.exit(1);
