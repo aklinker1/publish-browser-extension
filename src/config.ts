@@ -26,26 +26,32 @@ export function resolveConfig(
             zip: chromeZip,
             extensionId:
               config.chrome?.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
+            publisherId:
+              config.chrome?.publisherId ?? stringEnv('CHROME_PUBLISHER_ID'),
             clientId: config.chrome?.clientId ?? stringEnv('CHROME_CLIENT_ID'),
             clientSecret:
               config.chrome?.clientSecret ?? stringEnv('CHROME_CLIENT_SECRET'),
             refreshToken:
               config.chrome?.refreshToken ?? stringEnv('CHROME_REFRESH_TOKEN'),
-            publishTarget:
-              config.chrome?.publishTarget ??
-              stringEnv('CHROME_PUBLISH_TARGET') ??
-              'default',
             deployPercentage:
               config.chrome?.deployPercentage ??
               intEnv('CHROME_DEPLOY_PERCENTAGE'),
-            reviewExemption:
-              config.chrome?.reviewExemption ??
-              booleanEnv('CHROME_REVIEW_EXEMPTION') ??
-              false,
             skipSubmitReview:
               config.chrome?.skipSubmitReview ??
               booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
               false,
+            cancelPending:
+              config.chrome?.cancelPending ??
+              booleanEnv('CHROME_CANCEL_PENDING') ??
+              false,
+            skipReview:
+              config.chrome?.skipReview ??
+              booleanEnv('CHROME_SKIP_REVIEW') ??
+              false,
+            publishType:
+              config.chrome?.publishType ??
+              stringEnv('CHROME_PUBLISH_TYPE') ??
+              'DEFAULT_PUBLISH',
           },
     firefox:
       firefoxZip == null
@@ -152,15 +158,17 @@ export type InternalConfig = z.infer<typeof InternalConfig>;
 interface CustomEnv {
   DRY_RUN: string | undefined;
 
+  CHROME_ZIP: string | undefined;
+  CHROME_EXTENSION_ID: string | undefined;
+  CHROME_PUBLISHER_ID: string | undefined;
   CHROME_CLIENT_ID: string | undefined;
   CHROME_CLIENT_SECRET: string | undefined;
-  CHROME_DEPLOY_PERCENTAGE: string | undefined;
-  CHROME_EXTENSION_ID: string | undefined;
-  CHROME_PUBLISH_TARGET: string | undefined;
   CHROME_REFRESH_TOKEN: string | undefined;
-  CHROME_REVIEW_EXEMPTION: string | undefined;
+  CHROME_DEPLOY_PERCENTAGE: string | undefined;
   CHROME_SKIP_SUBMIT_REVIEW: string | undefined;
-  CHROME_ZIP: string | undefined;
+  CHROME_CANCEL_PENDING: string | undefined;
+  CHROME_SKIP_REVIEW: string | undefined;
+  CHROME_PUBLISH_TYPE: string | undefined;
 
   FIREFOX_ZIP: string | undefined;
   FIREFOX_SOURCES_ZIP: string | undefined;

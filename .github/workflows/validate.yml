@@ -29,11 +29,11 @@ jobs:
       - run: ./scripts/dev.sh all
         env:
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
+          CHROME_PUBLISHER_ID: ${{ secrets.TEST_CHROME_PUBLISHER_ID }}
           CHROME_CLIENT_ID: ${{ secrets.TEST_CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.TEST_CHROME_CLIENT_SECRET }}
           CHROME_REFRESH_TOKEN: ${{ secrets.TEST_CHROME_REFRESH_TOKEN }}
           CHROME_SKIP_SUBMIT_REVIEW: 'true'
-          CHROME_PUBLISH_TARGET: trustedTesters
           FIREFOX_EXTENSION_ID: ${{ secrets.TEST_FIREFOX_EXTENSION_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.TEST_FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.TEST_FIREFOX_JWT_SECRET }}

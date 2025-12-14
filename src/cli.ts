@@ -24,6 +24,10 @@ cli.option(
   'The ID of the extension to be submitted',
 );
 cli.option(
+  '--chrome-publisher-id [chromePublisherId]',
+  'The publisher ID from the Chrome Web Store Developer Dashboard',
+);
+cli.option(
   '--chrome-client-id [chromeClientId]',
   'Client ID used for authorizing requests to the Chrome Web Store',
 );
@@ -36,20 +40,24 @@ cli.option(
   'Refresh token used for authorizing requests to the Chrome Web Store',
 );
 cli.option(
-  '--chrome-publish-target [chromePublishTarget]',
-  'Group to publish to, "default" or "trustedTesters"',
-);
-cli.option(
   '--chrome-deploy-percentage [chromeDeployPercentage]',
   'An integer from 1-100',
 );
 cli.option(
-  '--chrome-review-exemption',
-  'Submit update using expedited review process',
-);
-cli.option(
   '--chrome-skip-submit-review',
   "Just upload the extension zip, don't submit it for review or publish it",
+);
+cli.option(
+  '--chrome-cancel-pending',
+  'Cancel any pending submission before uploading',
+);
+cli.option(
+  '--chrome-skip-review',
+  'Attempt to skip review if the item qualifies',
+);
+cli.option(
+  '--chrome-publish-type [chromePublishType]',
+  'Publish type: "DEFAULT_PUBLISH" or "STAGED_PUBLISH"',
 );
 // Firefox
 cli.option('--firefox-zip [firefoxZip]', 'Path to extension zip to upload');
@@ -106,13 +114,15 @@ function configFromFlags(flags: any): InlineConfig {
     chrome: {
       zip: flags.chromeZip,
       extensionId: flags.chromeExtensionId,
+      publisherId: flags.chromePublisherId,
       clientId: flags.chromeClientId,
       clientSecret: flags.chromeClientSecret,
       refreshToken: flags.chromeRefreshToken,
-      publishTarget: flags.chromePublishTarget,
       deployPercentage: flags.chromeDeployPercentage,
-      reviewExemption: flags.chromeReviewExemption,
       skipSubmitReview: flags.chromeSkipSubmitReview,
+      cancelPending: flags.chromeCancelPending,
+      skipReview: flags.chromeSkipReview,
+      publishType: flags.chromePublishType,
     },
     firefox: {
       zip: flags.firefoxZip,
