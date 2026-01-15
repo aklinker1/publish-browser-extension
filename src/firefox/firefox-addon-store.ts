@@ -36,7 +36,7 @@ export class FirefoxAddonStore implements Store {
   async submit(dryRun?: boolean): Promise<void> {
     this.setStatus('Getting addon details');
     const addon = await this.api.details({
-      extensionId: this.wrappedExtensionId,
+      extensionId: this.options.extensionId,
     });
     if (dryRun) {
       this.setStatus('DRY RUN: Skipped upload and publishing');
@@ -51,7 +51,7 @@ export class FirefoxAddonStore implements Store {
 
     this.setStatus('Submitting new version');
     const version = await this.api.versionCreate({
-      extensionId: this.wrappedExtensionId,
+      extensionId: this.options.extensionId,
       sourceFile: this.options.sourcesZip,
       uploadUuid: upload.uuid,
     });
@@ -84,18 +84,5 @@ export class FirefoxAddonStore implements Store {
     }
 
     return details;
-  }
-
-  /**
-   * Ensure the extension id is wrapped in curly braces, that's what the addon store API is expecting
-   * @example
-   * "test" -> "{test}"
-   */
-  private get wrappedExtensionId(): string {
-    let id = this.options.extensionId;
-    if (id.includes('@')) return id;
-    if (!id.startsWith('{')) id = '{' + id;
-    if (!id.endsWith('}')) id += '}';
-    return id;
   }
 }
