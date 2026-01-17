@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { FetchError } from 'ofetch';
 import { fetch } from '../utils/fetch';
 
 export type EdgeApiOptions = {
@@ -92,17 +93,18 @@ export class EdgeApi {
     token: EdgeTokenDetails;
   }): Promise<void> {
     const endpoint = `https://api.addons.microsoftedge.microsoft.com/v1/products/${params.productId}/submissions`;
-    const res = await fetch(endpoint, {
+    await fetch(endpoint, {
       method: 'POST',
       body: JSON.stringify({}),
       headers: this.getAuthHeaders(params.token),
-    });
-    if (!res.ok) {
-      console.log(await res.text());
-      throw Error(
-        `Edge API returned ${res.status} ${res.statusText} for ${endpoint}.`,
+    }).catch(err => {
+      if (!(err instanceof FetchError)) throw err;
+      const data =
+        typeof err.data === 'string' ? err.data : JSON.stringify(err.data);
+      throw new Error(
+        `Edge API failed to publish: ${err.status} ${err.statusText} - ${data}`,
       );
-    }
+    });
   }
 
   private getAuthHeaders(token: EdgeTokenDetails): Record<string, string> {
