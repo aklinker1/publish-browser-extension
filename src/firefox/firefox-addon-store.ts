@@ -87,7 +87,9 @@ export class FirefoxAddonStore implements Store {
   }
 
   /**
-   * Ensure the extension id is wrapped in curly braces, that's what the addon store API is expecting
+   * Ensure the extension id is not wrapped in curly braces, since that's what
+   * the addon store API is expecting.
+   *
    * @example
    * "{test}" -> "test"
    * "test" -> "test"
