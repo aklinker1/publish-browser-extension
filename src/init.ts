@@ -28,6 +28,12 @@ export async function init(config: InlineConfig) {
       required: true,
     },
   );
+  if (stores.length === 0) {
+    consola.warn(
+      'No stores selected, exiting. Use ↑/↓ and space to select stores before pressing enter.',
+    );
+    process.exit(1);
+  }
 
   const replacements: Entry[] = [];
   if (stores?.includes('chrome')) {
