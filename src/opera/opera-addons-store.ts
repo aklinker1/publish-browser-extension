@@ -27,11 +27,15 @@ export class OperaAddonsStore implements Store {
   async submit(dryRun?: boolean): Promise<void> {
     this.setStatus('Getting addon details');
 
-    const addon = await this.api.details({
-      packageId: this.options.packageId,
+    const credentials = {
       sessionId: this.options.sessionId,
       ingressCookie: this.options.ingressCookieApi,
       csrftoken: this.options.csrftoken,
+    };
+
+    const addon = await this.api.details({
+      packageId: this.options.packageId,
+      ...credentials,
     });
 
     if (dryRun) {
@@ -39,9 +43,32 @@ export class OperaAddonsStore implements Store {
       return;
     }
 
-    this.setStatus('Submitting new version');
+    this.setStatus('Getting last addon version');
 
-    // TODO
+    const latestVersion = addon.versions[0]?.version;
+    if (!latestVersion) {
+      throw new Error(
+        'You need at least one previous version to be uploaded before uploading a new one!',
+      );
+    }
+
+    this.setStatus('Uploading new version from zip');
+
+    const creationData = await this.api.uploadCreate({
+      packageId: this.options.packageId,
+      file: this.options.zip,
+      ...credentials,
+    });
+
+    this.setStatus('Waiting for validation results');
+    await this.api.uploadValidate({
+      packageId: this.options.packageId,
+      lastVersion: latestVersion,
+      ...creationData,
+      ...credentials,
+    });
+
+    // TODO: Submit changes
   }
 
   async ensureZipsExist(): Promise<void> {
