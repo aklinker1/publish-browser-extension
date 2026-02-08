@@ -2,16 +2,11 @@ import { z } from 'zod/v4';
 import type { Store } from '../utils/store';
 import { ensureZipExists } from '../utils/fs';
 import { OperaAddonsApi } from './opera-api';
-import type { OperaAddonApiError } from './opera-types';
-import consola from 'consola';
 
 export const OperaAddonsStoreOptions = z.object({
   zip: z.string().min(1),
   packageId: z.number().min(1),
-
   sessionId: z.string().min(1).trim(),
-  ingressCookieApi: z.string().min(1).trim(),
-  csrftoken: z.string().min(1),
 });
 
 export type OperaAddonsStoreOptions = z.infer<typeof OperaAddonsStoreOptions>;
@@ -23,13 +18,9 @@ export class OperaAddonsStore implements Store {
     readonly options: OperaAddonsStoreOptions,
     readonly setStatus: (text: string) => void,
   ) {
-    const credentials = {
+    this.api = new OperaAddonsApi({
       sessionId: this.options.sessionId,
-      ingressCookie: this.options.ingressCookieApi,
-      csrftoken: this.options.csrftoken,
-    };
-
-    this.api = new OperaAddonsApi(credentials);
+    });
   }
 
   async submit(dryRun?: boolean): Promise<void> {
@@ -43,7 +34,7 @@ export class OperaAddonsStore implements Store {
       throw new Error(addon.detail);
     }
 
-    consola.info(`Found ${addon.name} at ${addon.details_url}`);
+    this.setStatus(`Found ${addon.name} at ${addon.details_url}`);
 
     if (dryRun) {
       this.setStatus('DRY RUN: Skipped upload and publishing');
