@@ -6,7 +6,7 @@ import {
   validateConfig,
 } from './config';
 
-const RESET_ENV_NAMES = /(^CHROME_|^FIREFOX_|^EDGE_|^DRY_RUN$)/;
+const RESET_ENV_NAMES = /(^CHROME_|^FIREFOX_|^EDGE_|^OPERA_|^DRY_RUN$)/;
 
 describe('resolveConfig', () => {
   beforeEach(() => {
@@ -48,6 +48,13 @@ describe('resolveConfig', () => {
         clientSecret: 'clientSecret',
         skipSubmitReview: true,
         zip: 'zip',
+      },
+      opera: {
+        zip: 'zip',
+        packageId: 1,
+        sessionId: 'sessionId',
+        csrftoken: 'csrftoken',
+        ingressCookieApi: 'ingressCookieApi',
       },
     } satisfies InternalConfig;
 
@@ -91,6 +98,11 @@ describe('resolveConfig', () => {
     const edgeSkipSubmitReview = true;
     process.env.EDGE_SKIP_SUBMIT_REVIEW = String(edgeSkipSubmitReview);
 
+    process.env.OPERA_ZIP = 'OPERA_ZIP';
+    process.env.OPERA_SESSION_ID = 'OPERA_SESSION_ID';
+    const operaPackageId = 1;
+    process.env.OPERA_PACKAGE_ID = String(operaPackageId);
+
     const expected: InternalConfig = {
       dryRun,
       chrome: {
@@ -120,6 +132,13 @@ describe('resolveConfig', () => {
         accessTokenUrl: process.env.EDGE_ACCESS_TOKEN_URL,
         clientSecret: process.env.EDGE_CLIENT_SECRET,
         skipSubmitReview: edgeSkipSubmitReview,
+      },
+      opera: {
+        zip: process.env.OPERA_ZIP,
+        packageId: operaPackageId,
+        sessionId: process.env.OPERA_SESSION_ID!,
+        csrftoken: process.env.OPERA_CSRFTOKEN!,
+        ingressCookieApi: process.env.OPERA_INGRESS_COOKIE_API!,
       },
     };
 
@@ -151,6 +170,13 @@ describe('resolveConfig', () => {
         apiKey: 'apiKey',
         zip: 'zip',
       },
+      opera: {
+        zip: 'zip',
+        packageId: 1,
+        sessionId: 'sessionId',
+        csrftoken: 'csrftoken',
+        ingressCookieApi: 'ingressCookieApi',
+      },
     };
 
     const expected = {
@@ -171,6 +197,10 @@ describe('resolveConfig', () => {
         ...config.edge,
         skipSubmitReview: false,
       },
+      opera: {
+        ...config.opera,
+        // No default values
+      },
     };
 
     const actual = resolveConfig(config);
@@ -178,7 +208,7 @@ describe('resolveConfig', () => {
     expect(actual).toEqual(expected);
   });
 
-  it('should exclude chrome, firefox, and edge objects when their zip option is not passed', () => {
+  it('should exclude chrome, firefox, edge and opera objects when their zip option is not passed', () => {
     const config: InlineConfig = {
       dryRun: false,
       chrome: {
@@ -190,12 +220,16 @@ describe('resolveConfig', () => {
       edge: {
         clientId: 'clientId',
       },
+      opera: {
+        packageId: 1,
+      },
     };
     const expected: InternalConfig = {
       dryRun: false,
       chrome: undefined,
       edge: undefined,
       firefox: undefined,
+      opera: undefined,
     };
 
     const actual = resolveConfig(config);

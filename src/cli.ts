@@ -99,6 +99,24 @@ cli.option(
   '--edge-skip-submit-review',
   "Just upload the extension zip, don't submit it for review or publish it",
 );
+// Opera
+cli.option('--opera-zip [operaZip]', 'Path to extension zip to upload');
+cli.option(
+  '--opera-package-id [packageId]',
+  'Package ID listed in the package developer URL: https://addons.opera.com/developer/package/<packageId>',
+);
+cli.option(
+  '--opera-session-id [sessionId]',
+  'Session ID used for authorizing requests to Opera Addons API',
+);
+cli.option(
+  '--opera-ingress-cookie-api [ingressCookieApi]',
+  'Ingress Cookie API used for authorizing requests to Opera Addons API',
+);
+cli.option(
+  '--opera-csrftoken [csrftoken]',
+  'X-CSRFToken used for authorizing requests to Opera Addons API',
+);
 
 function configFromFlags(flags: any): InlineConfig {
   return {
@@ -130,6 +148,13 @@ function configFromFlags(flags: any): InlineConfig {
       clientSecret: flags.edgeClientSecret,
       accessTokenUrl: flags.edgeAccessTokenUrl,
       skipSubmitReview: flags.edgeSkipSubmitReview,
+    },
+    opera: {
+      zip: flags.operaZip,
+      packageId: flags.packageId,
+      sessionId: flags.sessionId,
+      ingressCookieApi: flags.ingressCookieApi,
+      csrftoken: flags.csrftoken,
     },
   };
 }
@@ -163,6 +188,7 @@ cli
       chromeZip: '...',
       firefoxZip: '...',
       edgeZip: '...',
+      operaZip: '...',
       ...flags,
     });
 
