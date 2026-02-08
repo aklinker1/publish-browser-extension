@@ -1,5 +1,10 @@
 import { fetch } from '../utils/fetch';
-import { fileFromPath } from 'formdata-node/file-from-path';
+import { FormData } from 'formdata-node';
+import { FormDataEncoder } from 'form-data-encoder';
+import { Readable } from 'node:stream';
+import fs from 'node:fs';
+import path from 'node:path';
+import { Blob } from 'node:buffer';
 
 // API guessed from : https://addons-static.operacdn.com/static/CACHE/js/catalog.6c1172c19572.js
 // And by looking at the HTTP requests while using the website
@@ -96,6 +101,12 @@ export class OperaAddonsApi {
     return new URL('https://addons.opera.com/api/file-upload/');
   }
 
+  private addonsUploadValidateEndpoint(packageId: number) {
+    return new URL(
+      `https://addons.opera.com/api/developer/package-versions/?package_id=${packageId}`,
+    );
+  }
+
   private addonsDetailsEndpoint(packageId: number) {
     return new URL(
       `https://addons.opera.com/api/developer/packages/${packageId}/`,
@@ -148,6 +159,109 @@ export class OperaAddonsApi {
         ...this.getCookieHeaders(params),
       },
     });
+  }
+
+  /**
+   * Upload a new package version for an Opera Addon
+   */
+  async uploadCreate(
+    params: OperaCookiesParams & {
+      packageId: number;
+      file: string;
+    },
+  ) {
+    const endpoint = this.addonsUploadCreateEndpoint();
+    const fileInfo = await this.fileInfo(params.file);
+
+    const chunkSize = 1024 * 1024;
+    const totalChunks = Math.ceil(fileInfo.size / chunkSize);
+
+    const identifier = this.generateIdentifier(fileInfo.size, fileInfo.name);
+
+    const stream = fs.createReadStream(params.file, {
+      highWaterMark: chunkSize,
+    });
+
+    let chunkNumber = 1;
+
+    for await (const chunk of stream) {
+      const form = new FormData();
+
+      form.append('file', new Blob([chunk]), fileInfo.name);
+
+      form.append('flowChunkNumber', String(chunkNumber));
+      form.append('flowChunkSize', String(chunkSize));
+      form.append('flowCurrentChunkSize', String(chunk.length));
+      form.append('flowTotalSize', String(fileInfo.size));
+      form.append('flowIdentifier', identifier);
+      form.append('flowFilename', fileInfo.name);
+      form.append('flowRelativePath', fileInfo.name);
+      form.append('flowTotalChunks', String(totalChunks));
+
+      const encoder = new FormDataEncoder(form);
+
+      const res = await fetch.raw(endpoint.href, {
+        method: 'POST',
+        headers: {
+          ...encoder.headers,
+          ...this.getCookieHeaders(params),
+          Referer: `https://addons.opera.com/developer/package/${params.packageId}/?tab=versions`,
+        },
+        body: Readable.from(encoder),
+      });
+
+      if (res.status < 200 || res.status >= 300) {
+        throw new Error(`Chunk ${chunkNumber} upload failed (${res.status})`);
+      }
+
+      chunkNumber++;
+    }
+
+    return {
+      fileId: identifier,
+      fileName: fileInfo.name,
+    };
+  }
+
+  async uploadValidate(
+    params: OperaCookiesParams & {
+      packageId: number;
+      fileId: `${number}-${string}`;
+      fileName: string;
+      lastVersion: string;
+    },
+  ) {
+    const endpoint = this.addonsUploadValidateEndpoint(params.packageId);
+
+    return fetch(endpoint.href, {
+      method: 'POST',
+      headers: {
+        ...this.getCookieHeaders(params),
+        accept: 'application/json; version=1.0',
+        Referer: `https://addons.opera.com/developer/package/${params.packageId}/?tab=versions`,
+      },
+      body: {
+        file_id: params.fileId,
+        file_name: params.fileName,
+        metadata_from: params.lastVersion,
+      },
+    });
+  }
+
+  private generateIdentifier(
+    size: number,
+    name: string,
+  ): `${number}-${string}` {
+    return `${size}-${name.replace(/[^0-9a-zA-Z_-]/g, '')}`;
+  }
+
+  private async fileInfo(filepath: string) {
+    const stat = await fs.promises.stat(filepath);
+    return {
+      path: filepath,
+      name: path.basename(filepath),
+      size: stat.size,
+    };
   }
 
   private getCookieHeaders(params: OperaCookiesParams) {
