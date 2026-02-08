@@ -2,6 +2,8 @@ import { z } from 'zod/v4';
 import type { Store } from '../utils/store';
 import { ensureZipExists } from '../utils/fs';
 import { OperaAddonsApi } from './opera-api';
+import type { OperaAddonApiError } from './opera-types';
+import consola from 'consola';
 
 export const OperaAddonsStoreOptions = z.object({
   zip: z.string().min(1),
@@ -21,22 +23,27 @@ export class OperaAddonsStore implements Store {
     readonly options: OperaAddonsStoreOptions,
     readonly setStatus: (text: string) => void,
   ) {
-    this.api = new OperaAddonsApi(options);
-  }
-
-  async submit(dryRun?: boolean): Promise<void> {
-    this.setStatus('Getting addon details');
-
     const credentials = {
       sessionId: this.options.sessionId,
       ingressCookie: this.options.ingressCookieApi,
       csrftoken: this.options.csrftoken,
     };
 
-    const addon = await this.api.details({
+    this.api = new OperaAddonsApi(credentials);
+  }
+
+  async submit(dryRun?: boolean): Promise<void> {
+    this.setStatus('Getting addon details');
+
+    const addon = await this.api.getAddonDetails({
       packageId: this.options.packageId,
-      ...credentials,
     });
+
+    if ('detail' in addon) {
+      throw new Error(addon.detail);
+    }
+
+    consola.info(`Found ${addon.name} at ${addon.details_url}`);
 
     if (dryRun) {
       this.setStatus('DRY RUN: Skipped upload and publishing');
@@ -54,18 +61,16 @@ export class OperaAddonsStore implements Store {
 
     this.setStatus('Uploading new version from zip');
 
-    const creationData = await this.api.uploadCreate({
+    const creationData = await this.api.uploadFile({
       packageId: this.options.packageId,
       file: this.options.zip,
-      ...credentials,
     });
 
     this.setStatus('Waiting for validation results');
-    await this.api.uploadValidate({
+    await this.api.validateFileUpload({
       packageId: this.options.packageId,
       lastVersion: latestVersion,
       ...creationData,
-      ...credentials,
     });
 
     // TODO: Submit changes

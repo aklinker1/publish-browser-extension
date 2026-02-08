@@ -5,158 +5,57 @@ import { Readable } from 'node:stream';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Blob } from 'node:buffer';
+import type { OperaAddonApiError, OperaAddonDetails } from './opera-types';
 
 // API guessed from : https://addons-static.operacdn.com/static/CACHE/js/catalog.6c1172c19572.js
 // And by looking at the HTTP requests while using the website
 
-export interface OperaAddonsApiOptions {}
-
-export interface OperaAddonDetails {
-  id: number;
-  slug: string;
-  name: string;
-  type: 'extensions' | (string & {});
-  versions: Array<{
-    version: string;
-    submitted_for_moderation: boolean;
-    type: string;
-    created: string;
-    warnings: unknown[];
-    retirejs_warnings: unknown[];
-  }>;
-  published_versions: Array<{
-    name: 'Opera' | (string & {});
-    version: unknown | null;
-  }>;
-  developer: string; // uuid v4
-  is_editable: boolean;
-  app_id: string;
-  category: {
-    slug: string;
-    name: string;
-  };
-  warnings: string[];
-  unlisted: boolean;
-  details_url: `https://addons.opera.com/en/${string}/details/${string}/`;
-  is_published: boolean;
-  available_auto_moderation: boolean;
-  dev_promotional_image: unknown | null;
-  is_extension: boolean;
-  retirejs_warnings: unknown[];
-}
-
-export interface OperaAddonVersionDetails {
-  version: string;
-  submitted_for_moderation: boolean;
-  support: string;
-  source_url: string;
-  service_url: string | null;
-  source_for_moderators_url: string;
-  build_instructions: string;
-  features: Array<{
-    name: string;
-  }>;
-  file_size: number;
-  icon: {
-    id: number;
-    width: 64;
-    height: 64;
-    url: string;
-  };
-  screenshots: Record<number, { id: number; url: string }> | null;
-  video: Record<number, { id: number; url: string }> | null;
-  license: { url: string; full_text: null } | { url: null; full_text: string };
-  privacy_policy:
-    | { url: string; full_text: null }
-    | { url: null; full_text: string };
-  translations: Record<
-    string,
-    {
-      language: {
-        code: string;
-        name: string;
-      };
-      short_description: string;
-      long_description: string;
-      changelog: string | null;
-    }
-  >;
-  type: string;
-  created: string;
-  warnings: string[];
-  download_url: `https://addons.opera.com/en/package/download/revision/${string /* slug */}/${string /* version */}/?zip=1&dev-panel=1`;
-  retirejs_warnings: unknown[];
-}
-
-export interface OperaCookiesParams {
+export interface OperaAddonsApiOptions {
+  apiUrl?: string;
   ingressCookie: string;
   sessionId: string;
   csrftoken: string;
 }
 
 export class OperaAddonsApi {
-  constructor(readonly options: OperaAddonsApiOptions) {}
+  constructor(
+    readonly options: OperaAddonsApiOptions,
+    private readonly operaApiUrl: string = options.apiUrl ??
+      'https://addons.opera.com/api',
+    private readonly sessionId: string = options.sessionId,
+    private readonly ingressCookie: string = options.ingressCookie,
+  ) {}
 
-  private addonsUploadCreateEndpoint() {
-    return new URL('https://addons.opera.com/api/file-upload/');
-  }
+  private uploadFileEndpoint = () =>
+    `${this.operaApiUrl}/file-upload/` as const;
 
-  private addonsUploadValidateEndpoint(packageId: number) {
-    return new URL(
-      `https://addons.opera.com/api/developer/package-versions/?package_id=${packageId}`,
-    );
-  }
+  private uploadValidateEndpoint = (packageId: number) =>
+    `${this.operaApiUrl}/developer/package-versions/?package_id=${packageId}` as const;
 
-  private addonsDetailsEndpoint(packageId: number) {
-    return new URL(
-      `https://addons.opera.com/api/developer/packages/${packageId}/`,
-    );
-  }
+  private addonDetailsEndpoint = (packageId: number) =>
+    `${this.operaApiUrl}/developer/packages/${packageId}/` as const;
 
-  private addonsVersionDetailsEndpoint(packageId: number, version: string) {
-    return new URL(
-      `https://addons.opera.com/api/developer/package-versions/${packageId}-${version}/`,
-    );
-  }
+  // unused
+  private addonVersionDetailsEndpoint = (packageId: number, version: string) =>
+    `${this.operaApiUrl}/developer/package-versions/${packageId}-${version}/` as const;
+
+  // unused
+  private addonDownloadStats = (packageId: number) =>
+    `${this.operaApiUrl}/developer/download-stats/${packageId}/` as const;
 
   /**
    * Get the detailed information about an Opera Addon
    */
-  async details(
-    params: OperaCookiesParams & {
-      packageId: number;
-    },
-  ): Promise<OperaAddonDetails> {
-    const endpoint = this.addonsDetailsEndpoint(params.packageId);
+  public async getAddonDetails(params: {
+    packageId: number;
+  }): Promise<OperaAddonDetails | OperaAddonApiError> {
+    const endpoint = this.addonDetailsEndpoint(params.packageId);
 
-    return await fetch(endpoint.href, {
+    return await fetch(endpoint, {
       method: 'GET',
       headers: {
         accept: 'application/json; version=1.0',
-        ...this.getCookieHeaders(params),
-      },
-    });
-  }
-
-  /**
-   * Get the detailed information about a package version for an Opera Addon
-   */
-  async addonVersionDetails(
-    params: OperaCookiesParams & {
-      packageId: number;
-      version: string;
-    },
-  ): Promise<OperaAddonVersionDetails> {
-    const endpoint = this.addonsVersionDetailsEndpoint(
-      params.packageId,
-      params.version,
-    );
-
-    return await fetch(endpoint.href, {
-      method: 'GET',
-      headers: {
-        accept: 'application/json; version=1.0',
-        ...this.getCookieHeaders(params),
+        cookie: `INGRESSCOOKIE_API=${this.ingressCookie}; sessionid=${this.sessionId};`,
       },
     });
   }
@@ -164,19 +63,17 @@ export class OperaAddonsApi {
   /**
    * Upload a new package version for an Opera Addon
    */
-  async uploadCreate(
-    params: OperaCookiesParams & {
-      packageId: number;
-      file: string;
-    },
-  ) {
-    const endpoint = this.addonsUploadCreateEndpoint();
+  public async uploadFile(params: { packageId: number; file: string }) {
+    const endpoint = this.uploadFileEndpoint();
     const fileInfo = await this.fileInfo(params.file);
 
     const chunkSize = 1024 * 1024;
     const totalChunks = Math.ceil(fileInfo.size / chunkSize);
 
-    const identifier = this.generateIdentifier(fileInfo.size, fileInfo.name);
+    const identifier = this.generateFileIdentifier(
+      fileInfo.size,
+      fileInfo.name,
+    );
 
     const stream = fs.createReadStream(params.file, {
       highWaterMark: chunkSize,
@@ -200,12 +97,13 @@ export class OperaAddonsApi {
 
       const encoder = new FormDataEncoder(form);
 
-      const res = await fetch.raw(endpoint.href, {
+      const res = await fetch.raw(endpoint, {
         method: 'POST',
         headers: {
           ...encoder.headers,
-          ...this.getCookieHeaders(params),
+          'x-csrftoken': this.csrftoken,
           Referer: `https://addons.opera.com/developer/package/${params.packageId}/?tab=versions`,
+          cookie: `INGRESSCOOKIE_API=${this.ingressCookie}; sessionid=${this.sessionId}; csrftoken=${this.csrftoken};`,
         },
         body: Readable.from(encoder),
       });
@@ -220,25 +118,27 @@ export class OperaAddonsApi {
     return {
       fileId: identifier,
       fileName: fileInfo.name,
-    };
+    } as const;
   }
 
-  async uploadValidate(
-    params: OperaCookiesParams & {
-      packageId: number;
-      fileId: `${number}-${string}`;
-      fileName: string;
-      lastVersion: string;
-    },
-  ) {
-    const endpoint = this.addonsUploadValidateEndpoint(params.packageId);
+  /**
+   * Bind an uploaded file to an addon package
+   */
+  public async validateFileUpload(params: {
+    packageId: number;
+    fileId: `${number}-${string}`;
+    fileName: string;
+    lastVersion: string;
+  }): Promise<unknown> {
+    const endpoint = this.uploadValidateEndpoint(params.packageId);
 
-    return fetch(endpoint.href, {
+    return fetch(endpoint, {
       method: 'POST',
       headers: {
-        ...this.getCookieHeaders(params),
-        accept: 'application/json; version=1.0',
+        'x-csrftoken': this.csrftoken,
         Referer: `https://addons.opera.com/developer/package/${params.packageId}/?tab=versions`,
+        accept: 'application/json; version=1.0',
+        cookie: `INGRESSCOOKIE_API=${this.ingressCookie}; sessionid=${this.sessionId}; csrftoken=${this.csrftoken};`,
       },
       body: {
         file_id: params.fileId,
@@ -248,12 +148,10 @@ export class OperaAddonsApi {
     });
   }
 
-  private generateIdentifier(
+  private generateFileIdentifier = (
     size: number,
     name: string,
-  ): `${number}-${string}` {
-    return `${size}-${name.replace(/[^0-9a-zA-Z_-]/g, '')}`;
-  }
+  ): `${number}-${string}` => `${size}-${name.replace(/[^0-9a-zA-Z_-]/g, '')}`;
 
   private async fileInfo(filepath: string) {
     const stat = await fs.promises.stat(filepath);
@@ -261,13 +159,6 @@ export class OperaAddonsApi {
       path: filepath,
       name: path.basename(filepath),
       size: stat.size,
-    };
-  }
-
-  private getCookieHeaders(params: OperaCookiesParams) {
-    return {
-      cookie: `INGRESSCOOKIE_API=${params.ingressCookie}; sessionid=${params.sessionId}; csrftoken=${params.csrftoken};`,
-      'x-csrftoken': params.csrftoken,
     };
   }
 }
