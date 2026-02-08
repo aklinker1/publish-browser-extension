@@ -109,14 +109,6 @@ cli.option(
   '--opera-session-id [sessionId]',
   'Session ID used for authorizing requests to Opera Addons API',
 );
-cli.option(
-  '--opera-ingress-cookie-api [ingressCookieApi]',
-  'Ingress Cookie API used for authorizing requests to Opera Addons API',
-);
-cli.option(
-  '--opera-csrftoken [csrftoken]',
-  'X-CSRFToken used for authorizing requests to Opera Addons API',
-);
 
 function configFromFlags(flags: any): InlineConfig {
   return {
@@ -153,8 +145,6 @@ function configFromFlags(flags: any): InlineConfig {
       zip: flags.operaZip,
       packageId: flags.packageId,
       sessionId: flags.sessionId,
-      ingressCookieApi: flags.ingressCookieApi,
-      csrftoken: flags.csrftoken,
     },
   };
 }

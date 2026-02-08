@@ -53,8 +53,6 @@ describe('resolveConfig', () => {
         zip: 'zip',
         packageId: 1,
         sessionId: 'sessionId',
-        csrftoken: 'csrftoken',
-        ingressCookieApi: 'ingressCookieApi',
       },
     } satisfies InternalConfig;
 
@@ -137,8 +135,6 @@ describe('resolveConfig', () => {
         zip: process.env.OPERA_ZIP,
         packageId: operaPackageId,
         sessionId: process.env.OPERA_SESSION_ID!,
-        csrftoken: process.env.OPERA_CSRFTOKEN!,
-        ingressCookieApi: process.env.OPERA_INGRESS_COOKIE_API!,
       },
     };
 
@@ -174,8 +170,6 @@ describe('resolveConfig', () => {
         zip: 'zip',
         packageId: 1,
         sessionId: 'sessionId',
-        csrftoken: 'csrftoken',
-        ingressCookieApi: 'ingressCookieApi',
       },
     };
 

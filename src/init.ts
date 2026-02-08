@@ -267,20 +267,6 @@ async function initOpera(
   );
   entries.push(['OPERA_SESSION_ID', sessionId]);
 
-  const csrftoken = await prompt<string>(
-    'Enter the CSRFToken (csrftoken):',
-    { type: 'text' },
-    previousOptions?.csrftoken,
-  );
-  entries.push(['OPERA_CSRFTOKEN', csrftoken]);
-
-  const ingressCookieApi = await prompt<string>(
-    'Enter the Ingress Cookie API (INGRESSCOOKIE_API):',
-    { type: 'text' },
-    previousOptions?.ingressCookieApi,
-  );
-  entries.push(['OPERA_INGRESS_COOKIE_API', ingressCookieApi]);
-
   return entries;
 }
 

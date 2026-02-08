@@ -91,10 +91,6 @@ export function resolveConfig(
             zip: operaZip,
             packageId: config.opera?.packageId ?? intEnv('OPERA_PACKAGE_ID'),
             sessionId: config.opera?.sessionId ?? stringEnv('OPERA_SESSION_ID'),
-            csrftoken: config.opera?.csrftoken ?? stringEnv('OPERA_CSRFTOKEN'),
-            ingressCookieApi:
-              config.opera?.ingressCookieApi ??
-              stringEnv('OPERA_INGRESS_COOKIE_API'),
           },
   };
 }
@@ -201,8 +197,6 @@ export interface CustomEnv {
   OPERA_ZIP: string | undefined;
   OPERA_PACKAGE_ID: string | undefined;
   OPERA_SESSION_ID: string | undefined;
-  OPERA_INGRESS_COOKIE_API: string | undefined;
-  OPERA_CSRFTOKEN: string | undefined;
 }
 
 declare global {

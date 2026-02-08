@@ -11,20 +11,19 @@ import type { OperaAddonApiError, OperaAddonDetails } from './opera-types';
 // And by looking at the HTTP requests while using the website
 
 export interface OperaAddonsApiOptions {
-  apiUrl?: string;
-  ingressCookie: string;
   sessionId: string;
-  csrftoken: string;
 }
 
 export class OperaAddonsApi {
+  private readonly operaApiUrl = 'https://addons.opera.com/api';
+  private readonly csrfToken: string;
+
   constructor(
-    readonly options: OperaAddonsApiOptions,
-    private readonly operaApiUrl: string = options.apiUrl ??
-      'https://addons.opera.com/api',
+    options: OperaAddonsApiOptions,
     private readonly sessionId: string = options.sessionId,
-    private readonly ingressCookie: string = options.ingressCookie,
-  ) {}
+  ) {
+    this.csrfToken = this.generateCSRFToken();
+  }
 
   private uploadFileEndpoint = () =>
     `${this.operaApiUrl}/file-upload/` as const;
@@ -55,7 +54,7 @@ export class OperaAddonsApi {
       method: 'GET',
       headers: {
         accept: 'application/json; version=1.0',
-        cookie: `INGRESSCOOKIE_API=${this.ingressCookie}; sessionid=${this.sessionId};`,
+        cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId};`,
       },
     });
   }
@@ -101,9 +100,9 @@ export class OperaAddonsApi {
         method: 'POST',
         headers: {
           ...encoder.headers,
-          'x-csrftoken': this.csrftoken,
+          'x-csrftoken': this.csrfToken,
           Referer: `https://addons.opera.com/developer/package/${params.packageId}/?tab=versions`,
-          cookie: `INGRESSCOOKIE_API=${this.ingressCookie}; sessionid=${this.sessionId}; csrftoken=${this.csrftoken};`,
+          cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId}; csrftoken=${this.csrfToken};`,
         },
         body: Readable.from(encoder),
       });
@@ -135,10 +134,10 @@ export class OperaAddonsApi {
     return fetch(endpoint, {
       method: 'POST',
       headers: {
-        'x-csrftoken': this.csrftoken,
+        'x-csrftoken': this.csrfToken,
         Referer: `https://addons.opera.com/developer/package/${params.packageId}/?tab=versions`,
         accept: 'application/json; version=1.0',
-        cookie: `INGRESSCOOKIE_API=${this.ingressCookie}; sessionid=${this.sessionId}; csrftoken=${this.csrftoken};`,
+        cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId}; csrftoken=${this.csrfToken};`,
       },
       body: {
         file_id: params.fileId,
@@ -147,6 +146,8 @@ export class OperaAddonsApi {
       },
     });
   }
+
+  private generateCSRFToken = () => '12345678901234567890123456789012'; // should be 32 chars long
 
   private generateFileIdentifier = (
     size: number,
