@@ -2,11 +2,13 @@ import { z } from 'zod/v4';
 import type { Store } from '../utils/store';
 import { ensureZipExists } from '../utils/fs';
 import { OperaAddonsApi } from './opera-api';
+import { NotImplemented } from '../utils/errors';
 
 export const OperaAddonsStoreOptions = z.object({
   zip: z.string().min(1),
   packageId: z.number().min(1),
   sessionId: z.string().min(1).trim(),
+  skipSubmitReview: z.boolean().default(false),
 });
 
 export type OperaAddonsStoreOptions = z.infer<typeof OperaAddonsStoreOptions>;
@@ -64,7 +66,13 @@ export class OperaAddonsStore implements Store {
       ...creationData,
     });
 
+    if (this.options.skipSubmitReview) {
+      this.setStatus('Skipping submission (skipSubmitReview=true)');
+      return;
+    }
+
     // TODO: Submit changes
+    throw NotImplemented('auto submission');
   }
 
   async ensureZipsExist(): Promise<void> {

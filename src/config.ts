@@ -91,6 +91,10 @@ export function resolveConfig(
             zip: operaZip,
             packageId: config.opera?.packageId ?? intEnv('OPERA_PACKAGE_ID'),
             sessionId: config.opera?.sessionId ?? stringEnv('OPERA_SESSION_ID'),
+            skipSubmitReview:
+              config.opera?.skipSubmitReview ??
+              booleanEnv('OPERA_SKIP_SUBMIT_REVIEW') ??
+              false,
           },
   };
 }
@@ -197,6 +201,7 @@ export interface CustomEnv {
   OPERA_ZIP: string | undefined;
   OPERA_PACKAGE_ID: string | undefined;
   OPERA_SESSION_ID: string | undefined;
+  OPERA_SKIP_SUBMIT_REVIEW: string | undefined;
 }
 
 declare global {
