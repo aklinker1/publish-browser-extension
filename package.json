@@ -42,7 +42,8 @@
     "prettier": "^3.8.1",
     "publint": "^0.3.17",
     "simple-git-hooks": "^2.13.1",
-    "tsdown": "^0.20.3"
+    "tsdown": "^0.20.3",
+    "typescript": "^5.9.3"
   },
   "simple-git-hooks": {
     "pre-commit": "bun lint-staged"
