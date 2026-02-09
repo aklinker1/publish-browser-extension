@@ -53,6 +53,7 @@ describe('resolveConfig', () => {
         zip: 'zip',
         packageId: 1,
         sessionId: 'sessionId',
+        skipSubmitReview: true,
       },
     } satisfies InternalConfig;
 
@@ -100,6 +101,8 @@ describe('resolveConfig', () => {
     process.env.OPERA_SESSION_ID = 'OPERA_SESSION_ID';
     const operaPackageId = 1;
     process.env.OPERA_PACKAGE_ID = String(operaPackageId);
+    const operaSkipSubmitReview = true;
+    process.env.OPERA_SKIP_SUBMIT_REVIEW = String(operaSkipSubmitReview);
 
     const expected: InternalConfig = {
       dryRun,
@@ -135,6 +138,7 @@ describe('resolveConfig', () => {
         zip: process.env.OPERA_ZIP,
         packageId: operaPackageId,
         sessionId: process.env.OPERA_SESSION_ID!,
+        skipSubmitReview: operaSkipSubmitReview,
       },
     };
 
@@ -170,6 +174,7 @@ describe('resolveConfig', () => {
         zip: 'zip',
         packageId: 1,
         sessionId: 'sessionId',
+        skipSubmitReview: false,
       },
     };
 

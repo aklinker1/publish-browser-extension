@@ -109,6 +109,10 @@ cli.option(
   '--opera-session-id [sessionId]',
   'Session ID used for authorizing requests to Opera Addons API',
 );
+cli.option(
+  '--opera-skip-submit-review',
+  "Just upload the extension zip, don't submit it for review or publish it",
+);
 
 function configFromFlags(flags: any): InlineConfig {
   return {
@@ -143,8 +147,9 @@ function configFromFlags(flags: any): InlineConfig {
     },
     opera: {
       zip: flags.operaZip,
-      packageId: flags.packageId,
-      sessionId: flags.sessionId,
+      packageId: flags.operaPackageId,
+      sessionId: flags.operaSessionId,
+      skipSubmitReview: flags.operaSkipSubmitReview,
     },
   };
 }

@@ -267,6 +267,13 @@ async function initOpera(
   );
   entries.push(['OPERA_SESSION_ID', sessionId]);
 
+  const submitForReview = await prompt<boolean>(
+    'When uploading, automatically submit new update for review?',
+    { type: 'confirm' },
+    String(!previousOptions?.skipSubmitReview),
+  );
+  entries.push(['OPERA_SKIP_SUBMIT_REVIEW', !submitForReview]);
+
   return entries;
 }
 
