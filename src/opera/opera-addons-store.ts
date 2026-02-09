@@ -2,7 +2,6 @@ import { z } from 'zod/v4';
 import type { Store } from '../utils/store';
 import { ensureZipExists } from '../utils/fs';
 import { OperaAddonsApi } from './opera-api';
-import { NotImplemented } from '../utils/errors';
 
 export const OperaAddonsStoreOptions = z.object({
   zip: z.string().min(1),
@@ -71,8 +70,27 @@ export class OperaAddonsStore implements Store {
       return;
     }
 
-    // TODO: Submit changes
-    throw NotImplemented('auto submission');
+    this.setStatus('Getting new addon version');
+
+    const updatedAddon = await this.api.getAddonDetails({
+      packageId: this.options.packageId,
+    });
+
+    if ('detail' in updatedAddon) {
+      throw new Error(updatedAddon.detail);
+    }
+
+    const newestVersion = updatedAddon.versions[0]?.version;
+    if (!newestVersion) {
+      throw new Error(
+        'Something went wrong while retrieving the newly uploaded version number!',
+      );
+    }
+
+    await this.api.submitVersion({
+      packageId: this.options.packageId,
+      versionNumber: newestVersion,
+    });
   }
 
   async ensureZipsExist(): Promise<void> {

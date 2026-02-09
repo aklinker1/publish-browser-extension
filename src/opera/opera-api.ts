@@ -34,13 +34,8 @@ export class OperaAddonsApi {
   private addonDetailsEndpoint = (packageId: number) =>
     `${this.operaApiUrl}/developer/packages/${packageId}/` as const;
 
-  // unused
-  private addonVersionDetailsEndpoint = (packageId: number, version: string) =>
-    `${this.operaApiUrl}/developer/package-versions/${packageId}-${version}/` as const;
-
-  // unused
-  private addonDownloadStats = (packageId: number) =>
-    `${this.operaApiUrl}/developer/download-stats/${packageId}/` as const;
+  private submitVersionEndpoint = (packageId: number, version: string) =>
+    `${this.operaApiUrl}/developer/package-versions/${packageId}-${version}/submit_for_moderation` as const;
 
   /**
    * Get the detailed information about an Opera Addon
@@ -147,7 +142,34 @@ export class OperaAddonsApi {
     });
   }
 
-  private generateCSRFToken = () => '12345678901234567890123456789012'; // should be 32 chars long
+  /**
+   * Submit given version for moderation review
+   */
+  public async submitVersion(params: {
+    packageId: number;
+    versionNumber: string;
+  }) {
+    const endpoint = this.submitVersionEndpoint(
+      params.packageId,
+      params.versionNumber,
+    );
+
+    return fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json; version=1.0',
+        'x-csrftoken': this.csrfToken,
+        Referer: `https://addons.opera.com/developer/package/${params.packageId}/version/${params.versionNumber}?language=en`,
+        cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId}; csrftoken=${this.csrfToken};`,
+      },
+      body: {},
+    });
+  }
+
+  // Opera use the standard Django CSRF token, which is a 32 character long random string.
+  // In the context of this API, we can just use a fixed string since it doesn't need to be valid.
+  // See : https://docs.djangoproject.com/en/4.2/ref/csrf/#ajax for more details about how Django CSRF tokens work.
+  private generateCSRFToken = () => '12345678901234567890123456789012';
 
   private generateFileIdentifier = (
     size: number,
