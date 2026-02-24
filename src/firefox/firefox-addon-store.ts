@@ -13,6 +13,7 @@ export const FirefoxAddonStoreOptions = z.object({
   jwtIssuer: z.string().min(1).trim(),
   jwtSecret: z.string().min(1).trim(),
   channel: z.enum(['listed', 'unlisted']).default('listed'),
+  compatibility: z.array(z.string()).optional(),
 });
 export type FirefoxAddonStoreOptions = z.infer<typeof FirefoxAddonStoreOptions>;
 
@@ -66,6 +67,15 @@ export class FirefoxAddonStore implements Store {
     );
     if (!upload.valid) throw Error(`Extension is invalid: ${validationUrl}`);
     else console.log('Firefox validation results: ' + validationUrl);
+
+    if (this.options.compatibility && this.options.compatibility.length > 0) {
+      this.setStatus('Updating version compatibility');
+      await this.api.versionEdit({
+        extensionId: this.extensionId,
+        versionId: version.id,
+        compatibility: this.options.compatibility,
+      });
+    }
   }
 
   private async uploadAndPollValidation(

@@ -64,6 +64,9 @@ export function resolveConfig(
               config.firefox?.channel ??
               stringEnv('FIREFOX_CHANNEL') ??
               'listed',
+            compatibility:
+              config.firefox?.compatibility ??
+              stringEnv('FIREFOX_COMPATIBILITY')?.split(','),
           },
     edge:
       edgeZip == null
@@ -168,6 +171,7 @@ export interface CustomEnv {
   FIREFOX_JWT_ISSUER: string | undefined;
   FIREFOX_JWT_SECRET: string | undefined;
   FIREFOX_CHANNEL: string | undefined;
+  FIREFOX_COMPATIBILITY: string | undefined;
 
   EDGE_ZIP: string | undefined;
   EDGE_PRODUCT_ID: string | undefined;
