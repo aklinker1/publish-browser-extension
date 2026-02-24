@@ -73,6 +73,10 @@ cli.option(
   '--firefox-channel [firefoxChannel]',
   'The channel to publish to, "listed" or "unlisted"',
 );
+cli.option(
+  '--firefox-compatibility [firefoxCompatibility]',
+  'Comma-separated list of compatible applications, e.g. "firefox,android"',
+);
 // Edge
 cli.option('--edge-zip [edgeZip]', 'Path to extension zip to upload');
 cli.option(
@@ -121,6 +125,7 @@ function configFromFlags(flags: any): InlineConfig {
       jwtIssuer: flags.firefoxJwtIssuer,
       jwtSecret: flags.firefoxJwtSecret,
       channel: flags.firefoxChannel,
+      compatibility: flags.firefoxCompatibility?.split(','),
     },
     edge: {
       zip: flags.edgeZip,

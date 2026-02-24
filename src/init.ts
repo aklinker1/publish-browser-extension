@@ -38,7 +38,11 @@ export async function init(config: InlineConfig) {
     replacements.push(...(await initChrome(previousConfig.chrome)));
   }
   if (stores?.includes('firefox')) {
-    replacements.push(...(await initFirefox(previousConfig.firefox)));
+    replacements.push(
+      ...(await initFirefox(
+        previousConfig.firefox as Partial<FirefoxAddonStoreOptions> | undefined,
+      )),
+    );
   }
   if (stores?.includes('edge')) {
     replacements.push(...(await initEdge(previousConfig.edge)));
