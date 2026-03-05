@@ -3,6 +3,7 @@ import { ChromeWebStoreOptions } from './chrome';
 import { EdgeAddonStoreOptions } from './edge';
 import { FirefoxAddonStoreOptions } from './firefox';
 import type { DeepPartial } from './utils/types';
+import { OperaAddonsStoreOptions } from './opera';
 
 /**
  * Given inline config, read environment variables and apply defaults. Throws an error if any config
@@ -16,6 +17,7 @@ export function resolveConfig(
   const chromeZip = config.chrome?.zip ?? stringEnv('CHROME_ZIP');
   const firefoxZip = config.firefox?.zip ?? stringEnv('FIREFOX_ZIP');
   const edgeZip = config.edge?.zip ?? stringEnv('EDGE_ZIP');
+  const operaZip = config.opera?.zip ?? stringEnv('OPERA_ZIP');
 
   return {
     dryRun,
@@ -82,6 +84,18 @@ export function resolveConfig(
               booleanEnv('EDGE_SKIP_SUBMIT_REVIEW') ??
               false,
           },
+    opera:
+      operaZip == null
+        ? undefined
+        : {
+            zip: operaZip,
+            packageId: config.opera?.packageId ?? intEnv('OPERA_PACKAGE_ID'),
+            sessionId: config.opera?.sessionId ?? stringEnv('OPERA_SESSION_ID'),
+            skipSubmitReview:
+              config.opera?.skipSubmitReview ??
+              booleanEnv('OPERA_SKIP_SUBMIT_REVIEW') ??
+              false,
+          },
   };
 }
 
@@ -138,6 +152,10 @@ export const InlineConfig = z.object({
    * Options for publishing to Edge.
    */
   edge: EdgeAddonStoreOptions.partial().optional(),
+  /**
+   * Options for publishing to Opera
+   */
+  opera: OperaAddonsStoreOptions.partial().optional(),
 });
 export type InlineConfig = z.infer<typeof InlineConfig>;
 
@@ -146,6 +164,7 @@ export const InternalConfig = z.object({
   chrome: ChromeWebStoreOptions.optional(),
   firefox: FirefoxAddonStoreOptions.optional(),
   edge: EdgeAddonStoreOptions.optional(),
+  opera: OperaAddonsStoreOptions.optional(),
 });
 export type InternalConfig = z.infer<typeof InternalConfig>;
 
@@ -178,6 +197,11 @@ export interface CustomEnv {
   EDGE_ACCESS_TOKEN_URL: string | undefined;
   EDGE_API_KEY: string | undefined;
   EDGE_SKIP_SUBMIT_REVIEW: string | undefined;
+
+  OPERA_ZIP: string | undefined;
+  OPERA_PACKAGE_ID: string | undefined;
+  OPERA_SESSION_ID: string | undefined;
+  OPERA_SKIP_SUBMIT_REVIEW: string | undefined;
 }
 
 declare global {

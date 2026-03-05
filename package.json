@@ -13,6 +13,7 @@
     "dev:chrome": "bun ./scripts/dev.mjs chrome",
     "dev:firefox": "bun ./scripts/dev.mjs firefox",
     "dev:edge": "bun ./scripts/dev.mjs edge",
+    "dev:opera": "bun ./scripts/dev.mjs opera",
     "dev:help": "bun ./scripts/dev.mjs help",
     "publish-extension": "bun src/cli.ts",
     "prepack": "bun run build",
