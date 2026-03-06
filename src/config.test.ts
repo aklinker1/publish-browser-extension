@@ -22,15 +22,17 @@ describe('resolveConfig', () => {
     const config = {
       dryRun: true,
       chrome: {
+        zip: 'zip',
+        extensionId: 'extensionId',
+        publisherId: 'publisherId',
         clientId: 'clientId',
         clientSecret: 'clientSecret',
-        deployPercentage: 50,
-        extensionId: 'extensionId',
-        publishTarget: 'trustedTesters',
         refreshToken: 'refreshToken',
-        reviewExemption: true,
+        deployPercentage: 50,
         skipSubmitReview: true,
-        zip: 'zip',
+        cancelPending: true,
+        skipReview: true,
+        publishType: 'STAGED_PUBLISH',
       },
       firefox: {
         jwtIssuer: 'jwtIssuer',
@@ -62,15 +64,18 @@ describe('resolveConfig', () => {
 
     process.env.CHROME_ZIP = 'CHROME_ZIP';
     process.env.CHROME_EXTENSION_ID = 'CHROME_EXTENSION_ID';
+    process.env.CHROME_PUBLISHER_ID = 'CHROME_PUBLISHER_ID';
     process.env.CHROME_CLIENT_ID = 'CHROME_CLIENT_ID';
     process.env.CHROME_CLIENT_SECRET = 'CHROME_CLIENT_SECRET';
     process.env.CHROME_REFRESH_TOKEN = 'CHROME_REFRESH_TOKEN';
-    const chromePublishTarget = 'trustedTesters';
-    process.env.CHROME_PUBLISH_TARGET = chromePublishTarget;
     const chromeSkipSubmitReview = true;
     process.env.CHROME_SKIP_SUBMIT_REVIEW = String(chromeSkipSubmitReview);
-    const chromeReviewExemption = true;
-    process.env.CHROME_REVIEW_EXEMPTION = String(chromeReviewExemption);
+    const chromeCancelPending = true;
+    process.env.CHROME_CANCEL_PENDING = String(chromeCancelPending);
+    const chromeSkipReview = true;
+    process.env.CHROME_SKIP_REVIEW = String(chromeSkipReview);
+    const chromePublishType = 'STAGED_PUBLISH';
+    process.env.CHROME_PUBLISH_TYPE = chromePublishType;
     const chromeDeployPercentage = 75;
     process.env.CHROME_DEPLOY_PERCENTAGE = String(chromeDeployPercentage);
 
@@ -96,13 +101,15 @@ describe('resolveConfig', () => {
       chrome: {
         zip: process.env.CHROME_ZIP!,
         extensionId: process.env.CHROME_EXTENSION_ID!,
+        publisherId: process.env.CHROME_PUBLISHER_ID!,
         clientId: process.env.CHROME_CLIENT_ID!,
         clientSecret: process.env.CHROME_CLIENT_SECRET!,
         refreshToken: process.env.CHROME_REFRESH_TOKEN!,
-        reviewExemption: chromeReviewExemption,
         deployPercentage: chromeDeployPercentage,
-        publishTarget: chromePublishTarget,
         skipSubmitReview: chromeSkipSubmitReview,
+        cancelPending: chromeCancelPending,
+        skipReview: chromeSkipReview,
+        publishType: chromePublishType,
       },
       firefox: {
         zip: process.env.FIREFOX_ZIP,
@@ -130,11 +137,12 @@ describe('resolveConfig', () => {
   it('should apply defaults', () => {
     const config: InlineConfig = {
       chrome: {
+        zip: 'zip',
+        extensionId: 'extensionId',
+        publisherId: 'publisherId',
         clientId: 'clientId',
         clientSecret: 'clientSecret',
-        extensionId: 'extensionId',
         refreshToken: 'refreshToken',
-        zip: 'zip',
       },
       firefox: {
         jwtIssuer: 'jwtIssuer',
@@ -159,9 +167,10 @@ describe('resolveConfig', () => {
       chrome: {
         ...config.chrome,
         skipSubmitReview: false,
-        reviewExemption: false,
+        cancelPending: false,
+        skipReview: false,
         deployPercentage: undefined,
-        publishTarget: 'default' as const,
+        publishType: 'DEFAULT_PUBLISH' as const,
       },
       firefox: {
         ...config.firefox,
@@ -213,7 +222,7 @@ describe('validateConfig', () => {
       },
     };
     expect(() => validateConfig(config)).toThrowError(
-      'Missing required config: CHROME_ZIP, CHROME_EXTENSION_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN',
+      'Missing required config: CHROME_ZIP, CHROME_EXTENSION_ID, CHROME_PUBLISHER_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN',
     );
   });
 });

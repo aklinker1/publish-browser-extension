@@ -6,13 +6,17 @@ import { ensureZipExists } from '../utils/fs';
 export const ChromeWebStoreOptions = z.object({
   zip: z.string().min(1),
   extensionId: z.string().min(1).trim(),
+  publisherId: z.string().min(1).trim(),
   clientId: z.string().min(1).trim(),
   clientSecret: z.string().min(1).trim(),
   refreshToken: z.string().min(1).trim(),
-  publishTarget: z.enum(['default', 'trustedTesters']).default('default'),
   deployPercentage: z.int().min(1).max(100).optional(),
-  reviewExemption: z.boolean().default(false),
   skipSubmitReview: z.boolean().default(false),
+  cancelPending: z.boolean().default(false),
+  skipReview: z.boolean().default(false),
+  publishType: z
+    .enum(['DEFAULT_PUBLISH', 'STAGED_PUBLISH'])
+    .default('DEFAULT_PUBLISH'),
 });
 export type ChromeWebStoreOptions = z.infer<typeof ChromeWebStoreOptions>;
 
@@ -33,12 +37,27 @@ export class ChromeWebStore implements Store {
       return;
     }
 
+    // Cancel pending submission if requested
+    if (this.options.cancelPending) {
+      this.setStatus('Cancelling pending submission');
+      await api.cancelSubmission({
+        extensionId: this.options.extensionId,
+        token,
+      });
+    }
+
     this.setStatus('Uploading new ZIP file');
-    await api.uploadZip({
+    const uploadResult = await api.uploadZip({
       extensionId: this.options.extensionId,
       zipFile: this.options.zip,
       token,
     });
+
+    // Check if upload is still processing
+    if (uploadResult.uploadState === 'IN_PROGRESS') {
+      this.setStatus('Upload in progress, waiting for processing...');
+      // TODO: Could poll fetchStatus here if needed
+    }
 
     if (this.options.skipSubmitReview) {
       this.setStatus('Skipping submission (skipSubmitReview=true)');
@@ -46,12 +65,12 @@ export class ChromeWebStore implements Store {
     }
 
     this.setStatus('Submitting for review');
-    await api.submitForReview({
+    await api.publish({
       extensionId: this.options.extensionId,
-      publishTarget: this.options.publishTarget,
       token,
       deployPercentage: this.options.deployPercentage,
-      reviewExemption: this.options.reviewExemption,
+      publishType: this.options.publishType,
+      skipReview: this.options.skipReview || undefined,
     });
   }
 
