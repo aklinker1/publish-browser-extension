@@ -13,7 +13,7 @@ export const FirefoxAddonStoreOptions = z.object({
   jwtIssuer: z.string().min(1).trim(),
   jwtSecret: z.string().min(1).trim(),
   channel: z.enum(['listed', 'unlisted']).default('listed'),
-  compatibility: z.array(z.string()).optional(),
+  compatibility: z.array(z.enum(['firefox', 'android'])).optional(),
 });
 export type FirefoxAddonStoreOptions = z.infer<typeof FirefoxAddonStoreOptions>;
 

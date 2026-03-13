@@ -66,7 +66,7 @@ export function resolveConfig(
               'listed',
             compatibility:
               config.firefox?.compatibility ??
-              stringEnv('FIREFOX_COMPATIBILITY')?.split(','),
+              (stringEnv('FIREFOX_COMPATIBILITY')?.split(',') as any),
           },
     edge:
       edgeZip == null
