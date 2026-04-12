@@ -16,6 +16,16 @@ export interface CwsTokenDetails {
   token_type: string;
 }
 
+interface CwsItemResponse {
+  kind: string;
+  id: string;
+  uploadState: string;
+  itemError?: Array<{
+    error_code: string;
+    error_detail: string;
+  }>;
+}
+
 export class CwsApi {
   constructor(readonly options: CwsApiOptions) {}
 
@@ -45,7 +55,7 @@ export class CwsApi {
     const endpoint = this.uploadEndpoint(params.extensionId);
     const form = new FormData();
     form.append('image', await fileFromPath(params.zipFile));
-    await fetch(endpoint.href, {
+    const res: CwsItemResponse = await fetch(endpoint.href, {
       method: 'PUT',
       body: form,
       headers: {
@@ -53,6 +63,12 @@ export class CwsApi {
         'x-goog-api-version': '2',
       },
     });
+    if (res.uploadState === 'FAILURE') {
+      const errors = res.itemError
+        ?.map((e) => `${e.error_code}: ${e.error_detail}`)
+        .join('\n');
+      throw new Error(`Chrome Web Store upload failed:\n${errors}`);
+    }
   }
 
   async submitForReview(params: {
@@ -78,7 +94,7 @@ export class CwsApi {
         String(params.reviewExemption),
       );
 
-    await fetch(endpoint.href, {
+    const res: CwsItemResponse = await fetch(endpoint.href, {
       method: 'POST',
       headers: {
         Authorization,
@@ -86,6 +102,12 @@ export class CwsApi {
         'Content-Length': '0',
       },
     });
+    if (res.uploadState === 'FAILURE') {
+      const errors = res.itemError
+        ?.map((e) => `${e.error_code}: ${e.error_detail}`)
+        .join('\n');
+      throw new Error(`Chrome Web Store publish failed:\n${errors}`);
+    }
   }
 
   getToken(): Promise<CwsTokenDetails> {
