@@ -1,5 +1,4 @@
-import { FormData } from 'formdata-node';
-import { fileFromPath } from 'formdata-node/file-from-path';
+import { createReadStream } from 'node:fs';
 import { fetch } from '../utils/fetch';
 
 export interface CwsApiOptions {
@@ -53,11 +52,10 @@ export class CwsApi {
     const Authorization = await this.getAuthHeader(params.token);
 
     const endpoint = this.uploadEndpoint(params.extensionId);
-    const form = new FormData();
-    form.append('image', await fileFromPath(params.zipFile));
+    const file = createReadStream(params.zipFile);
     const res: CwsItemResponse = await fetch(endpoint.href, {
       method: 'PUT',
-      body: form,
+      body: file,
       headers: {
         Authorization,
         'x-goog-api-version': '2',
