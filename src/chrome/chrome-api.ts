@@ -53,7 +53,6 @@ export class CwsApi {
 
     const endpoint = this.uploadEndpoint(params.extensionId);
     const file = createReadStream(params.zipFile);
-    console.log('NEW CODE');
     const res: CwsItemResponse = await fetch(endpoint.href, {
       method: 'PUT',
       body: file,
