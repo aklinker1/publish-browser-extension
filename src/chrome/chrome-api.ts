@@ -65,7 +65,7 @@ export class CwsApi {
     });
     if (res.uploadState === 'FAILURE') {
       const errors = res.itemError
-        ?.map((e) => `${e.error_code}: ${e.error_detail}`)
+        ?.map(e => `${e.error_code}: ${e.error_detail}`)
         .join('\n');
       throw new Error(`Chrome Web Store upload failed:\n${errors}`);
     }
@@ -104,7 +104,7 @@ export class CwsApi {
     });
     if (res.uploadState === 'FAILURE') {
       const errors = res.itemError
-        ?.map((e) => `${e.error_code}: ${e.error_detail}`)
+        ?.map(e => `${e.error_code}: ${e.error_detail}`)
         .join('\n');
       throw new Error(`Chrome Web Store publish failed:\n${errors}`);
     }
