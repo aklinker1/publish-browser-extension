@@ -149,6 +149,12 @@ export class AddonsApi {
     });
   }
 
+  private addonVersionEditEndpoint(extensionId: string, versionId: number) {
+    return new URL(
+      `https://addons.mozilla.org/api/v5/addons/addon/${extensionId}/versions/${versionId}/`,
+    );
+  }
+
   /**
    * See https://addons-server.readthedocs.io/en/latest/topics/api/auth.html
    */
@@ -166,5 +172,27 @@ export class AddonsApi {
 
   private getAuthHeader(): string {
     return `JWT ${this.createJwt()}`;
+  }
+
+  async versionEdit(params: {
+    extensionId: string;
+    versionId: number;
+    compatibility: string[];
+  }): Promise<void> {
+    const endpoint = this.addonVersionEditEndpoint(
+      params.extensionId,
+      params.versionId,
+    );
+
+    await fetch(endpoint.href, {
+      method: 'PATCH',
+      headers: {
+        Authorization: this.getAuthHeader(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        compatibility: params.compatibility,
+      }),
+    });
   }
 }
