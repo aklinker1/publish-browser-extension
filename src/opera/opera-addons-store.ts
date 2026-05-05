@@ -2,7 +2,6 @@ import { z } from 'zod/v4';
 import type { Store } from '../utils/store';
 import { ensureZipExists } from '../utils/fs';
 import { OperaAddonsApi } from './opera-api';
-import { sleep } from '../utils/sleep';
 
 export const OperaAddonsStoreOptions = z.object({
   zip: z.string().min(1),
@@ -48,7 +47,7 @@ export class OperaAddonsStore implements Store {
 
     // For some reasons, when pushing a new version, Opera's API copies
     // almost all the details from the previous version, except for the
-    // "short summary" field. So we need to copy that part ouserselves by
+    // "short summary" field. So we need to copy that part ourselves by
     // reusing the previous version's details
     const previousVersionDetails = await this.api.getAddonVersionDetails({
       packageId: this.options.packageId,
@@ -62,7 +61,7 @@ export class OperaAddonsStore implements Store {
     if (!previousVersionDetails.translations.en?.short_description) {
       throw new Error(
         'The previous version is missing the English short description, ' +
-          'which is required to be copied to the new version.' +
+          'which is required to be copied to the new version. ' +
           'Please add it in Opera Developer Dashboard and try again.',
       );
     }
@@ -83,44 +82,23 @@ export class OperaAddonsStore implements Store {
       `File uploaded (fileId: ${creationData.fileId}), waiting for validation results...`,
     );
 
-    // Their might be some delay between the upload file request finishing and
-    // the file being actually available for validation, so we need to wait a bit
-    // before sending the validation request
-    await sleep(5_000);
-
-    await this.api.validateFileUpload({
+    const validationResult = await this.api.validateFileUpload({
       packageId: this.options.packageId,
       lastVersion: previousVersion,
       ...creationData,
     });
 
-    if (this.options.skipSubmitReview) {
-      this.setStatus('Skipping submission (skipSubmitReview=true)');
-      return;
+    if ('detail' in validationResult) {
+      throw new Error(validationResult.detail);
     }
 
-    this.setStatus('Getting new addon version');
-
-    const updatedAddon = await this.api.getAddonDetails({
-      packageId: this.options.packageId,
-    });
-
-    if ('detail' in updatedAddon) {
-      throw new Error(updatedAddon.detail);
-    }
-
-    const newestVersion = updatedAddon.versions[0]?.version;
-    if (!newestVersion) {
-      throw new Error(
-        'Something went wrong while retrieving the newly uploaded version number!',
-      );
-    }
+    this.setStatus('Updating new addon version details');
 
     // As said above, we need to copy the previous version short summary/description
     // details to the new version
-    await this.api.updateAddonVersionDetails({
+    const updatedDetails = await this.api.updateAddonVersionDetails({
       packageId: this.options.packageId,
-      version: newestVersion,
+      version: validationResult.version,
       details: {
         translations: {
           en: {
@@ -131,6 +109,15 @@ export class OperaAddonsStore implements Store {
       },
     });
 
+    if ('detail' in updatedDetails) {
+      throw new Error(updatedDetails.detail);
+    }
+
+    if (this.options.skipSubmitReview) {
+      this.setStatus('Skipping submission (skipSubmitReview=true)');
+      return;
+    }
+
     this.setStatus(
       'Submitting new version for review, this may take a while... (~2 minutes)',
     );
@@ -139,7 +126,7 @@ export class OperaAddonsStore implements Store {
     // to be processed by Opera's API
     const res = await this.api.submitVersion({
       packageId: this.options.packageId,
-      versionNumber: newestVersion,
+      versionNumber: validationResult.version,
     });
 
     if ('detail' in res) {

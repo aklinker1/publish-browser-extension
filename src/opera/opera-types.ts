@@ -36,6 +36,14 @@ export interface OperaAddonDetails {
   retirejs_warnings: unknown[];
 }
 
+export interface OperaAddonFileValidationResponse {
+  version: string;
+  submitted_for_moderation: boolean;
+  type: string;
+  created: string;
+  warnings: string[];
+}
+
 export interface OperaAddonVersionDetails {
   version: string;
   submitted_for_moderation: boolean;

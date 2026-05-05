@@ -249,16 +249,30 @@ async function initOpera(
     'Your `--opera-package-id` is listed in the URL of your addon developer dashboard, example:\n' +
       'https://addons.opera.com/developer/package/<packageId>',
   );
-  const packageId = await prompt<number>(
-    'Enter the package ID (packageId):',
-    { type: 'text' },
-    String(previousOptions?.packageId),
-  );
+
+  let packageId: number | undefined;
+  while (true) {
+    const input = await prompt<string>(
+      'Enter the package ID (packageId):',
+      { type: 'text' },
+      previousOptions?.packageId
+        ? String(previousOptions.packageId)
+        : undefined,
+    );
+
+    const parsed = Number(input.trim());
+    if (Number.isInteger(parsed) && parsed > 0) {
+      packageId = parsed;
+      break;
+    }
+
+    consola.warn('Please enter a valid positive integer for the package ID.');
+  }
   entries.push(['OPERA_PACKAGE_ID', packageId]);
 
   consola.info(
-    'Your `--opera-session-id`, `--opera-csrtoken` and `--opera-ingress-cookie-api` are ' +
-      'Cookies available on the Opera Addons website: https://addons.opera.com/developer/',
+    'Your `--opera-session-id` is the `sessionid` cookie available on the Opera Addons website: ' +
+      'https://addons.opera.com/developer/',
   );
   const sessionId = await prompt<string>(
     'Enter the session ID (sessionid):',

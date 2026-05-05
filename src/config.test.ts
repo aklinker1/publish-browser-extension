@@ -174,7 +174,6 @@ describe('resolveConfig', () => {
         zip: 'zip',
         packageId: 1,
         sessionId: 'sessionId',
-        skipSubmitReview: false,
       },
     };
 
@@ -198,7 +197,7 @@ describe('resolveConfig', () => {
       },
       opera: {
         ...config.opera,
-        // No default values
+        skipSubmitReview: false,
       },
     };
 

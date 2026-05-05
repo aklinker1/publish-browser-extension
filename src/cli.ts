@@ -115,6 +115,20 @@ cli.option(
 );
 
 function configFromFlags(flags: any): InlineConfig {
+  let operaPackageId: number | undefined = undefined;
+
+  if (flags.operaPackageId !== undefined) {
+    const parsed = Number(flags.operaPackageId);
+
+    if (!Number.isNaN(parsed) && Number.isInteger(parsed) && parsed > 0) {
+      operaPackageId = parsed;
+    } else {
+      consola.warn(
+        `Invalid value for --opera-package-id: "${flags.operaPackageId}". It must be a positive integer.`,
+      );
+    }
+  }
+
   return {
     dryRun: flags.dryRun,
     chrome: {
@@ -147,7 +161,7 @@ function configFromFlags(flags: any): InlineConfig {
     },
     opera: {
       zip: flags.operaZip,
-      packageId: flags.operaPackageId,
+      packageId: operaPackageId,
       sessionId: flags.operaSessionId,
       skipSubmitReview: flags.operaSkipSubmitReview,
     },

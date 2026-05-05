@@ -8,6 +8,7 @@ import { Blob } from 'node:buffer';
 import type {
   OperaAddonApiError,
   OperaAddonDetails,
+  OperaAddonFileValidationResponse,
   OperaAddonVersionDetails,
 } from './opera-types';
 import type { DeepPartial } from '../utils/types';
@@ -22,11 +23,10 @@ export interface OperaAddonsApiOptions {
 export class OperaAddonsApi {
   private readonly operaApiUrl = 'https://addons.opera.com/api';
   private readonly csrfToken: string;
+  private readonly sessionId: string;
 
-  constructor(
-    options: OperaAddonsApiOptions,
-    private readonly sessionId: string = options.sessionId,
-  ) {
+  constructor(options: OperaAddonsApiOptions) {
+    this.sessionId = options.sessionId;
     this.csrfToken = this.generateCSRFToken();
   }
 
@@ -100,7 +100,7 @@ export class OperaAddonsApi {
         cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId}; csrftoken=${this.csrfToken};`,
         Referer: `https://addons.opera.com/developer/package/${params.packageId}/version/${params.version}`,
       },
-      body: JSON.stringify(params.details),
+      body: params.details,
     });
   }
 
@@ -173,7 +173,7 @@ export class OperaAddonsApi {
     fileId: `${number}-${string}`;
     fileName: string;
     lastVersion: string;
-  }): Promise<unknown> {
+  }): Promise<OperaAddonFileValidationResponse | OperaAddonApiError> {
     const endpoint = this.uploadValidateEndpoint(params.packageId);
 
     return fetch(endpoint, {
@@ -189,6 +189,15 @@ export class OperaAddonsApi {
         file_name: params.fileName,
         metadata_from: params.lastVersion,
       },
+      // There might be some delay between the upload file request finishing and
+      // the file being actually available for validation, so the request might
+      // fail. To work around this, we retry a few times with some delay.
+      retry: 10,
+      retryDelay: 5_000,
+      retryStatusCodes: [400, 500, 502, 503, 504],
+      // empty method to avoid spamming the console with HTML error responses
+      // from the server while retrying
+      onResponseError: async () => {},
     });
   }
 
@@ -216,7 +225,7 @@ export class OperaAddonsApi {
     });
   }
 
-  // Opera use the standard Django CSRF token, which is a 32 character long random string.
+  // Opera uses the standard Django CSRF token, which is a 32-character-long random string.
   // In the context of this API, we can just use a fixed string since it doesn't need to be valid.
   // See : https://docs.djangoproject.com/en/4.2/ref/csrf/#ajax for more details about how Django CSRF tokens work.
   private generateCSRFToken = () => '12345678901234567890123456789012';
