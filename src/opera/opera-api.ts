@@ -34,8 +34,10 @@ export class OperaAddonsApi {
   private addonDetailsEndpoint = (packageId: number) =>
     `${this.operaApiUrl}/developer/packages/${packageId}/` as const;
 
+  // Trailing slash is required - Opera's backend (Django) has APPEND_SLASH=True, so a request
+  // without it gets 301-redirected, and fetch will follow the redirect as a GET, causing a 405.
   private submitVersionEndpoint = (packageId: number, version: string) =>
-    `${this.operaApiUrl}/developer/package-versions/${packageId}-${version}/submit_for_moderation` as const;
+    `${this.operaApiUrl}/developer/package-versions/${packageId}-${version}/submit_for_moderation/` as const;
 
   /**
    * Get the detailed information about an Opera Addon
@@ -96,7 +98,7 @@ export class OperaAddonsApi {
         headers: {
           ...encoder.headers,
           'x-csrftoken': this.csrfToken,
-          Referer: `https://addons.opera.com/developer/package/${params.packageId}/?tab=versions`,
+          Referer: `https://addons.opera.com/developer/package/${params.packageId}/`,
           cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId}; csrftoken=${this.csrfToken};`,
         },
         body: Readable.from(encoder),
@@ -130,7 +132,7 @@ export class OperaAddonsApi {
       method: 'POST',
       headers: {
         'x-csrftoken': this.csrfToken,
-        Referer: `https://addons.opera.com/developer/package/${params.packageId}/?tab=versions`,
+        Referer: `https://addons.opera.com/developer/package/${params.packageId}/`,
         accept: 'application/json; version=1.0',
         cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId}; csrftoken=${this.csrfToken};`,
       },
@@ -162,7 +164,7 @@ export class OperaAddonsApi {
         Referer: `https://addons.opera.com/developer/package/${params.packageId}/version/${params.versionNumber}?language=en`,
         cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId}; csrftoken=${this.csrfToken};`,
       },
-      body: {},
+      body: undefined, // No body required
     });
   }
 
