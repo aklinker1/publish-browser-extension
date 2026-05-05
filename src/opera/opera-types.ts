@@ -35,3 +35,48 @@ export interface OperaAddonDetails {
   is_extension: boolean;
   retirejs_warnings: unknown[];
 }
+
+export interface OperaAddonVersionDetails {
+  version: string;
+  submitted_for_moderation: boolean;
+  support: unknown | null;
+  source_url: string | null;
+  service_url: string | null;
+  source_for_moderators_url: string | null;
+  build_instructions: string | null;
+  features: unknown[];
+  file_size: number;
+  icon: {
+    id: number;
+    width: number;
+    height: number;
+    url: string;
+  } | null;
+  screenshots: Record<
+    number,
+    {
+      id: number;
+      url: string;
+    }
+  >;
+  video: string | null;
+  license: string | null;
+  privacy_policy: string | null;
+  translations: Record<
+    string,
+    {
+      language: {
+        code: string;
+        name: string;
+      };
+      short_description: string;
+      long_description: string;
+      changelog: string | null;
+    }
+  >;
+  type: 'Chromium Extension';
+  created: string;
+  warnings: unknown[];
+  download_url: string;
+  retirejs_warnings: unknown[];
+}

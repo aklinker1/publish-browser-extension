@@ -5,7 +5,12 @@ import { Readable } from 'node:stream';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Blob } from 'node:buffer';
-import type { OperaAddonApiError, OperaAddonDetails } from './opera-types';
+import type {
+  OperaAddonApiError,
+  OperaAddonDetails,
+  OperaAddonVersionDetails,
+} from './opera-types';
+import type { DeepPartial } from '../utils/types';
 
 // API guessed from : https://addons-static.operacdn.com/static/CACHE/js/catalog.6c1172c19572.js
 // And by looking at the HTTP requests while using the website
@@ -39,6 +44,9 @@ export class OperaAddonsApi {
   private submitVersionEndpoint = (packageId: number, version: string) =>
     `${this.operaApiUrl}/developer/package-versions/${packageId}-${version}/submit_for_moderation/` as const;
 
+  private addonVersionDetailsEndpoint = (packageId: number, version: string) =>
+    `${this.operaApiUrl}/developer/package-versions/${packageId}-${version}/` as const;
+
   /**
    * Get the detailed information about an Opera Addon
    */
@@ -53,6 +61,46 @@ export class OperaAddonsApi {
         accept: 'application/json; version=1.0',
         cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId};`,
       },
+    });
+  }
+
+  public async getAddonVersionDetails(params: {
+    packageId: number;
+    version: string;
+  }): Promise<OperaAddonVersionDetails | OperaAddonApiError> {
+    const endpoint = this.addonVersionDetailsEndpoint(
+      params.packageId,
+      params.version,
+    );
+
+    return await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        accept: 'application/json; version=1.0',
+        cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId};`,
+      },
+    });
+  }
+
+  public async updateAddonVersionDetails(params: {
+    packageId: number;
+    version: string;
+    details: DeepPartial<OperaAddonVersionDetails>;
+  }): Promise<OperaAddonVersionDetails | OperaAddonApiError> {
+    const endpoint = this.addonVersionDetailsEndpoint(
+      params.packageId,
+      params.version,
+    );
+
+    return await fetch(endpoint, {
+      method: 'PATCH',
+      headers: {
+        accept: 'application/json; version=1.0',
+        'x-csrftoken': this.csrfToken,
+        cookie: `INGRESSCOOKIE_API; sessionid=${this.sessionId}; csrftoken=${this.csrfToken};`,
+        Referer: `https://addons.opera.com/developer/package/${params.packageId}/version/${params.version}`,
+      },
+      body: JSON.stringify(params.details),
     });
   }
 
@@ -150,7 +198,7 @@ export class OperaAddonsApi {
   public async submitVersion(params: {
     packageId: number;
     versionNumber: string;
-  }) {
+  }): Promise<OperaAddonVersionDetails | OperaAddonApiError> {
     const endpoint = this.submitVersionEndpoint(
       params.packageId,
       params.versionNumber,
