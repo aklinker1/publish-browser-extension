@@ -99,8 +99,36 @@ cli.option(
   '--edge-skip-submit-review',
   "Just upload the extension zip, don't submit it for review or publish it",
 );
+// Opera
+cli.option('--opera-zip [operaZip]', 'Path to extension zip to upload');
+cli.option(
+  '--opera-package-id [packageId]',
+  'Package ID listed in the package developer URL: https://addons.opera.com/developer/package/<packageId>',
+);
+cli.option(
+  '--opera-session-id [sessionId]',
+  'Session ID used for authorizing requests to Opera Addons API',
+);
+cli.option(
+  '--opera-skip-submit-review',
+  "Just upload the extension zip, don't submit it for review or publish it",
+);
 
 function configFromFlags(flags: any): InlineConfig {
+  let operaPackageId: number | undefined = undefined;
+
+  if (flags.operaPackageId !== undefined) {
+    const parsed = Number(flags.operaPackageId);
+
+    if (!Number.isNaN(parsed) && Number.isInteger(parsed) && parsed > 0) {
+      operaPackageId = parsed;
+    } else {
+      consola.warn(
+        `Invalid value for --opera-package-id: "${flags.operaPackageId}". It must be a positive integer.`,
+      );
+    }
+  }
+
   return {
     dryRun: flags.dryRun,
     chrome: {
@@ -130,6 +158,12 @@ function configFromFlags(flags: any): InlineConfig {
       clientSecret: flags.edgeClientSecret,
       accessTokenUrl: flags.edgeAccessTokenUrl,
       skipSubmitReview: flags.edgeSkipSubmitReview,
+    },
+    opera: {
+      zip: flags.operaZip,
+      packageId: operaPackageId,
+      sessionId: flags.operaSessionId,
+      skipSubmitReview: flags.operaSkipSubmitReview,
     },
   };
 }
@@ -163,6 +197,7 @@ cli
       chromeZip: '...',
       firefoxZip: '...',
       edgeZip: '...',
+      operaZip: '...',
       ...flags,
     });
 

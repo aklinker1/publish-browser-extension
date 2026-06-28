@@ -5,6 +5,7 @@ import { ChromeWebStoreOptions } from './chrome';
 import { FirefoxAddonStoreOptions } from './firefox';
 import { EdgeAddonStoreOptions } from './edge';
 import { ofetch } from 'ofetch';
+import type { OperaAddonsStoreOptions } from './opera';
 
 type Entry = [key: keyof CustomEnv, value: string | number | boolean];
 
@@ -24,6 +25,7 @@ export async function init(config: InlineConfig) {
         { value: 'chrome', label: 'Chrome Web Store' },
         { value: 'firefox', label: 'Firefox Addon Store' },
         { value: 'edge', label: 'Edge Addon Store' },
+        { value: 'opera', label: 'Opera Addons' },
       ],
       required: true,
     },
@@ -43,11 +45,14 @@ export async function init(config: InlineConfig) {
   if (stores?.includes('edge')) {
     replacements.push(...(await initEdge(previousConfig.edge)));
   }
+  if (stores?.includes('opera')) {
+    replacements.push(...(await initOpera(previousConfig.opera)));
+  }
 
   await updateEnvFile(replacements);
   console.log();
   consola.log(
-    'To submit an update, run:\n\n  `publish-extension --chrome-zip path/to/extension.zip \\`\n    `--firefox-zip path/to/extension.zip \\`\n    `--edge-zip path/to/extension.zip`',
+    'To submit an update, run:\n\n  `publish-extension --chrome-zip path/to/extension.zip \\`\n    `--firefox-zip path/to/extension.zip \\`\n    `--edge-zip path/to/extension.zip \\`\n    `--opera-zip path/to/extension.zip`',
   );
 }
 
@@ -228,6 +233,60 @@ async function initFirefox(
     previousOptions?.channel,
   );
   entries.push(['FIREFOX_CHANNEL', channel]);
+
+  return entries;
+}
+
+async function initOpera(
+  previousOptions: Partial<OperaAddonsStoreOptions> | undefined,
+): Promise<Entry[]> {
+  const entries: Entry[] = [];
+
+  console.log();
+  consola.start('Opera Addons\n');
+
+  consola.info(
+    'Your `--opera-package-id` is listed in the URL of your addon developer dashboard, example:\n' +
+      'https://addons.opera.com/developer/package/<packageId>',
+  );
+
+  let packageId: number | undefined;
+  while (true) {
+    const input = await prompt<string>(
+      'Enter the package ID (packageId):',
+      { type: 'text' },
+      previousOptions?.packageId
+        ? String(previousOptions.packageId)
+        : undefined,
+    );
+
+    const parsed = Number(input.trim());
+    if (Number.isInteger(parsed) && parsed > 0) {
+      packageId = parsed;
+      break;
+    }
+
+    consola.warn('Please enter a valid positive integer for the package ID.');
+  }
+  entries.push(['OPERA_PACKAGE_ID', packageId]);
+
+  consola.info(
+    'Your `--opera-session-id` is the `sessionid` cookie available on the Opera Addons website: ' +
+      'https://addons.opera.com/developer/',
+  );
+  const sessionId = await prompt<string>(
+    'Enter the session ID (sessionid):',
+    { type: 'text' },
+    previousOptions?.sessionId,
+  );
+  entries.push(['OPERA_SESSION_ID', sessionId]);
+
+  const submitForReview = await prompt<boolean>(
+    'When uploading, automatically submit new update for review?',
+    { type: 'confirm' },
+    String(!previousOptions?.skipSubmitReview),
+  );
+  entries.push(['OPERA_SKIP_SUBMIT_REVIEW', !submitForReview]);
 
   return entries;
 }

@@ -3,6 +3,7 @@ import { ChromeWebStore } from './chrome';
 import { InlineConfig, resolveConfig, validateConfig } from './config';
 import { EdgeAddonStore } from './edge';
 import { FirefoxAddonStore } from './firefox';
+import { OperaAddonsStore } from './opera';
 import type { Store, SubmitResult } from './utils/store';
 import { consola } from 'consola';
 
@@ -68,6 +69,14 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
       name: 'Edge Addon Store',
       getStore: setStatus =>
         new EdgeAddonStore(internalConfig.edge!, setStatus),
+    });
+  }
+  if (internalConfig.opera) {
+    stores.push({
+      id: 'opera',
+      name: 'Opera Addons',
+      getStore: setStatus =>
+        new OperaAddonsStore(internalConfig.opera!, setStatus),
     });
   }
 

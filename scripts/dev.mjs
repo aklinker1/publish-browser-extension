@@ -30,6 +30,8 @@ try {
         'extension/firefox.zip',
         '--edge-zip',
         'extension/chrome.zip',
+        '--opera-zip',
+        'extension/chrome.zip',
       ]);
       break;
 
@@ -50,10 +52,14 @@ try {
       publish(['--edge-zip', 'extension/chrome.zip']);
       break;
 
+    case 'opera':
+      publish(['--opera-zip', 'extension/chrome.zip']);
+      break;
+
     default:
       console.log();
       console.log(
-        "Run 'bun dev:chrome' or 'bun dev:firefox' or 'bun dev:edge' or 'bun dev:all'",
+        "Run 'bun dev:chrome' or 'bun dev:firefox' or 'bun dev:edge' or 'bun dev:opera' or 'bun dev:all'",
       );
       publish();
       break;

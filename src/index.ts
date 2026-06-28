@@ -5,3 +5,4 @@ export { InlineConfig } from './config';
 export * from './firefox';
 export * from './edge';
 export * from './chrome';
+export * from './opera';
