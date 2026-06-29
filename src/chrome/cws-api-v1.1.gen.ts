@@ -1,5 +1,3 @@
-import type { BodyInit } from 'bun';
-
 export namespace CwsApiV1_1 {
   export const BASE_URL = 'https://chromewebstore.googleapis.com/';
 
@@ -102,7 +100,7 @@ export namespace CwsApiV1_1 {
            */
           publisherEmail?: string;
         };
-        body: BodyInit;
+        body: Bun.BodyInit;
         response: { type: 'json'; value: Item };
       };
       '/chromewebstore/v1.1/items/{itemId}/publish': {
@@ -139,7 +137,7 @@ export namespace CwsApiV1_1 {
           itemId: string;
         };
 
-        body: BodyInit;
+        body: Bun.BodyInit;
         response: { type: 'json'; value: Item };
       };
     };
