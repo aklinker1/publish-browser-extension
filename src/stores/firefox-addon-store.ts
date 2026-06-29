@@ -47,9 +47,7 @@ export class FirefoxAddonStore implements Store {
     this.setStatus('Getting addon details');
     const addon = await this.client.get(
       '/api/v5/addons/addon/{idOrSlugOrGuid}',
-      {
-        params: { idOrSlugOrGuid: this.extensionId },
-      },
+      { params: { idOrSlugOrGuid: this.extensionId } },
     );
 
     if (dryRun) {
@@ -74,9 +72,7 @@ export class FirefoxAddonStore implements Store {
     const upload = await pollUntil<FirefoxApiV5.UploadDetails>(async () => {
       const polledUpload = await this.client.get(
         '/api/v5/addons/upload/{uuid}',
-        {
-          params: { uuid: uploadUuid },
-        },
+        { params: { uuid: uploadUuid } },
       );
       if (!polledUpload.processed) return;
 
