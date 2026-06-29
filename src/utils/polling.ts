@@ -1,13 +1,14 @@
-export function pollUntil(options: {
-  interval?: number;
-  timeout?: number;
-  condition: () => Promise<boolean>;
-}): Promise<void> {
+export function pollUntil<T>(
+  condition: () => Promise<T | undefined>,
+  options?: {
+    interval?: number;
+    timeout?: number;
+  },
+): Promise<T> {
   const {
     interval = 5e3, // 5 seconds
     timeout = 10 * 60e3, // 10 minutes
-    condition,
-  } = options;
+  } = options ?? {};
   const start = Date.now();
 
   return new Promise((resolve, reject) => {
@@ -18,9 +19,10 @@ export function pollUntil(options: {
         reject(new Error('Timeout'));
         return;
       }
-      if (await condition()) {
+      const res = await condition();
+      if (res != null) {
         clearInterval(intervalId);
-        resolve();
+        resolve(res);
       }
     }, interval);
   });

@@ -1,10 +1,16 @@
-import { AddonsApi, type UploadDetails } from '../apis/firefox-api';
-import { sleep } from '../utils/sleep';
-import { withTimeout } from '../utils/withTimeout';
 import { plural } from '../utils/plural';
 import type { Store } from './store';
 import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
+import { createHttpClient, type HttpClient } from '../utils/http-client';
+import { FirefoxApiV5 } from '../apis/firefox-api-v5';
+import { createFirefoxJwt } from '../utils/firefox-auth';
+import { pollUntil } from '../utils/polling';
+
+import { FormData } from 'formdata-node';
+import { fileFromPath } from 'formdata-node/file-from-path';
+import { FormDataEncoder } from 'form-data-encoder';
+import { Readable } from 'node:stream';
 
 export const FirefoxAddonStoreOptions = z.object({
   zip: z.string().min(1),
@@ -17,13 +23,18 @@ export const FirefoxAddonStoreOptions = z.object({
 export type FirefoxAddonStoreOptions = z.infer<typeof FirefoxAddonStoreOptions>;
 
 export class FirefoxAddonStore implements Store {
-  private api: AddonsApi;
+  private client: HttpClient<FirefoxApiV5.Endpoints>;
 
   constructor(
     readonly options: FirefoxAddonStoreOptions,
     readonly setStatus: (text: string) => void,
   ) {
-    this.api = new AddonsApi(options);
+    this.client = createHttpClient({
+      baseUrl: FirefoxApiV5.BASE_URL,
+      defaultHeaders: () => ({
+        Authorization: `JWT ${createFirefoxJwt(options.jwtIssuer, options.jwtSecret)}`,
+      }),
+    });
   }
 
   async ensureZipsExist(): Promise<void> {
@@ -35,55 +46,62 @@ export class FirefoxAddonStore implements Store {
 
   async submit(dryRun?: boolean): Promise<void> {
     this.setStatus('Getting addon details');
-    const addon = await this.api.details({
-      extensionId: this.extensionId,
+    const addon = await this.client.get('/addons/addon/{idOrSlugOrGuid}', {
+      params: { idOrSlugOrGuid: this.extensionId },
     });
+
     if (dryRun) {
       this.setStatus('DRY RUN: Skipped upload and publishing');
       return;
     }
 
-    // Firefox recommends 5-10s polling and a 10 minute timeout
-    const pollInterval = 5e3; // 5 seconds
-    const timeout = 10 * 60e3; // 10 minutes
-    const uploadPromise = this.uploadAndPollValidation(pollInterval);
-    const upload = await withTimeout(uploadPromise, timeout);
-
-    this.setStatus('Submitting new version');
-    const version = await this.api.versionCreate({
-      extensionId: this.extensionId,
-      sourceFile: this.options.sourcesZip,
-      uploadUuid: upload.uuid,
-    });
-
-    const validationUrl = `https://addons.mozilla.org/en-US/developers/addon/${addon.id}/file/${version.file.id}/validation`;
-    const { errors, notices, warnings } = upload.validation;
-    this.setStatus(
-      `Validation results: ${plural(errors, 'error')}, ${plural(
-        warnings,
-        'warning',
-      )}, ${plural(notices, 'notice')}`,
-    );
-    if (!upload.valid) throw Error(`Extension is invalid: ${validationUrl}`);
-    else console.log('Firefox validation results: ' + validationUrl);
-  }
-
-  private async uploadAndPollValidation(
-    pollIntervalMs: number,
-  ): Promise<UploadDetails> {
     this.setStatus('Uploading new ZIP file');
-    let details = await this.api.uploadCreate({
-      file: this.options.zip,
+    const uploadBody = this.createForm({
       channel: this.options.channel,
+      upload: await fileFromPath(this.options.zip),
+    });
+    const { uuid: uploadUuid } = await this.client.post('/addons/upload', {
+      body: uploadBody.body,
+      headers: uploadBody.encoder.headers,
     });
 
     this.setStatus('Waiting for validation results');
-    while (!details.processed) {
-      await sleep(pollIntervalMs);
-      details = await this.api.uploadDetail(details);
+    const upload = await pollUntil<FirefoxApiV5.UploadDetails>(async () => {
+      const polledUpload = await this.client.get('/addons/upload/{uuid}', {
+        params: { uuid: uploadUuid },
+      });
+      if (!polledUpload.processed) return;
+
+      this.setStatus(
+        `Validation results: ${this.buildValidationSummary(polledUpload)}`,
+      );
+      return polledUpload;
+    });
+
+    this.setStatus('Submitting new version');
+    const versionBody = this.createForm({
+      upload: upload.uuid,
+      source: this.options.sourcesZip
+        ? await fileFromPath(this.options.sourcesZip)
+        : '',
+    });
+    const version = await this.client.post(
+      '/addons/addon/{idOrSlugOrGuid}/versions',
+      {
+        params: { idOrSlugOrGuid: this.extensionId },
+        body: versionBody.body,
+        headers: versionBody.encoder.headers,
+      },
+    );
+
+    const validationUrl = `https://addons.mozilla.org/en-US/developers/addon/${addon.id}/file/${version.file.id}/validation`;
+    if (!upload.valid) {
+      throw Error(
+        `Extension is invalid (${this.buildValidationSummary(upload)}): ${validationUrl}`,
+      );
     }
 
-    return details;
+    console.log('Firefox validation results: ' + validationUrl);
   }
 
   /**
@@ -100,5 +118,25 @@ export class FirefoxAddonStore implements Store {
     if (id.startsWith('{')) id = id.slice(1);
     if (id.endsWith('}')) id = id.slice(0, -1);
     return id;
+  }
+
+  private createForm(value: Record<string, unknown>): {
+    body: Readable;
+    encoder: FormDataEncoder;
+  } {
+    const form = new FormData();
+    for (const [key, val] of Object.entries(value)) {
+      if (val != null) form.set(key, val);
+    }
+    const encoder = new FormDataEncoder(form);
+    return { body: Readable.from(encoder), encoder };
+  }
+
+  private buildValidationSummary(upload: FirefoxApiV5.UploadDetails): string {
+    return [
+      plural(upload.validation.errors, 'error'),
+      plural(upload.validation.warnings, 'warning'),
+      plural(upload.validation.notices, 'notice'),
+    ].join(', ');
   }
 }
