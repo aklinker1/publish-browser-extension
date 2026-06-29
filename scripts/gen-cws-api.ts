@@ -10,7 +10,6 @@ if (!docRes.ok) throw Error('Fetch request failed', { cause: docRes });
 const doc = (await docRes.json()) as DiscoveryDoc.Document;
 
 const mod = [
-  "import type { BodyInit } from 'bun'",
   `export namespace CwsApiV${version.slice(1).replace('.', '_')} {`,
   `  export const BASE_URL = '${doc.baseUrl}';`,
   ...Object.entries(doc.schemas).map(([name, schema]) =>
@@ -73,7 +72,12 @@ namespace DiscoveryDoc {
     mediaUpload?: {
       accept: `${string}/${string}`[];
       maxSize: number;
-      protocols: unknown;
+      protocols: {
+        simple: {
+          path: string;
+          multipart: boolean;
+        };
+      };
     };
     parameters: Record<
       string,
@@ -159,11 +163,17 @@ function getAllMethods(
   });
 }
 
+function ensureSlashPrefix(path: string): string {
+  return path.startsWith('/') ? path : `/${path}`;
+}
+
 function generateEndpointTypes(): string {
   const methods = getAllMethods(doc.resources).reduce((map, method) => {
     const key = method.httpMethod ?? '""';
     map[key] ??= [];
-    map[key].push(`"/${method.path}": ${generateMethodType(method)}`);
+    map[key].push(
+      `"${ensureSlashPrefix(method.mediaUpload?.protocols.simple.path ?? method.path)}": ${generateMethodType(method)}`,
+    );
     return map;
   }, Object.create(null));
 
@@ -214,7 +224,7 @@ function generateMethodQueryType(
 }
 
 function generateMethodBodyType(method: DiscoveryDoc.MethodDef): string {
-  if (method.mediaUpload) return `BodyInit`;
+  if (method.mediaUpload) return `Bun.BodyInit`;
 
   if (method.request) return generateSchemaType(method.request);
 

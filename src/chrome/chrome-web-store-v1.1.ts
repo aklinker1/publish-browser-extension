@@ -55,10 +55,14 @@ export class ChromeWebStoreV1_1 implements Store {
 
     this.setStatus('Uploading new ZIP file');
     const file = createReadStream(this.options.zip);
-    await this.client.put('/chromewebstore/v1.1/items/{itemId}', {
-      params: { itemId: this.options.extensionId },
-      body: file,
-    });
+    let item = await this.client.put(
+      '/upload/chromewebstore/v1.1/items/{itemId}',
+      {
+        params: { itemId: this.options.extensionId },
+        body: file,
+      },
+    );
+    this.checkUploadState(item);
 
     if (this.options.skipSubmitReview) {
       this.setStatus('Skipping submission (skipSubmitReview=true)');
@@ -66,22 +70,26 @@ export class ChromeWebStoreV1_1 implements Store {
     }
 
     this.setStatus('Submitting for review');
-    await this.client.post('/chromewebstore/v1.1/items/{itemId}/publish', {
-      params: {
-        itemId: this.options.extensionId,
+    item = await this.client.post(
+      '/chromewebstore/v1.1/items/{itemId}/publish',
+      {
+        params: {
+          itemId: this.options.extensionId,
+        },
+        // TODO: Do I need both of these?
+        query: {
+          deployPercentage: this.options.deployPercentage,
+          publishTarget: this.options.publishTarget,
+          reviewExemption: this.options.reviewExemption,
+        },
+        body: {
+          deployPercentage: this.options.deployPercentage,
+          reviewExemption: this.options.reviewExemption,
+          target: this.options.publishTarget,
+        },
       },
-      // TODO: Do I need both of these?
-      query: {
-        deployPercentage: this.options.deployPercentage,
-        publishTarget: this.options.publishTarget,
-        reviewExemption: this.options.reviewExemption,
-      },
-      body: {
-        deployPercentage: this.options.deployPercentage,
-        reviewExemption: this.options.reviewExemption,
-        target: this.options.publishTarget,
-      },
-    });
+    );
+    this.checkUploadState(item);
   }
 
   async ensureZipsExist(): Promise<void> {
@@ -113,6 +121,20 @@ export class ChromeWebStoreV1_1 implements Store {
     if (!res.ok) throw FetchError.from(res);
 
     return (await res.json()) as CwsTokenDetails;
+  }
+
+  private checkUploadState(item: CwsApiV1_1.Item): void | never {
+    if (item.uploadState === 'FAILURE' || item.uploadState === 'NOT_FOUND')
+      throw new ChromeWebStoreUploadStateError(item);
+  }
+}
+
+export class ChromeWebStoreUploadStateError extends Error {
+  constructor(item: CwsApiV1_1.Item) {
+    super(`CWS item upload state is ${item.uploadState}`, {
+      cause: item,
+    });
+    this.name = 'ChromeWebStoreUploadStateError';
   }
 }
 
