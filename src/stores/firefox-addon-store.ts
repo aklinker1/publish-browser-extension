@@ -1,4 +1,4 @@
-import { AddonsApi, type UploadDetails } from './firefox-api';
+import { AddonsApi, type UploadDetails } from '../apis/firefox-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import { plural } from '../utils/plural';

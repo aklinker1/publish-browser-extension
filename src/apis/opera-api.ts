@@ -10,7 +10,7 @@ import type {
   OperaAddonDetails,
   OperaAddonFileValidationResponse,
   OperaAddonVersionDetails,
-} from './opera-types';
+} from './opera-api-types';
 import type { DeepPartial } from '../utils/types';
 
 // API guessed from : https://addons-static.operacdn.com/static/CACHE/js/catalog.6c1172c19572.js

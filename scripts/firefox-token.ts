@@ -1,5 +1,5 @@
 import { consola } from 'consola';
-import { AddonsApi } from '../src/firefox/firefox-api';
+import { AddonsApi } from '../src/apis/firefox-api';
 import { config } from 'dotenv';
 
 config({ path: '.env.submit', quiet: true });

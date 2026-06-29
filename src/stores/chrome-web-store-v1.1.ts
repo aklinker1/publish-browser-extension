@@ -2,7 +2,7 @@ import type { Store } from '../utils/store';
 import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
-import { CwsApiV1_1 } from './cws-api-v1.1.gen';
+import { CwsApiV1_1 } from '../apis/cws-api-v1.1.gen';
 import { FetchError } from '../utils/errors';
 import { createReadStream } from 'node:fs';
 

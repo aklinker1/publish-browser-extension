@@ -1,8 +1,8 @@
 import { cac } from 'cac';
 import { version } from '../package.json';
-import { submit } from './submit';
+import { submit } from './commands/submit';
 import { InlineConfig } from './config';
-import { init } from './init';
+import { init } from './commands/init';
 import { consola } from 'consola';
 import { config } from 'dotenv';
 

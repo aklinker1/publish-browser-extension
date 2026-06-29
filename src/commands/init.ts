@@ -1,11 +1,11 @@
 import { consola } from 'consola';
-import { InlineConfig, resolveConfig, type CustomEnv } from './config';
+import { InlineConfig, resolveConfig, type CustomEnv } from '../config';
 import { copyFile, writeFile, readFile } from 'node:fs/promises';
-import { ChromeWebStoreOptions } from './chrome';
-import { FirefoxAddonStoreOptions } from './firefox';
-import { EdgeAddonStoreOptions } from './edge';
+import { ChromeWebStoreOptions } from '../stores/chrome-web-store-v1.1';
+import { FirefoxAddonStoreOptions } from '../stores/firefox-addon-store';
+import { EdgeAddonStoreOptions } from '../stores/edge-addon-store';
+import { OperaAddonsStoreOptions } from '../stores/opera-addons-store';
 import { ofetch } from 'ofetch';
-import type { OperaAddonsStoreOptions } from './opera';
 
 type Entry = [key: keyof CustomEnv, value: string | number | boolean];
 

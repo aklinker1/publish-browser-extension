@@ -2,7 +2,7 @@ import {
   type DraftOperation,
   EdgeApi,
   type EdgeTokenDetails,
-} from './edge-api';
+} from '../apis/edge-api';
 import { sleep } from '../utils/sleep';
 import { withTimeout } from '../utils/withTimeout';
 import type { Store } from '../utils/store';
