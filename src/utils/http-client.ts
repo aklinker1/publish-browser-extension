@@ -18,6 +18,11 @@ export type HttpClientInputs<
   TPath extends keyof TEndpoints[TMethod],
 > = Omit<TEndpoints[TMethod][TPath], 'response'> & {
   headers?: Record<string, string>;
+  mapResponse?: (
+    res: Response,
+  ) =>
+    | HttpClientResponseValue<TEndpoints, TMethod, TPath>
+    | Promise<HttpClientResponseValue<TEndpoints, TMethod, TPath>>;
 };
 
 export type HttpClientResponseType<
@@ -120,6 +125,7 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
       },
       body: body?.value,
     };
+    // console.log(init); // Uncomment to debug
 
     const res = await globalThis.fetch(url, init);
     if (!res.ok)
@@ -127,7 +133,18 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
         `Fetch request failed with code ${res.status} ${res.statusText}: ${await res.text()}`,
       );
 
+    if (inputs.mapResponse) {
+      return await inputs.mapResponse(res);
+    }
+
     const contentType = res.headers.get('Content-Type');
+    if (contentType == null)
+      return undefined as HttpClientResponseValue<
+        TEndpoints,
+        typeof method,
+        typeof path
+      >;
+
     if (contentType?.includes('application/json')) {
       const data = await res.json();
       return data as HttpClientResponseValue<

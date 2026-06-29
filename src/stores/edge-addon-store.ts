@@ -1,13 +1,10 @@
-import {
-  type DraftOperation,
-  EdgeApi,
-  type EdgeTokenDetails,
-} from '../apis/edge-api';
-import { sleep } from '../utils/sleep';
-import { withTimeout } from '../utils/withTimeout';
+import { EdgeApiV1_1 } from '../apis/edge-api-v1.1';
 import type { Store } from './store';
 import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
+import { createHttpClient, type HttpClient } from '../utils/http-client';
+import { pollUntil } from '../utils/polling';
+import { createReadStream } from 'node:fs';
 
 export const EdgeAddonStoreOptions = z.object({
   zip: z.string().min(1),
@@ -24,13 +21,19 @@ export const EdgeAddonStoreOptions = z.object({
 export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptions>;
 
 export class EdgeAddonStore implements Store {
-  private api: EdgeApi;
+  private client: HttpClient<EdgeApiV1_1.Endpoints>;
 
   constructor(
     private readonly options: EdgeAddonStoreOptions,
     readonly setStatus: (text: string) => void,
   ) {
-    this.api = new EdgeApi(options);
+    this.client = createHttpClient({
+      baseUrl: EdgeApiV1_1.BASE_URL,
+      defaultHeaders: {
+        'X-ClientID': options.clientId,
+        Authorization: `ApiKey ${options.apiKey}`,
+      },
+    });
   }
 
   async ensureZipsExist(): Promise<void> {
@@ -38,58 +41,55 @@ export class EdgeAddonStore implements Store {
   }
 
   async submit(dryRun?: boolean | undefined): Promise<void> {
-    this.setStatus('Getting authorization token');
-    const token = await this.api.getToken();
-
+    // TODO: Figure out a way to validate the API key before exiting the dry run
     if (dryRun) {
-      // TODO: Validate v1.1 API key before returning. v1.0 token is validated inside `this.api.getToken()` above.
       this.setStatus('DRY RUN: Skipped upload and publishing');
       return;
     }
 
-    const pollInterval = 5e3; // 5 seconds
-    const timeout = 10 * 60e3; // 10 minutes
-    const uploadPromise = this.uploadAndPollValidation(token, pollInterval);
-    await withTimeout(uploadPromise, timeout);
+    this.setStatus('Uploading new ZIP file');
+    const { operationId } = await this.client.post(
+      '/v1/products/{productId}/submissions/draft/package',
+      {
+        params: {
+          productId: this.options.productId,
+        },
+        body: createReadStream(this.options.zip),
+        headers: {
+          'Content-Type': 'application/zip',
+        },
+        mapResponse: res => ({
+          operationId: res.headers.get('Location') as string,
+        }),
+      },
+    );
 
+    this.setStatus('Waiting for validation results');
+    await pollUntil({
+      interval: 5e3,
+      timeout: 10 * 60e3,
+      condition: async () => {
+        const operation = await this.client.get(
+          `/v1/products/{productId}/submissions/draft/package/operations/{operationId}`,
+          { params: { operationId, productId: this.options.productId } },
+        );
+        if (operation.status === 'Failed')
+          throw Error(
+            `Validation failed: ${JSON.stringify(operation, null, 2)}`,
+          );
+
+        return operation.status === 'Succeeded';
+      },
+    });
     if (this.options.skipSubmitReview) {
       this.setStatus('Skipping submission (skipSubmitReview=true)');
       return;
     }
 
     this.setStatus('Submitting new version');
-    await this.api.publish({
-      token,
-      productId: this.options.productId,
+    await this.client.post('/v1/products/{productId}/submissions', {
+      params: { productId: this.options.productId },
+      body: {},
     });
-  }
-
-  private async uploadAndPollValidation(
-    token: EdgeTokenDetails,
-    pollIntervalMs: number,
-  ): Promise<void> {
-    this.setStatus('Uploading new ZIP file');
-    const { operationId } = await this.api.uploadDraft({
-      token,
-      productId: this.options.productId,
-      zipFile: this.options.zip,
-    });
-
-    this.setStatus('Waiting for validation results');
-    let operation: DraftOperation;
-    do {
-      await sleep(pollIntervalMs);
-      operation = await this.api.uploadDraftOperation({
-        token,
-        operationId,
-        productId: this.options.productId,
-      });
-    } while (operation.status === 'InProgress');
-
-    if (operation.status === 'Failed') {
-      throw Error(`Validation failed: ${JSON.stringify(operation, null, 2)}`);
-    } else {
-      this.setStatus('Extension is valid');
-    }
   }
 }
