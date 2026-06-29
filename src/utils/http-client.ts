@@ -125,7 +125,7 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
       },
       body: body?.value,
     };
-    // console.log(init); // Uncomment to debug
+    console.log({ url: url.href, ...init }, '\n\n'); // Uncomment to debug
 
     const res = await globalThis.fetch(url, init);
     if (!res.ok)

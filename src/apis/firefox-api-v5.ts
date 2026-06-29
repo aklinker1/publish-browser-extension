@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream';
 
 export namespace FirefoxApiV5 {
-  export const BASE_URL = 'https://addons.mozilla.org/api/v5';
+  export const BASE_URL = 'https://addons.mozilla.org';
 
   export interface AddonDetails {
     id: string;
@@ -36,7 +36,7 @@ export namespace FirefoxApiV5 {
       /**
        * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#detail
        */
-      '/addons/addon/{idOrSlugOrGuid}': {
+      '/api/v5/addons/addon/{idOrSlugOrGuid}': {
         params: {
           idOrSlugOrGuid: string | number;
         };
@@ -46,7 +46,7 @@ export namespace FirefoxApiV5 {
       /**
        * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-detail
        */
-      '/addons/upload/{uuid}': {
+      '/api/v5/addons/upload/{uuid}': {
         params: {
           uuid: string | number;
         };
@@ -57,7 +57,7 @@ export namespace FirefoxApiV5 {
       /**
        * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
        */
-      '/addons/upload': {
+      '/api/v5/addons/upload': {
         body: Readable;
         response: { type: 'json'; value: UploadDetails };
       };
@@ -65,7 +65,7 @@ export namespace FirefoxApiV5 {
       /**
        * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
        */
-      '/addons/addon/{idOrSlugOrGuid}/versions': {
+      '/api/v5/addons/addon/{idOrSlugOrGuid}/versions': {
         params: {
           idOrSlugOrGuid: string | number;
         };

@@ -45,9 +45,12 @@ export class FirefoxAddonStore implements Store {
 
   async submit(dryRun?: boolean): Promise<void> {
     this.setStatus('Getting addon details');
-    const addon = await this.client.get('/addons/addon/{idOrSlugOrGuid}', {
-      params: { idOrSlugOrGuid: this.extensionId },
-    });
+    const addon = await this.client.get(
+      '/api/v5/addons/addon/{idOrSlugOrGuid}',
+      {
+        params: { idOrSlugOrGuid: this.extensionId },
+      },
+    );
 
     if (dryRun) {
       this.setStatus('DRY RUN: Skipped upload and publishing');
@@ -59,16 +62,22 @@ export class FirefoxAddonStore implements Store {
       channel: this.options.channel,
       upload: await fileFromPath(this.options.zip),
     });
-    const { uuid: uploadUuid } = await this.client.post('/addons/upload', {
-      body: uploadBody.body,
-      headers: uploadBody.encoder.headers,
-    });
+    const { uuid: uploadUuid } = await this.client.post(
+      '/api/v5/addons/upload',
+      {
+        body: uploadBody.body,
+        headers: uploadBody.encoder.headers,
+      },
+    );
 
     this.setStatus('Waiting for validation results');
     const upload = await pollUntil<FirefoxApiV5.UploadDetails>(async () => {
-      const polledUpload = await this.client.get('/addons/upload/{uuid}', {
-        params: { uuid: uploadUuid },
-      });
+      const polledUpload = await this.client.get(
+        '/api/v5/addons/upload/{uuid}',
+        {
+          params: { uuid: uploadUuid },
+        },
+      );
       if (!polledUpload.processed) return;
 
       this.setStatus(
@@ -85,7 +94,7 @@ export class FirefoxAddonStore implements Store {
         : '',
     });
     const version = await this.client.post(
-      '/addons/addon/{idOrSlugOrGuid}/versions',
+      '/api/v5/addons/addon/{idOrSlugOrGuid}/versions',
       {
         params: { idOrSlugOrGuid: this.extensionId },
         body: versionBody.body,
