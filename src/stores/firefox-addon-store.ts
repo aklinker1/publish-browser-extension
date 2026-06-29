@@ -18,6 +18,7 @@ export const FirefoxAddonStoreOptions = z.object({
   jwtIssuer: z.string().min(1).trim(),
   jwtSecret: z.string().min(1).trim(),
   channel: z.enum(['listed', 'unlisted']).default('listed'),
+  compatibility: z.enum(['firefox', 'android']).array().optional(),
 });
 export type FirefoxAddonStoreOptions = z.infer<typeof FirefoxAddonStoreOptions>;
 
@@ -106,6 +107,20 @@ export class FirefoxAddonStore implements Store {
     }
 
     console.log('Firefox validation results: ' + validationUrl);
+
+    if (this.options.compatibility?.length) {
+      this.setStatus('Updating version compatibility');
+      await this.client.fetch(
+        'PATCH',
+        `/api/v5/addons/addon/{idOrSlugOrGuid}/versions/{versionId}/`,
+        {
+          params: { idOrSlugOrGuid: this.extensionId, versionId: version.id },
+          body: {
+            compatibility: this.options.compatibility,
+          },
+        },
+      );
+    }
   }
 
   /**

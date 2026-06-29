@@ -73,5 +73,16 @@ export namespace FirefoxApiV5 {
         response: { type: 'json'; value: AddonVersion };
       };
     };
+    PATCH: {
+      '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/{versionId}/': {
+        params: {
+          idOrSlugOrGuid: string | number;
+          versionId: number;
+        };
+        body: {
+          compatibility: string[];
+        };
+      };
+    };
   };
 }

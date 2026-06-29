@@ -41,6 +41,7 @@ jobs:
           FIREFOX_JWT_ISSUER: ${{ secrets.TEST_FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.TEST_FIREFOX_JWT_SECRET }}
           FIREFOX_CHANNEL: unlisted
+          FIREFOX_COMPATIBILITY: firefox,android
           EDGE_PRODUCT_ID: ${{ secrets.TEST_EDGE_PRODUCT_ID }}
           EDGE_CLIENT_ID: ${{ secrets.TEST_EDGE_CLIENT_ID }}
           EDGE_API_KEY: ${{ secrets.TEST_EDGE_API_KEY }}

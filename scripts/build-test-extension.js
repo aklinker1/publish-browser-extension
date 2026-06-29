@@ -64,5 +64,10 @@ await createExtensionZip(firefoxZip, {
   background: {
     scripts: ['background.js'],
   },
+  browser_specific_settings: {
+    gecko: {
+      data_collection_permissions: { required: ['none'] },
+    },
+  },
 });
 consola.success('Done');
