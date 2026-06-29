@@ -6,7 +6,6 @@ import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { FirefoxApiV5 } from '../apis/firefox-api-v5';
 import { createFirefoxJwt } from '../utils/firefox-auth';
 import { pollUntil } from '../utils/polling';
-
 import { FormData } from 'formdata-node';
 import { fileFromPath } from 'formdata-node/file-from-path';
 import { FormDataEncoder } from 'form-data-encoder';
