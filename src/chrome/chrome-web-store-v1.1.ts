@@ -39,8 +39,8 @@ export class ChromeWebStoreV1_1 implements Store {
   ) {
     this.client = createHttpClient<CwsApiV1_1.Endpoints>({
       baseUrl: CwsApiV1_1.BASE_URL,
-      defaultHeaders: () => ({
-        Authorization: `Bearer ${options.clientSecret}`,
+      defaultHeaders: async () => ({
+        Authorization: `Bearer ${await this.getToken()}`,
         'x-goog-api-version': '2',
       }),
     });
