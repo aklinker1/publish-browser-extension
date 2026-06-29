@@ -102,7 +102,7 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
           : { type: 'json', value: JSON.stringify(inputs.body) }
         : undefined;
 
-    const res = await globalThis.fetch(url, {
+    const init: RequestInit = {
       method: String(method),
       headers: {
         ...(typeof options.defaultHeaders === 'function'
@@ -114,7 +114,9 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
         ...inputs.headers,
       },
       body: body?.value,
-    });
+    };
+
+    const res = await globalThis.fetch(url, init);
     if (!res.ok)
       throw new Error(
         `Fetch request failed with code ${res.status} ${res.statusText}: ${await res.text()}`,
