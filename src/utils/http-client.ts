@@ -105,7 +105,9 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
     const res = await globalThis.fetch(url, {
       method: String(method),
       headers: {
-        ...options.defaultHeaders,
+        ...(typeof options.defaultHeaders === 'function'
+          ? await options.defaultHeaders()
+          : options.defaultHeaders),
         ...(body?.type === 'json'
           ? { 'Content-Type': 'application/json' }
           : {}),
