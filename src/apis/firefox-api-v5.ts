@@ -57,7 +57,7 @@ export namespace FirefoxApiV5 {
       /**
        * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
        */
-      '/api/v5/addons/upload': {
+      '/api/v5/addons/upload/': {
         body: Readable;
         response: { type: 'json'; value: UploadDetails };
       };
@@ -65,7 +65,7 @@ export namespace FirefoxApiV5 {
       /**
        * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
        */
-      '/api/v5/addons/addon/{idOrSlugOrGuid}/versions': {
+      '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/': {
         params: {
           idOrSlugOrGuid: string | number;
         };

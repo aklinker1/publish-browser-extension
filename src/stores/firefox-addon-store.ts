@@ -63,7 +63,7 @@ export class FirefoxAddonStore implements Store {
       upload: await fileFromPath(this.options.zip),
     });
     const { uuid: uploadUuid } = await this.client.post(
-      '/api/v5/addons/upload',
+      '/api/v5/addons/upload/',
       {
         body: uploadBody.body,
         headers: uploadBody.encoder.headers,
@@ -94,7 +94,7 @@ export class FirefoxAddonStore implements Store {
         : '',
     });
     const version = await this.client.post(
-      '/api/v5/addons/addon/{idOrSlugOrGuid}/versions',
+      '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/',
       {
         params: { idOrSlugOrGuid: this.extensionId },
         body: versionBody.body,
