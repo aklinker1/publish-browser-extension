@@ -18,28 +18,6 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     consola.warn('Dry run, skipping submission');
   }
 
-  if (
-    internalConfig.edge?.clientSecret ||
-    internalConfig.edge?.accessTokenUrl
-  ) {
-    consola.warn(
-      [
-        'Edge API v1.0 was deprecated Jan 1, 2025. v1.1 of the API requires different authentication. To upgrade:',
-        '  1. Remove the `--edge-client-secret` or `EDGE_CLIENT_SECRET` environment variable',
-        '  2. Remove the `--edge-access-token-url` or `EDGE_ACCESS_TOKEN_URL` environment variable',
-        '  3. Follow the instructions below to add the `--edge-api-key` flag or `EDGE_API_KEY` environment variable',
-        'Or run `publish-extension init` and re-initialize the edge store.',
-        '',
-        'To generate an API key:',
-        '  1. Visit https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi',
-        '  2. Enable the v1.1 API if necessary',
-        '  3. Create an new API key',
-        '',
-        'Refer to Microsoft API reference for more details: https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api?tabs=v1-1#overview-of-using-the-update-rest-api',
-      ].join('\n'),
-    );
-  }
-
   // Get list of stores that need released
 
   const stores: Array<{

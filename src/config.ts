@@ -78,10 +78,6 @@ export function resolveConfig(
             productId: config.edge?.productId ?? stringEnv('EDGE_PRODUCT_ID'),
             clientId: config.edge?.clientId ?? stringEnv('EDGE_CLIENT_ID'),
             apiKey: config.edge?.apiKey ?? stringEnv('EDGE_API_KEY'),
-            clientSecret:
-              config.edge?.clientSecret ?? stringEnv('EDGE_CLIENT_SECRET'),
-            accessTokenUrl:
-              config.edge?.accessTokenUrl ?? stringEnv('EDGE_ACCESS_TOKEN_URL'),
             skipSubmitReview:
               config.edge?.skipSubmitReview ??
               booleanEnv('EDGE_SKIP_SUBMIT_REVIEW') ??

@@ -160,8 +160,6 @@ function configFromFlags(flags: any): InlineConfig {
       productId: flags.edgeProductId,
       clientId: flags.edgeClientId,
       apiKey: flags.edgeApiKey,
-      clientSecret: flags.edgeClientSecret,
-      accessTokenUrl: flags.edgeAccessTokenUrl,
       skipSubmitReview: flags.edgeSkipSubmitReview,
     },
     opera: {

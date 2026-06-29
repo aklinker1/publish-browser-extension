@@ -44,8 +44,6 @@ describe('resolveConfig', () => {
         productId: 'productId',
         clientId: 'clientId',
         apiKey: 'apiKey',
-        accessTokenUrl: 'accessTokenUrl',
-        clientSecret: 'clientSecret',
         skipSubmitReview: true,
         zip: 'zip',
       },
@@ -92,8 +90,6 @@ describe('resolveConfig', () => {
     process.env.EDGE_PRODUCT_ID = 'EDGE_PRODUCT_ID';
     process.env.EDGE_CLIENT_ID = 'EDGE_CLIENT_ID';
     process.env.EDGE_API_KEY = 'EDGE_API_KEY';
-    process.env.EDGE_CLIENT_SECRET = 'EDGE_CLIENT_SECRET';
-    process.env.EDGE_ACCESS_TOKEN_URL = 'EDGE_ACCESS_TOKEN_URL';
     const edgeSkipSubmitReview = true;
     process.env.EDGE_SKIP_SUBMIT_REVIEW = String(edgeSkipSubmitReview);
 
@@ -130,8 +126,6 @@ describe('resolveConfig', () => {
         productId: process.env.EDGE_PRODUCT_ID,
         clientId: process.env.EDGE_CLIENT_ID,
         apiKey: process.env.EDGE_API_KEY,
-        accessTokenUrl: process.env.EDGE_ACCESS_TOKEN_URL,
-        clientSecret: process.env.EDGE_CLIENT_SECRET,
         skipSubmitReview: edgeSkipSubmitReview,
       },
       opera: {
@@ -164,9 +158,7 @@ describe('resolveConfig', () => {
       },
       edge: {
         clientId: 'clientId',
-        clientSecret: 'clientSecret',
         productId: 'productId',
-        accessTokenUrl: 'accessTokenUrl',
         apiKey: 'apiKey',
         zip: 'zip',
       },
