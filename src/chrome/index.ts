@@ -1,2 +1,1 @@
-export * from './chrome-api';
-export * from './chrome-web-store';
+export * from './chrome-web-store-v1.1';
