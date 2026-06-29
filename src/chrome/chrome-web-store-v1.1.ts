@@ -55,14 +55,14 @@ export class ChromeWebStoreV1_1 implements Store {
 
     this.setStatus('Uploading new ZIP file');
     const file = createReadStream(this.options.zip);
-    let item = await this.client.put(
+    const uploadItem = await this.client.put(
       '/upload/chromewebstore/v1.1/items/{itemId}',
       {
         params: { itemId: this.options.extensionId },
         body: file,
       },
     );
-    this.checkUploadState(item);
+    this.checkUploadState(uploadItem);
 
     if (this.options.skipSubmitReview) {
       this.setStatus('Skipping submission (skipSubmitReview=true)');
@@ -70,26 +70,21 @@ export class ChromeWebStoreV1_1 implements Store {
     }
 
     this.setStatus('Submitting for review');
-    item = await this.client.post(
+    const publishItem = await this.client.post(
       '/chromewebstore/v1.1/items/{itemId}/publish',
       {
         params: {
           itemId: this.options.extensionId,
         },
-        // TODO: Do I need both of these?
         query: {
           deployPercentage: this.options.deployPercentage,
           publishTarget: this.options.publishTarget,
           reviewExemption: this.options.reviewExemption,
         },
-        body: {
-          deployPercentage: this.options.deployPercentage,
-          reviewExemption: this.options.reviewExemption,
-          target: this.options.publishTarget,
-        },
+        body: undefined!,
       },
     );
-    this.checkUploadState(item);
+    this.checkUploadState(publishItem);
   }
 
   async ensureZipsExist(): Promise<void> {
