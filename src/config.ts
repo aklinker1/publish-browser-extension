@@ -195,10 +195,6 @@ export interface CustomEnv {
   EDGE_ZIP: string | undefined;
   EDGE_PRODUCT_ID: string | undefined;
   EDGE_CLIENT_ID: string | undefined;
-  /** @deprecated since Edge API v1.1 release */
-  EDGE_CLIENT_SECRET: string | undefined;
-  /** @deprecated since Edge API v1.1 release */
-  EDGE_ACCESS_TOKEN_URL: string | undefined;
   EDGE_API_KEY: string | undefined;
   EDGE_SKIP_SUBMIT_REVIEW: string | undefined;
 
