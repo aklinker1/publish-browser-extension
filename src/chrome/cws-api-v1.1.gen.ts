@@ -1,13 +1,17 @@
 import type { BodyInit } from 'bun';
 
-export const BASE_URL = 'https://chromewebstore.googleapis.com/';
-
 export namespace CwsApiV1_1 {
+  export const BASE_URL = 'https://chromewebstore.googleapis.com/';
+
   export type Item = {
     /**
-     * Public key of this item.
+     * Status of the operation. Possible values are: - \"FAILURE\" - \"IN_PROGRESS\" - \"NOT_FOUND\" - \"SUCCESS\"
      */
-    publicKey?: string;
+    uploadState?: string;
+    /**
+     * Detail human-readable status of the operation, in English only. Same error messages are displayed when you upload your app to the Chrome Web Store.
+     */
+    itemError?: Array<ItemError>;
     /**
      * The CRX version of the item. If the projection is draft, then it is the draft's CRX version.
      */
@@ -21,24 +25,20 @@ export namespace CwsApiV1_1 {
      */
     kind?: string;
     /**
-     * Status of the operation. Possible values are: - \"FAILURE\" - \"IN_PROGRESS\" - \"NOT_FOUND\" - \"SUCCESS\"
+     * Public key of this item.
      */
-    uploadState?: string;
-    /**
-     * Detail human-readable status of the operation, in English only. Same error messages are displayed when you upload your app to the Chrome Web Store.
-     */
-    itemError?: Array<ItemError>;
+    publicKey?: string;
   };
 
   export type ItemError = {
     /**
-     * The human-readable detail message of the error.
-     */
-    error_detail?: string;
-    /**
      * The error code.
      */
     error_code?: string;
+    /**
+     * The human-readable detail message of the error.
+     */
+    error_detail?: string;
   };
 
   export type PublishRequest = {
@@ -58,21 +58,21 @@ export namespace CwsApiV1_1 {
 
   export type Item2 = {
     /**
+     * Static string value is always "chromewebstore#item".
+     */
+    kind?: string;
+    /**
      * The ID of this item.
      */
     item_id?: string;
-    /**
-     * The status code of this publish operation. It may contain multiple elements from the following list: NOT_AUTHORIZED, INVALID_DEVELOPER, DEVELOPER_NO_OWNERSHIP, DEVELOPER_SUSPENDED, ITEM_NOT_FOUND, ITEM_PENDING_REVIEW, ITEM_TAKEN_DOWN, PUBLISHER_SUSPENDED.
-     */
-    status?: Array<string>;
     /**
      * Detailed human-comprehensible explanation of the status code above.
      */
     statusDetail?: Array<string>;
     /**
-     * Static string value is always "chromewebstore#item".
+     * The status code of this publish operation. It may contain multiple elements from the following list: NOT_AUTHORIZED, INVALID_DEVELOPER, DEVELOPER_NO_OWNERSHIP, DEVELOPER_SUSPENDED, ITEM_NOT_FOUND, ITEM_PENDING_REVIEW, ITEM_TAKEN_DOWN, PUBLISHER_SUSPENDED.
      */
-    kind?: string;
+    status?: Array<string>;
   };
 
   export type Endpoints = {
