@@ -9,7 +9,7 @@ export type Endpoints = {
   };
 };
 
-export type RestClientInputs<
+export type HttpClientInputs<
   TEndpoints extends Endpoints,
   TMethod extends keyof TEndpoints,
   TPath extends keyof TEndpoints[TMethod],
@@ -17,7 +17,7 @@ export type RestClientInputs<
   headers?: Record<string, string>;
 };
 
-export type RestClientResponseType<
+export type HttpClientResponseType<
   TEndpoints extends Endpoints,
   TMethod extends keyof TEndpoints,
   TPath extends keyof TEndpoints[TMethod],
@@ -25,7 +25,7 @@ export type RestClientResponseType<
   ? TEndpoints[TMethod][TPath]['response']['type']
   : never;
 
-export type RestClientResponseValue<
+export type HttpClientResponseValue<
   TEndpoints extends Endpoints,
   TMethod extends keyof TEndpoints,
   TPath extends keyof TEndpoints[TMethod],
@@ -33,44 +33,44 @@ export type RestClientResponseValue<
   ? TEndpoints[TMethod][TPath]['response']['value']
   : never;
 
-export interface RestClient<TEndpoints extends Endpoints> {
+export interface HttpClient<TEndpoints extends Endpoints> {
   fetch<
     TMethod extends keyof TEndpoints,
     TPath extends keyof TEndpoints[TMethod],
   >(
     method: TMethod,
     path: TPath,
-    inputs: RestClientInputs<TEndpoints, TMethod, TPath>,
-  ): Promise<RestClientResponseValue<TEndpoints, TMethod, TPath>>;
+    inputs: HttpClientInputs<TEndpoints, TMethod, TPath>,
+  ): Promise<HttpClientResponseValue<TEndpoints, TMethod, TPath>>;
 
   get<TPath extends keyof TEndpoints['GET']>(
     path: TPath,
-    inputs: RestClientInputs<TEndpoints, 'GET', TPath>,
-  ): Promise<RestClientResponseValue<TEndpoints, 'GET', TPath>>;
+    inputs: HttpClientInputs<TEndpoints, 'GET', TPath>,
+  ): Promise<HttpClientResponseValue<TEndpoints, 'GET', TPath>>;
 
   post<TPath extends keyof TEndpoints['POST']>(
     path: TPath,
-    inputs: RestClientInputs<TEndpoints, 'POST', TPath>,
-  ): Promise<RestClientResponseValue<TEndpoints, 'POST', TPath>>;
+    inputs: HttpClientInputs<TEndpoints, 'POST', TPath>,
+  ): Promise<HttpClientResponseValue<TEndpoints, 'POST', TPath>>;
 
   put<TPath extends keyof TEndpoints['PUT']>(
     path: TPath,
-    inputs: RestClientInputs<TEndpoints, 'PUT', TPath>,
-  ): Promise<RestClientResponseValue<TEndpoints, 'PUT', TPath>>;
+    inputs: HttpClientInputs<TEndpoints, 'PUT', TPath>,
+  ): Promise<HttpClientResponseValue<TEndpoints, 'PUT', TPath>>;
 
   delete<TPath extends keyof TEndpoints['DELETE']>(
     path: TPath,
-    inputs: RestClientInputs<TEndpoints, 'DELETE', TPath>,
-  ): Promise<RestClientResponseValue<TEndpoints, 'DELETE', TPath>>;
+    inputs: HttpClientInputs<TEndpoints, 'DELETE', TPath>,
+  ): Promise<HttpClientResponseValue<TEndpoints, 'DELETE', TPath>>;
 }
 
-export function createRestClient<TEndpoints extends Endpoints>(options: {
+export function createHttpClient<TEndpoints extends Endpoints>(options: {
   baseUrl: string;
   defaultHeaders?:
     | Record<string, string>
     | (() => Promise<Record<string, string>> | Record<string, string>);
-}): RestClient<TEndpoints> {
-  const fetch: RestClient<TEndpoints>['fetch'] = async (
+}): HttpClient<TEndpoints> {
+  const fetch: HttpClient<TEndpoints>['fetch'] = async (
     method,
     path,
     inputs,
@@ -121,7 +121,7 @@ export function createRestClient<TEndpoints extends Endpoints>(options: {
     const contentType = res.headers.get('Content-Type');
     if (contentType?.includes('application/json')) {
       const data = await res.json();
-      return data as RestClientResponseValue<
+      return data as HttpClientResponseValue<
         TEndpoints,
         typeof method,
         typeof path

@@ -1,33 +1,6 @@
 import type { BodyInit } from 'bun';
 
-export namespace Cws1_1 {
-  export type Item = {
-    /**
-     * Public key of this item.
-     */
-    publicKey?: string;
-    /**
-     * Unique ID of the item.
-     */
-    id?: string;
-    /**
-     * Detail human-readable status of the operation, in English only. Same error messages are displayed when you upload your app to the Chrome Web Store.
-     */
-    itemError?: Array<ItemError>;
-    /**
-     * The CRX version of the item. If the projection is draft, then it is the draft's CRX version.
-     */
-    crxVersion?: string;
-    /**
-     * Identifies this resource as an Item. Value: the fixed string "chromewebstore#item".
-     */
-    kind?: string;
-    /**
-     * Status of the operation. Possible values are: - \"FAILURE\" - \"IN_PROGRESS\" - \"NOT_FOUND\" - \"SUCCESS\"
-     */
-    uploadState?: string;
-  };
-
+export namespace CwsApiV1_1 {
   export type PublishRequest = {
     /**
      * The publish target of this publish operation. This is the same as using publishTarget as a URL query parameter. The string value can either be target="trustedTesters" or target="default". The default value, if none is supplied, is target="default". Recommended usage is to use the URL query parameter to specificy the value.
@@ -45,21 +18,48 @@ export namespace Cws1_1 {
 
   export type Item2 = {
     /**
-     * Static string value is always "chromewebstore#item".
+     * Detailed human-comprehensible explanation of the status code above.
      */
-    kind?: string;
+    statusDetail?: Array<string>;
     /**
      * The ID of this item.
      */
     item_id?: string;
     /**
-     * Detailed human-comprehensible explanation of the status code above.
-     */
-    statusDetail?: Array<string>;
-    /**
      * The status code of this publish operation. It may contain multiple elements from the following list: NOT_AUTHORIZED, INVALID_DEVELOPER, DEVELOPER_NO_OWNERSHIP, DEVELOPER_SUSPENDED, ITEM_NOT_FOUND, ITEM_PENDING_REVIEW, ITEM_TAKEN_DOWN, PUBLISHER_SUSPENDED.
      */
     status?: Array<string>;
+    /**
+     * Static string value is always "chromewebstore#item".
+     */
+    kind?: string;
+  };
+
+  export type Item = {
+    /**
+     * Status of the operation. Possible values are: - \"FAILURE\" - \"IN_PROGRESS\" - \"NOT_FOUND\" - \"SUCCESS\"
+     */
+    uploadState?: string;
+    /**
+     * The CRX version of the item. If the projection is draft, then it is the draft's CRX version.
+     */
+    crxVersion?: string;
+    /**
+     * Unique ID of the item.
+     */
+    id?: string;
+    /**
+     * Detail human-readable status of the operation, in English only. Same error messages are displayed when you upload your app to the Chrome Web Store.
+     */
+    itemError?: Array<ItemError>;
+    /**
+     * Identifies this resource as an Item. Value: the fixed string "chromewebstore#item".
+     */
+    kind?: string;
+    /**
+     * Public key of this item.
+     */
+    publicKey?: string;
   };
 
   export type ItemError = {

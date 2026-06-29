@@ -1,8 +1,8 @@
 import type { Store } from '../utils/store';
 import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
-import { createRestClient, type RestClient } from '../utils/rest-client';
-import { Cws1_1 } from './cws-api-v1.1.gen';
+import { createHttpClient, type HttpClient } from '../utils/http-client';
+import { CwsApiV1_1 } from './cws-api-v1.1.gen';
 import { FetchError } from '../utils/errors';
 import { createReadStream } from 'node:fs';
 
@@ -30,15 +30,15 @@ export interface CwsTokenDetails {
 }
 
 export class ChromeWebStoreV1_1 implements Store {
-  private client: RestClient<Cws1_1.Endpoints>;
+  private client: HttpClient<CwsApiV1_1.Endpoints>;
   private tokenCache: Promise<CwsTokenDetails> | undefined;
 
   constructor(
     readonly options: ChromeWebStoreV1_1Options,
     readonly setStatus: (text: string) => void,
   ) {
-    this.client = createRestClient<Cws1_1.Endpoints>({
-      baseUrl: Cws1_1.BASE_URL,
+    this.client = createHttpClient<CwsApiV1_1.Endpoints>({
+      baseUrl: CwsApiV1_1.BASE_URL,
       defaultHeaders: () => ({
         Authorization: `Bearer ${options.clientSecret}`,
         'x-goog-api-version': '2',
