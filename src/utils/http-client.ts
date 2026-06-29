@@ -1,3 +1,6 @@
+import type { BodyInit } from 'bun';
+import { ReadStream } from 'node:fs';
+
 export type Endpoints = {
   [method: string]: {
     [path: `/${string}`]: {
@@ -95,12 +98,16 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
       });
     }
 
-    const body =
-      'body' in inputs
-        ? inputs.body instanceof FormData
-          ? { type: 'form', value: inputs.body }
-          : { type: 'json', value: JSON.stringify(inputs.body) }
-        : undefined;
+    let body: { type?: string; value: BodyInit } | undefined;
+    if ('body' in inputs && inputs.body) {
+      if (inputs.body instanceof FormData) {
+        body = { value: inputs.body };
+      } else if (inputs.body instanceof ReadStream) {
+        body = { value: inputs.body };
+      } else {
+        body = { type: 'application/json', value: JSON.stringify(inputs.body) };
+      }
+    }
 
     const init: RequestInit = {
       method: String(method),
@@ -108,9 +115,7 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
         ...(typeof options.defaultHeaders === 'function'
           ? await options.defaultHeaders()
           : options.defaultHeaders),
-        ...(body?.type === 'json'
-          ? { 'Content-Type': 'application/json' }
-          : {}),
+        ...(body?.type ? { 'Content-Type': body.type } : {}),
         ...inputs.headers,
       },
       body: body?.value,
