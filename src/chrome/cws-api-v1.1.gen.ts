@@ -1,6 +1,46 @@
 import type { BodyInit } from 'bun';
 
+export const BASE_URL = 'https://chromewebstore.googleapis.com/';
+
 export namespace CwsApiV1_1 {
+  export type Item = {
+    /**
+     * Public key of this item.
+     */
+    publicKey?: string;
+    /**
+     * The CRX version of the item. If the projection is draft, then it is the draft's CRX version.
+     */
+    crxVersion?: string;
+    /**
+     * Unique ID of the item.
+     */
+    id?: string;
+    /**
+     * Identifies this resource as an Item. Value: the fixed string "chromewebstore#item".
+     */
+    kind?: string;
+    /**
+     * Status of the operation. Possible values are: - \"FAILURE\" - \"IN_PROGRESS\" - \"NOT_FOUND\" - \"SUCCESS\"
+     */
+    uploadState?: string;
+    /**
+     * Detail human-readable status of the operation, in English only. Same error messages are displayed when you upload your app to the Chrome Web Store.
+     */
+    itemError?: Array<ItemError>;
+  };
+
+  export type ItemError = {
+    /**
+     * The human-readable detail message of the error.
+     */
+    error_detail?: string;
+    /**
+     * The error code.
+     */
+    error_code?: string;
+  };
+
   export type PublishRequest = {
     /**
      * The publish target of this publish operation. This is the same as using publishTarget as a URL query parameter. The string value can either be target="trustedTesters" or target="default". The default value, if none is supplied, is target="default". Recommended usage is to use the URL query parameter to specificy the value.
@@ -18,10 +58,6 @@ export namespace CwsApiV1_1 {
 
   export type Item2 = {
     /**
-     * Detailed human-comprehensible explanation of the status code above.
-     */
-    statusDetail?: Array<string>;
-    /**
      * The ID of this item.
      */
     item_id?: string;
@@ -30,47 +66,13 @@ export namespace CwsApiV1_1 {
      */
     status?: Array<string>;
     /**
+     * Detailed human-comprehensible explanation of the status code above.
+     */
+    statusDetail?: Array<string>;
+    /**
      * Static string value is always "chromewebstore#item".
      */
     kind?: string;
-  };
-
-  export type Item = {
-    /**
-     * Status of the operation. Possible values are: - \"FAILURE\" - \"IN_PROGRESS\" - \"NOT_FOUND\" - \"SUCCESS\"
-     */
-    uploadState?: string;
-    /**
-     * The CRX version of the item. If the projection is draft, then it is the draft's CRX version.
-     */
-    crxVersion?: string;
-    /**
-     * Unique ID of the item.
-     */
-    id?: string;
-    /**
-     * Detail human-readable status of the operation, in English only. Same error messages are displayed when you upload your app to the Chrome Web Store.
-     */
-    itemError?: Array<ItemError>;
-    /**
-     * Identifies this resource as an Item. Value: the fixed string "chromewebstore#item".
-     */
-    kind?: string;
-    /**
-     * Public key of this item.
-     */
-    publicKey?: string;
-  };
-
-  export type ItemError = {
-    /**
-     * The error code.
-     */
-    error_code?: string;
-    /**
-     * The human-readable detail message of the error.
-     */
-    error_detail?: string;
   };
 
   export type Endpoints = {
@@ -116,13 +118,13 @@ export namespace CwsApiV1_1 {
            */
           deployPercentage?: number;
           /**
-           * Provide defined publishTarget in URL (case sensitive): publishTarget="trustedTesters" or publishTarget="default". Defaults to publishTarget="default".
-           */
-          publishTarget?: string;
-          /**
            * Optional. The caller request to exempt the review and directly publish because the update is within the list that we can automatically validate. The API will check if the exemption can be granted using real time data.
            */
           reviewExemption?: boolean;
+          /**
+           * Provide defined publishTarget in URL (case sensitive): publishTarget="trustedTesters" or publishTarget="default". Defaults to publishTarget="default".
+           */
+          publishTarget?: string;
         };
         body: PublishRequest;
         response: { type: 'json'; value: Item2 };
@@ -142,6 +144,4 @@ export namespace CwsApiV1_1 {
       };
     };
   };
-
-  export const BASE_URL = 'https://chromewebstore.googleapis.com/';
 }

@@ -11,12 +11,12 @@ const doc = (await docRes.json()) as DiscoveryDoc.Document;
 
 const mod = [
   "import type { BodyInit } from 'bun'",
+  `export const BASE_URL = '${doc.baseUrl}';`,
   `export namespace CwsApiV${version.slice(1).replace('.', '_')} {`,
   ...Object.entries(doc.schemas).map(([name, schema]) =>
     generateSchemaTypeDefinition(name, schema),
   ),
   generateEndpointTypes(),
-  `export const BASE_URL = '${doc.baseUrl}';`,
   '}',
 ];
 
