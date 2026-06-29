@@ -1,9 +1,10 @@
 import { Listr } from 'listr2';
-import { ChromeWebStore } from './chrome';
-import { InlineConfig, resolveConfig, validateConfig } from './config';
-import { EdgeAddonStore } from './edge';
-import { FirefoxAddonStore } from './firefox';
-import type { Store, SubmitResult } from './utils/store';
+import { ChromeWebStore } from '../stores/chrome-web-store-v1.1';
+import { InlineConfig, resolveConfig, validateConfig } from '../config';
+import { EdgeAddonStore } from '../stores/edge-addon-store';
+import { FirefoxAddonStore } from '../stores/firefox-addon-store';
+import { OperaAddonsStore } from '../stores/opera-addons-store';
+import type { Store, SubmitResult } from '../stores/store';
 import { consola } from 'consola';
 
 export async function submit(config: InlineConfig): Promise<SubmitResults> {
@@ -70,6 +71,14 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
         new EdgeAddonStore(internalConfig.edge!, setStatus),
     });
   }
+  if (internalConfig.opera) {
+    stores.push({
+      id: 'opera',
+      name: 'Opera Addons',
+      getStore: setStatus =>
+        new OperaAddonsStore(internalConfig.opera!, setStatus),
+    });
+  }
 
   if (stores.length === 0) {
     throw Error('No ZIP files detected to upload');
@@ -93,7 +102,6 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
           await store.submit(internalConfig.dryRun);
           results[id] = { success: true };
         } catch (err) {
-          consola.error(err);
           results[id] = { success: false, err: err };
           throw err;
         }
@@ -113,7 +121,8 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     return !result.success;
   });
   if (errors.length > 0) {
-    throw Error(`Submissions failed: ${errors.length}`, { cause: errors });
+    // Listr already logs the errors, just show a summary at the end
+    throw Error(`Submissions failed: ${errors.length}`);
   }
 
   // Return the results

@@ -1,5 +1,23 @@
 # Changelog
 
+## v4.0.5
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v4.0.4...v4.0.5)
+
+### 🩹 Fixes
+
+- **cws:** Add handling of errors in 200 response from CWS ([#63](https://github.com/aklinker1/publish-browser-extension/pull/63))
+- Fix invalid chrome zips ([#66](https://github.com/aklinker1/publish-browser-extension/pull/66))
+
+### 🏡 Chore
+
+- Fix formatting ([b6d4ae5](https://github.com/aklinker1/publish-browser-extension/commit/b6d4ae5))
+
+### ❤️ Contributors
+
+- Aaron ([@aklinker1](https://github.com/aklinker1))
+- Rolf Erik Lekang ([@relekang](https://github.com/relekang))
+
 ## v4.0.4
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v4.0.3...v4.0.4)

@@ -5,7 +5,12 @@ https://github.com/aklinker1/publish-browser-extension/assets/10101283/b0e856ca-
 
 ## Features
 
-- Publish to the **Chrome Web Store**, **Firefox Addon Store**, and **Edge Addon Store**
+- Publish to the following stores:
+  - [Chrome](https://developer.chrome.com/docs/webstore)
+  - [Edge](https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home)
+  - [Firefox](https://addons.mozilla.org/en-US/firefox/extensions/)
+  - [Opera](https://addons.opera.com/developer/)
+
 - Helper script to generate secrets and configure options
 - **Upload sources ZIP** to the Firefox Addon Store
 
@@ -37,7 +42,8 @@ Then, just run the submit command, passing the ZIP files you want to submit:
 publish-extension \
   --chrome-zip dist/chrome.zip \
   --firefox-zip dist/firefox.zip --firefox-sources-zip dist/sources.zip \
-  --edge-zip dist/chrome.zip
+  --edge-zip dist/chrome.zip \
+  --opera-zip dist/opera.zip
 ```
 
 `publish-extension` will automatically look for a `.env.submit` file and load it if it exists.
@@ -69,10 +75,15 @@ publishExtension({
   },
   edge: {
     zip: 'dist/chrome.zip',
-    productId: "<edge-product-id>",
-    clientId: "<edge-client-id>",
-    apiKey: "<edge-api-key>",
+    productId: '<edge-product-id>',
+    clientId: '<edge-client-id>',
+    apiKey: '<edge-api-key>',
     skipSubmitReview: false,
+  },
+  opera: {
+    zip: 'dist/opera.zip',
+    packageId: '<opera-package-id>',
+    sessionId: '<opera-session-id>',
   },
 })
   .then(results => console.log(results))
@@ -105,4 +116,5 @@ publishExtension({
    bun dev:chrome
    bun dev:firefox
    bun dev:edge
+   bun dev:opera
    ```
