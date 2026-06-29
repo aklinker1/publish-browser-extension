@@ -4,7 +4,7 @@ import { InlineConfig, resolveConfig, validateConfig } from '../config';
 import { EdgeAddonStore } from '../stores/edge-addon-store';
 import { FirefoxAddonStore } from '../stores/firefox-addon-store';
 import { OperaAddonsStore } from '../stores/opera-addons-store';
-import type { Store, SubmitResult } from '../utils/store';
+import type { Store, SubmitResult } from '../stores/store';
 import { consola } from 'consola';
 
 export async function submit(config: InlineConfig): Promise<SubmitResults> {

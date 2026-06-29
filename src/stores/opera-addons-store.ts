@@ -1,5 +1,5 @@
 import { z } from 'zod/v4';
-import type { Store } from '../utils/store';
+import type { Store } from './store';
 import { ensureZipExists } from '../utils/fs';
 import { OperaAddonsApi } from '../apis/opera-api';
 
