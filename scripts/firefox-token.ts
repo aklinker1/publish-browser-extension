@@ -1,15 +1,14 @@
+// Used to log a JWT for cURL, Postman, etc.
+//
+//   bun run --env=.env.submit scripts/firefox-token.ts
+//
 import { consola } from 'consola';
-import { AddonsApi } from '../src/apis/firefox-api';
-import { config } from 'dotenv';
+import { createFirefoxJwt } from '../src/utils/firefox-auth';
 
-config({ path: '.env.submit', quiet: true });
+const token = createFirefoxJwt(
+  process.env.FIREFOX_JWT_ISSUER ?? '',
+  process.env.FIREFOX_JWT_SECRET ?? '',
+  5 * 60e3, // 5 minutes
+);
 
-// This file is used to generate a token for Insomnia/Postman
-// bun generate-firefox-token
-
-const api = new AddonsApi({
-  jwtIssuer: process.env.FIREFOX_JWT_ISSUER ?? '',
-  jwtSecret: process.env.FIREFOX_JWT_SECRET ?? '',
-});
-
-consola.info(api['createJwt'](5 * 60));
+consola.info(token);

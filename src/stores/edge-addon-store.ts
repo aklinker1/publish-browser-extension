@@ -65,22 +65,16 @@ export class EdgeAddonStore implements Store {
     );
 
     this.setStatus('Waiting for validation results');
-    await pollUntil({
-      interval: 5e3,
-      timeout: 10 * 60e3,
-      condition: async () => {
-        const operation = await this.client.get(
-          `/v1/products/{productId}/submissions/draft/package/operations/{operationId}`,
-          { params: { operationId, productId: this.options.productId } },
-        );
-        if (operation.status === 'Failed')
-          throw Error(
-            `Validation failed: ${JSON.stringify(operation, null, 2)}`,
-          );
-
-        return operation.status === 'Succeeded';
-      },
+    await pollUntil(async () => {
+      const operation = await this.client.get(
+        `/v1/products/{productId}/submissions/draft/package/operations/{operationId}`,
+        { params: { operationId, productId: this.options.productId } },
+      );
+      if (operation.status === 'Succeeded') return operation;
+      if (operation.status === 'Failed')
+        throw Error(`Validation failed: ${JSON.stringify(operation, null, 2)}`);
     });
+
     if (this.options.skipSubmitReview) {
       this.setStatus('Skipping submission (skipSubmitReview=true)');
       return;

@@ -102,7 +102,6 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
           await store.submit(internalConfig.dryRun);
           results[id] = { success: true };
         } catch (err) {
-          consola.error(err);
           results[id] = { success: false, err: err };
           throw err;
         }
@@ -122,7 +121,8 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     return !result.success;
   });
   if (errors.length > 0) {
-    throw Error(`Submissions failed: ${errors.length}`, { cause: errors });
+    // Listr already logs the errors, just show a summary at the end
+    throw Error(`Submissions failed: ${errors.length}`);
   }
 
   // Return the results

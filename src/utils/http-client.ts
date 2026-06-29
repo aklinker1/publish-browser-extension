@@ -1,5 +1,6 @@
 import type { BodyInit } from 'bun';
 import { ReadStream } from 'node:fs';
+import { Readable } from 'node:stream';
 
 export type Endpoints = {
   [method: string]: {
@@ -109,6 +110,8 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
         body = { value: inputs.body };
       } else if (inputs.body instanceof ReadStream) {
         body = { value: inputs.body };
+      } else if (inputs.body instanceof Readable) {
+        body = { value: inputs.body };
       } else {
         body = { type: 'application/json', value: JSON.stringify(inputs.body) };
       }
@@ -125,7 +128,7 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
       },
       body: body?.value,
     };
-    // console.log(init); // Uncomment to debug
+    // console.log({ url: url.href, ...init }, '\n\n'); // Uncomment to debug
 
     const res = await globalThis.fetch(url, init);
     if (!res.ok)
