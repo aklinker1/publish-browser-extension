@@ -1,8 +1,8 @@
 import { Listr } from 'listr2';
-import { ChromeWebStore } from '../stores/chrome-web-store-v1.1';
+import { ChromeWebStoreV1_1 } from '../stores/chrome-web-store-v1.1';
 import { InlineConfig, resolveConfig, validateConfig } from '../config';
-import { EdgeAddonStore } from '../stores/edge-addon-store';
-import { FirefoxAddonStore } from '../stores/firefox-addon-store';
+import { EdgeAddonStoreV1_1 } from '../stores/edge-addon-store-v1.1';
+import { FirefoxAddonStoreV5 } from '../stores/firefox-addon-store-v5';
 import { OperaAddonsStore } from '../stores/opera-addons-store';
 import type { Store, SubmitResult } from '../stores/store';
 import { consola } from 'consola';
@@ -30,7 +30,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
       id: 'chrome',
       name: 'Chrome Web Store',
       getStore: setStatus =>
-        new ChromeWebStore(internalConfig.chrome!, setStatus),
+        new ChromeWebStoreV1_1(internalConfig.chrome!, setStatus),
     });
   }
   if (internalConfig.firefox) {
@@ -38,7 +38,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
       id: 'firefox',
       name: 'Firefox Addon Store',
       getStore: setStatus =>
-        new FirefoxAddonStore(internalConfig.firefox!, setStatus),
+        new FirefoxAddonStoreV5(internalConfig.firefox!, setStatus),
     });
   }
   if (internalConfig.edge) {
@@ -46,7 +46,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
       id: 'edge',
       name: 'Edge Addon Store',
       getStore: setStatus =>
-        new EdgeAddonStore(internalConfig.edge!, setStatus),
+        new EdgeAddonStoreV1_1(internalConfig.edge!, setStatus),
     });
   }
   if (internalConfig.opera) {

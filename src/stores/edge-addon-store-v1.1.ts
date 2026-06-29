@@ -6,7 +6,7 @@ import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { pollUntil } from '../utils/polling';
 import { createReadStream } from 'node:fs';
 
-export const EdgeAddonStoreOptions = z.object({
+export const EdgeAddonStoreV1_1Options = z.object({
   zip: z.string().min(1),
   productId: z.string().min(1).trim(),
   clientId: z.string().min(1).trim(),
@@ -14,13 +14,15 @@ export const EdgeAddonStoreOptions = z.object({
   apiKey: z.string().min(1).trim(),
 });
 
-export type EdgeAddonStoreOptions = z.infer<typeof EdgeAddonStoreOptions>;
+export type EdgeAddonStoreV1_1Options = z.infer<
+  typeof EdgeAddonStoreV1_1Options
+>;
 
-export class EdgeAddonStore implements Store {
+export class EdgeAddonStoreV1_1 implements Store {
   private client: HttpClient<EdgeApiV1_1.Endpoints>;
 
   constructor(
-    private readonly options: EdgeAddonStoreOptions,
+    private readonly options: EdgeAddonStoreV1_1Options,
     readonly setStatus: (text: string) => void,
   ) {
     this.client = createHttpClient({
@@ -83,3 +85,10 @@ export class EdgeAddonStore implements Store {
     });
   }
 }
+
+export {
+  /** @deprecated Use EdgeAddonStoreV1_1 instead. */
+  EdgeAddonStoreV1_1 as EdgeAddonStore,
+  /** @deprecated Use EdgeAddonStoreV1_1Options instead. */
+  EdgeAddonStoreV1_1Options as EdgeAddonStoreOptions,
+};

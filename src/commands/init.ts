@@ -1,9 +1,9 @@
 import { consola } from 'consola';
 import { InlineConfig, resolveConfig, type CustomEnv } from '../config';
 import { copyFile, writeFile, readFile } from 'node:fs/promises';
-import { ChromeWebStoreOptions } from '../stores/chrome-web-store-v1.1';
-import { FirefoxAddonStoreOptions } from '../stores/firefox-addon-store';
-import { EdgeAddonStoreOptions } from '../stores/edge-addon-store';
+import { ChromeWebStoreV1_1Options } from '../stores/chrome-web-store-v1.1';
+import { FirefoxAddonStoreV5Options } from '../stores/firefox-addon-store-v5';
+import { EdgeAddonStoreV1_1Options } from '../stores/edge-addon-store-v1.1';
 import { OperaAddonsStoreOptions } from '../stores/opera-addons-store';
 import { ofetch } from 'ofetch';
 
@@ -42,7 +42,9 @@ export async function init(config: InlineConfig) {
   if (stores?.includes('firefox')) {
     replacements.push(
       ...(await initFirefox(
-        previousConfig.firefox as Partial<FirefoxAddonStoreOptions> | undefined,
+        previousConfig.firefox as
+          | Partial<FirefoxAddonStoreV5Options>
+          | undefined,
       )),
     );
   }
@@ -81,7 +83,7 @@ async function prompt<T>(
 }
 
 async function initChrome(
-  previousOptions: Partial<ChromeWebStoreOptions> | undefined,
+  previousOptions: Partial<ChromeWebStoreV1_1Options> | undefined,
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 
@@ -182,7 +184,7 @@ async function initChrome(
 }
 
 async function initFirefox(
-  previousOptions: Partial<FirefoxAddonStoreOptions> | undefined,
+  previousOptions: Partial<FirefoxAddonStoreV5Options> | undefined,
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 
@@ -296,7 +298,7 @@ async function initOpera(
 }
 
 async function initEdge(
-  previousOptions: Partial<EdgeAddonStoreOptions> | undefined,
+  previousOptions: Partial<EdgeAddonStoreV1_1Options> | undefined,
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 

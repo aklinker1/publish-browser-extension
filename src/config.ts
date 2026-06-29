@@ -1,7 +1,7 @@
 import { z } from 'zod/v4';
-import { ChromeWebStoreOptions } from './stores/chrome-web-store-v1.1';
-import { EdgeAddonStoreOptions } from './stores/edge-addon-store';
-import { FirefoxAddonStoreOptions } from './stores/firefox-addon-store';
+import { ChromeWebStoreV1_1Options } from './stores/chrome-web-store-v1.1';
+import { EdgeAddonStoreV1_1Options } from './stores/edge-addon-store-v1.1';
+import { FirefoxAddonStoreV5Options } from './stores/firefox-addon-store-v5';
 import type { DeepPartial } from './utils/types';
 import { OperaAddonsStoreOptions } from './stores/opera-addons-store';
 
@@ -142,15 +142,15 @@ export const InlineConfig = z.object({
   /**
    * Options for publishing to chrome.
    */
-  chrome: ChromeWebStoreOptions.partial().optional(),
+  chrome: ChromeWebStoreV1_1Options.partial().optional(),
   /**
    * Options for publishing to Firefox.
    */
-  firefox: FirefoxAddonStoreOptions.partial().optional(),
+  firefox: FirefoxAddonStoreV5Options.partial().optional(),
   /**
    * Options for publishing to Edge.
    */
-  edge: EdgeAddonStoreOptions.partial().optional(),
+  edge: EdgeAddonStoreV1_1Options.partial().optional(),
   /**
    * Options for publishing to Opera
    */
@@ -160,9 +160,9 @@ export type InlineConfig = z.infer<typeof InlineConfig>;
 
 export const InternalConfig = z.object({
   dryRun: z.boolean(),
-  chrome: ChromeWebStoreOptions.optional(),
-  firefox: FirefoxAddonStoreOptions.optional(),
-  edge: EdgeAddonStoreOptions.optional(),
+  chrome: ChromeWebStoreV1_1Options.optional(),
+  firefox: FirefoxAddonStoreV5Options.optional(),
+  edge: EdgeAddonStoreV1_1Options.optional(),
   opera: OperaAddonsStoreOptions.optional(),
 });
 export type InternalConfig = z.infer<typeof InternalConfig>;
