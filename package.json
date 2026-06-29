@@ -2,7 +2,7 @@
   "name": "publish-browser-extension",
   "description": "Easily publish web extensions to their stores",
   "version": "4.0.5",
-  "packageManager": "bun@1.3.4",
+  "packageManager": "bun@1.3.14",
   "type": "module",
   "scripts": {
     "check": "check",
@@ -17,7 +17,10 @@
     "dev:help": "bun ./scripts/dev.mjs help",
     "publish-extension": "bun src/cli.ts",
     "prepack": "bun run build",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks",
+    "gen:cws": "bun run --sequential 'gen:cws:*'",
+    "gen:cws:v1.1": "bun run scripts/gen-cws-api.ts v1.1",
+    "gen:cws:v2": "bun run scripts/gen-cws-api.ts v2"
   },
   "dependencies": {
     "cac": "^6.7.14",
