@@ -12,14 +12,15 @@ const doc = (await docRes.json()) as DiscoveryDoc.Document;
 const mod = [
   `export namespace CwsApiV${version.slice(1).replace('.', '_')} {`,
   `  export const BASE_URL = '${doc.baseUrl}';`,
-  ...Object.entries(doc.schemas).map(([name, schema]) =>
-    generateSchemaTypeDefinition(name, schema),
-  ),
+  ...Object.entries(doc.schemas)
+    // Sort alphabetically for consistent output
+    .toSorted(([a], [b]) => a.localeCompare(b))
+    .map(([name, schema]) => generateSchemaTypeDefinition(name, schema)),
   generateEndpointTypes(),
   '}',
 ];
 
-const outputFile = `src/chrome/cws-api-${version}.gen.ts`;
+const outputFile = `src/apis/cws-api-${version}.gen.ts`;
 const formatted = await format(mod.join('\n\n'), { filepath: outputFile });
 await Bun.write(outputFile, formatted);
 
@@ -122,14 +123,17 @@ function resolveRef(schema: DiscoveryDoc.SchemaRef): string {
 function generateObjectType(
   properties: Record<string, DiscoveryDoc.Schema & { required?: boolean }>,
 ): string {
-  const props = Object.entries(properties).flatMap(([name, type]) => {
-    return [
-      ...('description' in type && type.description
-        ? [jsdoc(type.description)]
-        : []),
-      `  "${name}"${type.required ? '' : '?'}: ${generateSchemaType(type)};`,
-    ];
-  });
+  const props = Object.entries(properties)
+    // Sort alphabetically for consistent output
+    .toSorted(([a], [b]) => a.localeCompare(b))
+    .flatMap(([name, type]) => {
+      return [
+        ...('description' in type && type.description
+          ? [jsdoc(type.description)]
+          : []),
+        `  "${name}"${type.required ? '' : '?'}: ${generateSchemaType(type)};`,
+      ];
+    });
   return `{ ${props.join('\n')} }`;
 }
 
@@ -168,14 +172,21 @@ function ensureSlashPrefix(path: string): string {
 }
 
 function generateEndpointTypes(): string {
-  const methods = getAllMethods(doc.resources).reduce((map, method) => {
-    const key = method.httpMethod ?? '""';
-    map[key] ??= [];
-    map[key].push(
-      `"${ensureSlashPrefix(method.mediaUpload?.protocols.simple.path ?? method.path)}": ${generateMethodType(method)}`,
-    );
-    return map;
-  }, Object.create(null));
+  const methods = getAllMethods(doc.resources)
+    // Sort alphabetically for consistent output
+    .toSorted(
+      (a, b) =>
+        a.httpMethod.localeCompare(b.httpMethod) ||
+        a.path.localeCompare(b.path),
+    )
+    .reduce((map, method) => {
+      const key = method.httpMethod ?? '""';
+      map[key] ??= [];
+      map[key].push(
+        `"${ensureSlashPrefix(method.mediaUpload?.protocols.simple.path ?? method.path)}": ${generateMethodType(method)}`,
+      );
+      return map;
+    }, Object.create(null));
 
   return `
     export type Endpoints = {
