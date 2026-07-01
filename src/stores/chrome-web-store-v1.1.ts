@@ -7,6 +7,7 @@ import { FetchError } from '../utils/errors';
 import { createReadStream } from 'node:fs';
 
 export const ChromeWebStoreV1_1Options = z.object({
+  apiVersion: z.undefined().or(z.literal('v1.1')),
   zip: z.string().min(1),
   extensionId: z.string().min(1).trim(),
   clientId: z.string().min(1).trim(),
