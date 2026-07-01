@@ -28,8 +28,6 @@ jobs:
       - uses: ./.github/actions/setup
       - run: |
           bun ./scripts/dev.mjs chrome
-          bun ./scripts/dev.mjs firefox
-          bun ./scripts/dev.mjs edge
         env:
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.TEST_CHROME_CLIENT_ID }}

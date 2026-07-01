@@ -2,7 +2,7 @@ import type { Store } from './store';
 import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
-import { CwsApiV2 } from '../apis/cws-api';
+import { CwsApiV2 } from '../apis/cws-api-v2.gen';
 import { FetchError } from '../utils/errors';
 import { createReadStream } from 'node:fs';
 
@@ -29,7 +29,6 @@ export interface CwsTokenDetails {
 
 export class ChromeWebStoreV2 implements Store {
   private client: HttpClient<CwsApiV2.Endpoints>;
-  private tokenCache: Promise<CwsTokenDetails> | undefined;
 
   constructor(
     readonly options: ChromeWebStoreV2Options,
@@ -38,13 +37,15 @@ export class ChromeWebStoreV2 implements Store {
     this.client = createHttpClient<CwsApiV2.Endpoints>({
       baseUrl: CwsApiV2.BASE_URL,
       defaultHeaders: async () => ({
-        Authorization: `Bearer ${await this.getToken()}`,
+        // TODO: Authorization header
         'x-goog-api-version': '2',
       }),
     });
   }
 
-  async submit(dryRun?: boolean): Promise<void> {}
+  async submit(dryRun?: boolean): Promise<void> {
+    throw Error('TODO');
+  }
 
   async ensureZipsExist(): Promise<void> {
     await ensureZipExists(this.options.zip);
