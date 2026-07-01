@@ -2,7 +2,7 @@ import { createHmac, createSign } from 'node:crypto';
 
 const ALG_MAP = {
   RS256: 'RSA-SHA256',
-  HS256: 'HMAC-SHA256',
+  HS256: 'sha256',
 };
 
 type Alg = keyof typeof ALG_MAP;
