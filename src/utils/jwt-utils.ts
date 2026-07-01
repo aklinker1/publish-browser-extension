@@ -1,8 +1,23 @@
-import { createSign } from 'node:crypto';
+import { createHmac, createSign } from 'node:crypto';
 
 const ALG_MAP = {
   RS256: 'RSA-SHA256',
   HS256: 'HMAC-SHA256',
+};
+
+type Alg = keyof typeof ALG_MAP;
+
+type Signer = (alg: Alg, privateKey: string, signingInput: string) => string;
+
+const SYMMETRIC_SIGNER: Signer = (alg, privateKey, signingInput) =>
+  createHmac(ALG_MAP[alg], privateKey).update(signingInput).digest('base64url');
+
+const ASYMMETRIC_SIGNER: Signer = (alg, privateKey, signingInput) =>
+  createSign(ALG_MAP[alg]).update(signingInput).sign(privateKey, 'base64url');
+
+const SIGNER: Record<Alg, Signer> = {
+  RS256: ASYMMETRIC_SIGNER,
+  HS256: SYMMETRIC_SIGNER,
 };
 
 export type JwtPayloadBuilderOptions = {
@@ -55,8 +70,7 @@ export function signJwt(
   const encodedPayload = Buffer.from(JSON.stringify(claims)).toString(
     'base64url',
   );
-  const signature = createSign(ALG_MAP[alg])
-    .update(`${encodedHeader}.${encodedPayload}`)
-    .sign(privateKey, 'base64url');
+  const signingInput = `${encodedHeader}.${encodedPayload}`;
+  const signature = SIGNER[alg](alg, privateKey, signingInput);
   return `${encodedHeader}.${encodedPayload}.${signature}`;
 }
