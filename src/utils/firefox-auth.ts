@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { signJwt } from './jwt-utils';
 
 /**
  * See https://addons-server.readthedocs.io/en/latest/topics/api/auth.html
@@ -6,14 +6,11 @@ import jwt from 'jsonwebtoken';
 export function createFirefoxJwt(
   issuer: string,
   secret: string,
-  timeout = 30e3,
+  expiresInS = 30,
 ): string {
-  const issuedAt = Math.floor(Date.now() / 1000);
-  const payload = {
-    iss: issuer,
+  return signJwt('HS256', secret, {
+    expiresInS,
+    issuer,
     jti: Math.random().toString(),
-    iat: issuedAt,
-    exp: issuedAt + Math.floor(timeout / 1000),
-  };
-  return jwt.sign(payload, secret ?? '', { algorithm: 'HS256' });
+  });
 }
