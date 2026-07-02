@@ -28,7 +28,7 @@ cli.option(
   'The ID of the extension to be submitted',
 );
 cli.option(
-  '--chrome-api-version',
+  '--chrome-api-version [chromeApiVersion]',
   'The API version to use for the Chrome Web Store: "v1.1" or "v2" (default: v1.1)',
 );
 cli.option(
