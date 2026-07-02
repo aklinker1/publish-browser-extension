@@ -106,7 +106,7 @@ async function initChrome(
         {
           label: 'v2 (recommended)',
           value: 'v2',
-          hint: 'Uses a service account — required after October 15th, 2026',
+          hint: 'Uses a service account - required after October 15th, 2026',
         },
         {
           label: 'v1.1 (deprecated)',
@@ -283,7 +283,7 @@ async function initChromeV2(
   ]);
 
   const serviceAccountPrivateKey = await prompt<string>(
-    "Enter the service account's private key (keep the \\n in the string when copying it here):",
+    'Enter the service account\'s private key (copy it in as a single line, keeping the "\\n" characters as-is):',
     { type: 'text' },
     previousOptions?.serviceAccountPrivateKey,
   );
