@@ -25,36 +25,40 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     name: string;
     getStore: (setStatus: (text: string) => void) => Store;
   }> = [];
+
   if (internalConfig.chrome) {
+    const storeOptions = internalConfig.chrome;
     stores.push({
       id: 'chrome',
       name: 'Chrome Web Store',
-      getStore: setStatus =>
-        new ChromeWebStoreV1_1(internalConfig.chrome!, setStatus),
+      getStore: setStatus => new ChromeWebStoreV1_1(storeOptions, setStatus),
     });
   }
+
   if (internalConfig.firefox) {
+    const storeOptions = internalConfig.firefox;
     stores.push({
       id: 'firefox',
       name: 'Firefox Addon Store',
-      getStore: setStatus =>
-        new FirefoxAddonStoreV5(internalConfig.firefox!, setStatus),
+      getStore: setStatus => new FirefoxAddonStoreV5(storeOptions, setStatus),
     });
   }
+
   if (internalConfig.edge) {
+    const storeOptions = internalConfig.edge;
     stores.push({
       id: 'edge',
       name: 'Edge Addon Store',
-      getStore: setStatus =>
-        new EdgeAddonStoreV1_1(internalConfig.edge!, setStatus),
+      getStore: setStatus => new EdgeAddonStoreV1_1(storeOptions, setStatus),
     });
   }
+
   if (internalConfig.opera) {
+    const storeOptions = internalConfig.opera;
     stores.push({
       id: 'opera',
       name: 'Opera Addons',
-      getStore: setStatus =>
-        new OperaAddonsStore(internalConfig.opera!, setStatus),
+      getStore: setStatus => new OperaAddonsStore(storeOptions!, setStatus),
     });
   }
 
