@@ -31,6 +31,7 @@ describe('resolveConfig', () => {
         publishType: 'STAGED_PUBLISH',
         skipReview: true,
         skipSubmitReview: true,
+        cancelPending: true,
         zip: 'zip',
       },
       firefox: {
@@ -119,6 +120,7 @@ describe('resolveConfig', () => {
         skipReview: chromeSkipReview,
         deployPercentage: chromeDeployPercentage,
         skipSubmitReview: chromeSkipSubmitReview,
+        cancelPending: false,
       },
       firefox: {
         zip: process.env.FIREFOX_ZIP,

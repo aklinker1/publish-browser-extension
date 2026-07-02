@@ -81,6 +81,10 @@ cli.option(
   '--chrome-publish-type [chromePublishType]',
   '[api v2 only] Set to "STAGED_PUBLISH" to not publish the extension immediately after submission',
 );
+cli.option(
+  '--chrome-cancel-pending',
+  '[api v2 only] Cancel any pending review before submitting the new version',
+);
 // Firefox
 cli.option('--firefox-zip [firefoxZip]', 'Path to extension zip to upload');
 cli.option(
@@ -183,6 +187,7 @@ function configFromFlags(flags: any): InlineConfig {
     serviceAccountClientEmail: flags.chromeServiceAccountClientEmail,
     serviceAccountPrivateKey: flags.chromeServiceAccountPrivateKey,
     publishType: flags.chromePublishType,
+    cancelPending: flags.chromeCancelPending,
   };
 
   return {
