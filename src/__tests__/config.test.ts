@@ -4,7 +4,7 @@ import {
   InternalConfig,
   resolveConfig,
   validateConfig,
-} from './config';
+} from '../config';
 
 const RESET_ENV_NAMES = /(^CHROME_|^FIREFOX_|^EDGE_|^OPERA_|^DRY_RUN$)/;
 
