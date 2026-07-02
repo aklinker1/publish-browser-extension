@@ -13,7 +13,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
 
   const internalConfig = validateConfig(resolveConfig(config));
 
-  console.log('');
+  console.log();
   consola.info('Publishing Extension');
   if (internalConfig.dryRun) {
     consola.warn('Dry run, skipping submission');

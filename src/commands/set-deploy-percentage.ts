@@ -6,7 +6,7 @@ import {
 } from '../stores/chrome-web-store-v2';
 
 export async function setDeployPercentage(config: InlineConfig): Promise<void> {
-  console.log('');
+  console.log();
   consola.info('Set CWS Deploy Percentage');
 
   if (config.dryRun)
@@ -27,5 +27,7 @@ export async function setDeployPercentage(config: InlineConfig): Promise<void> {
   const store = new ChromeWebStoreV2(resolved, consola.success);
   await store.setDeploymentPercentage(resolved.deployPercentage);
 
+  console.log();
   consola.success(`Deploy percentage set to ${resolved.deployPercentage}`);
+  console.log();
 }

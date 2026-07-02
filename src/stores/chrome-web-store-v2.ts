@@ -54,7 +54,6 @@ export class ChromeWebStoreV2 implements Store {
 
   async submit(dryRun?: boolean): Promise<void> {
     this.setStatus?.('Validating credentials');
-    console.log(1, '\n\n\n\n');
     const status = await this.client.get('/v2/{+name}:fetchStatus', {
       params: { name: this.nameParam },
     });
@@ -76,7 +75,6 @@ export class ChromeWebStoreV2 implements Store {
 
     this.setStatus?.('Uploading new ZIP file');
     const file = createReadStream(this.options.zip);
-    console.log(2, '\n\n\n\n');
     const uploadRes = await this.client.post('/upload/v2/{+name}:upload', {
       params: { name: this.nameParam },
       body: file,
@@ -89,7 +87,6 @@ export class ChromeWebStoreV2 implements Store {
     }
 
     this.setStatus?.('Submitting for review');
-    console.log(3, '\n\n\n\n');
     const publishRes = await this.client.post('/v2/{+name}:publish', {
       params: { name: this.nameParam },
       body: {
@@ -102,9 +99,7 @@ export class ChromeWebStoreV2 implements Store {
       },
     });
 
-    console.log(4, '\n\n\n\n');
     if (publishRes.warningInfo?.warnings?.length) {
-      console.log(5, '\n\n\n\n');
       this.setStatus?.(
         `Found ${publishRes.warningInfo.warnings.length} warning(s)`,
       );
@@ -112,7 +107,6 @@ export class ChromeWebStoreV2 implements Store {
         consola.warn(`${warning.reason}: ${warning.description}`);
       }
     }
-    console.log(6, '\n\n\n\n');
   }
 
   async ensureZipsExist(): Promise<void> {
