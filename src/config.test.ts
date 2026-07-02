@@ -248,7 +248,7 @@ describe('validateConfig', () => {
       },
     };
     expect(() => validateConfig(config)).toThrowError(
-      'Missing required config: CHROME',
+      'Missing required config: CHROME_ZIP, CHROME_EXTENSION_ID, CHROME_PUBLISHER_ID, CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL, CHROME_SERVICE_ACCOUNT_PRIVATE_KEY',
     );
   });
 });

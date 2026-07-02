@@ -241,7 +241,10 @@ export type InlineConfig = z.infer<typeof InlineConfig>;
 export const InternalConfig = z.object({
   dryRun: z.boolean(),
   chrome: z
-    .union([ChromeWebStoreV1_1Options, ChromeWebStoreV2Options])
+    .discriminatedUnion('apiVersion', [
+      ChromeWebStoreV1_1Options,
+      ChromeWebStoreV2Options,
+    ])
     .optional(),
   firefox: FirefoxAddonStoreV5Options.optional(),
   edge: EdgeAddonStoreV1_1Options.optional(),
