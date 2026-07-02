@@ -188,6 +188,7 @@ describe('resolveConfig', () => {
         skipReview: undefined,
         deployPercentage: undefined,
         publishType: undefined,
+        cancelPending: false,
       },
       firefox: {
         ...config.firefox,
