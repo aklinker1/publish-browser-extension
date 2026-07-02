@@ -5,9 +5,11 @@ import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { CwsApiV1_1 } from '../apis/cws-api-v1.1.gen';
 import { FetchError } from '../utils/errors';
 import { createReadStream } from 'node:fs';
+import consola from 'consola';
 
+/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
 export const ChromeWebStoreV1_1Options = z.object({
-  apiVersion: z.undefined().or(z.literal('v1.1')),
+  apiVersion: z.literal('v1.1').optional(),
   zip: z.string().min(1),
   extensionId: z.string().min(1).trim(),
   clientId: z.string().min(1).trim(),
@@ -18,10 +20,12 @@ export const ChromeWebStoreV1_1Options = z.object({
   reviewExemption: z.boolean().default(false),
   skipSubmitReview: z.boolean().default(false),
 });
+/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
 export type ChromeWebStoreV1_1Options = z.infer<
   typeof ChromeWebStoreV1_1Options
 >;
 
+/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
 export interface CwsTokenDetails {
   access_token: string;
   expires_in: number;
@@ -30,6 +34,7 @@ export interface CwsTokenDetails {
   token_type: string;
 }
 
+/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
 export class ChromeWebStoreV1_1 implements Store {
   private client: HttpClient<CwsApiV1_1.Endpoints>;
   private tokenCache: Promise<CwsTokenDetails> | undefined;
@@ -38,6 +43,9 @@ export class ChromeWebStoreV1_1 implements Store {
     readonly options: ChromeWebStoreV1_1Options,
     readonly setStatus: (text: string) => void,
   ) {
+    consola.warn(
+      'Chrome Web Store API v1.1 is deprecated and will stop working October 15th, 2026. Run `publish-extension init` or `wxt submit init` to walk through setting up your API v2 credentials.',
+    );
     this.client = createHttpClient<CwsApiV1_1.Endpoints>({
       baseUrl: CwsApiV1_1.BASE_URL,
       defaultHeaders: async () => ({

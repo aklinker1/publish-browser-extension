@@ -1,5 +1,10 @@
 import { consola } from 'consola';
-import { InlineConfig, resolveConfig, type CustomEnv } from '../config';
+import {
+  InlineConfig,
+  resolveConfig,
+  type AllChromeOptions,
+  type CustomEnv,
+} from '../config';
 import { copyFile, writeFile, readFile } from 'node:fs/promises';
 import { ChromeWebStoreV1_1Options } from '../stores/chrome-web-store-v1.1';
 import { FirefoxAddonStoreV5Options } from '../stores/firefox-addon-store-v5';
@@ -37,7 +42,9 @@ export async function init(config: InlineConfig) {
 
   const replacements: Entry[] = [];
   if (stores?.includes('chrome')) {
-    replacements.push(...(await initChrome(previousConfig.chrome)));
+    replacements.push(
+      ...(await initChrome(previousConfig.chrome as AllChromeOptions)),
+    );
   }
   if (stores?.includes('firefox')) {
     replacements.push(

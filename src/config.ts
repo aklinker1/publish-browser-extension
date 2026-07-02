@@ -6,6 +6,17 @@ import type { DeepPartial } from './utils/types';
 import { OperaAddonsStoreOptions } from './stores/opera-addons-store';
 import { ChromeWebStoreV2Options } from './stores/chrome-web-store-v2';
 
+/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
+export type AllChromeOptions = {
+  [key in
+    | keyof ChromeWebStoreV1_1Options
+    | keyof ChromeWebStoreV2Options]: key extends keyof ChromeWebStoreV1_1Options
+    ? ChromeWebStoreV1_1Options[key]
+    : key extends keyof ChromeWebStoreV2Options
+      ? ChromeWebStoreV2Options[key]
+      : never;
+};
+
 /**
  * Given inline config, read environment variables and apply defaults. Throws an error if any config
  * is missing.
@@ -62,90 +73,96 @@ export function resolveConfig(
 
 function buildChromeV1_1Options(
   zip: string,
-  chrome: Partial<ChromeWebStoreV1_1Options>,
+  chrome: Partial<ChromeWebStoreV1_1Options> | undefined,
 ): Partial<ChromeWebStoreV1_1Options> {
   return {
     zip,
     apiVersion: 'v1.1',
-    clientId: chrome.clientId ?? stringEnv('CHROME_CLIENT_ID'),
-    clientSecret: chrome.clientSecret ?? stringEnv('CHROME_CLIENT_SECRET'),
-    refreshToken: chrome.refreshToken ?? stringEnv('CHROME_REFRESH_TOKEN'),
-    extensionId: chrome.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
-    publishTarget: chrome.publishTarget ?? stringEnv('CHROME_PUBLISH_TARGET'),
+    clientId: chrome?.clientId ?? stringEnv('CHROME_CLIENT_ID'),
+    clientSecret: chrome?.clientSecret ?? stringEnv('CHROME_CLIENT_SECRET'),
+    refreshToken: chrome?.refreshToken ?? stringEnv('CHROME_REFRESH_TOKEN'),
+    extensionId: chrome?.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
+    publishTarget: chrome?.publishTarget ?? stringEnv('CHROME_PUBLISH_TARGET'),
     reviewExemption:
-      chrome.reviewExemption ?? booleanEnv('CHROME_REVIEW_EXEMPTION'),
+      chrome?.reviewExemption ?? booleanEnv('CHROME_REVIEW_EXEMPTION'),
     skipSubmitReview:
-      chrome.skipSubmitReview ?? booleanEnv('CHROME_SKIP_SUBMIT_REVIEW'),
+      chrome?.skipSubmitReview ??
+      booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
+      false,
     deployPercentage:
-      chrome.deployPercentage ?? numberEnv('CHROME_DEPLOY_PERCENTAGE'),
+      chrome?.deployPercentage ?? numberEnv('CHROME_DEPLOY_PERCENTAGE'),
   };
 }
 
 function buildChromeV2Options(
   zip: string,
-  chrome: Partial<ChromeWebStoreV2Options>,
+  chrome: Partial<ChromeWebStoreV2Options> | undefined,
 ): Partial<ChromeWebStoreV2Options> {
   return {
     zip,
     apiVersion: 'v2',
-    extensionId: chrome.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
-    publisherId: chrome.publisherId ?? stringEnv('CHROME_PUBLISHER_ID'),
+    extensionId: chrome?.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
+    publisherId: chrome?.publisherId ?? stringEnv('CHROME_PUBLISHER_ID'),
     serviceAccountClientEmail:
-      chrome.serviceAccountClientEmail ??
+      chrome?.serviceAccountClientEmail ??
       stringEnv('CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL'),
     serviceAccountPrivateKey:
-      chrome.serviceAccountPrivateKey ??
+      chrome?.serviceAccountPrivateKey ??
       stringEnv('CHROME_SERVICE_ACCOUNT_PRIVATE_KEY'),
-    publishType: chrome.publishType ?? stringEnv('CHROME_PUBLISH_TYPE'),
+    publishType: chrome?.publishType ?? stringEnv('CHROME_PUBLISH_TYPE'),
     deployPercentage:
-      chrome.deployPercentage ?? numberEnv('CHROME_DEPLOY_PERCENTAGE'),
-    skipReview: chrome.skipReview ?? booleanEnv('CHROME_SKIP_REVIEW'),
+      chrome?.deployPercentage ?? numberEnv('CHROME_DEPLOY_PERCENTAGE'),
+    skipReview: chrome?.skipReview ?? booleanEnv('CHROME_SKIP_REVIEW'),
     skipSubmitReview:
-      chrome.skipSubmitReview ?? booleanEnv('CHROME_SKIP_SUBMIT_REVIEW'),
+      chrome?.skipSubmitReview ??
+      booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
+      false,
   };
 }
 
 function buildFirefoxV5Options(
   zip: string,
-  firefox: Partial<FirefoxAddonStoreV5Options>,
+  firefox: Partial<FirefoxAddonStoreV5Options> | undefined,
 ): Partial<FirefoxAddonStoreV5Options> {
   return {
     zip,
-    sourcesZip: firefox.sourcesZip ?? stringEnv('FIREFOX_SOURCES_ZIP'),
-    extensionId: firefox.extensionId ?? stringEnv('FIREFOX_EXTENSION_ID'),
-    jwtIssuer: firefox.jwtIssuer ?? stringEnv('FIREFOX_JWT_ISSUER'),
-    jwtSecret: firefox.jwtSecret ?? stringEnv('FIREFOX_JWT_SECRET'),
-    channel: firefox.channel ?? stringEnv('FIREFOX_CHANNEL') ?? 'listed',
+    sourcesZip: firefox?.sourcesZip ?? stringEnv('FIREFOX_SOURCES_ZIP'),
+    extensionId: firefox?.extensionId ?? stringEnv('FIREFOX_EXTENSION_ID'),
+    jwtIssuer: firefox?.jwtIssuer ?? stringEnv('FIREFOX_JWT_ISSUER'),
+    jwtSecret: firefox?.jwtSecret ?? stringEnv('FIREFOX_JWT_SECRET'),
+    channel: firefox?.channel ?? stringEnv('FIREFOX_CHANNEL') ?? 'listed',
     compatibility:
-      firefox.compatibility ??
+      firefox?.compatibility ??
       (stringEnv('FIREFOX_COMPATIBILITY')?.split(',') as any),
   };
 }
 
 function buildEdgeV1_1Options(
   zip: string,
-  edge: Partial<EdgeAddonStoreV1_1Options>,
+  edge: Partial<EdgeAddonStoreV1_1Options> | undefined,
 ): Partial<EdgeAddonStoreV1_1Options> {
   return {
     zip,
-    productId: edge.productId ?? stringEnv('EDGE_PRODUCT_ID'),
-    clientId: edge.clientId ?? stringEnv('EDGE_CLIENT_ID'),
-    apiKey: edge.apiKey ?? stringEnv('EDGE_API_KEY'),
+    productId: edge?.productId ?? stringEnv('EDGE_PRODUCT_ID'),
+    clientId: edge?.clientId ?? stringEnv('EDGE_CLIENT_ID'),
+    apiKey: edge?.apiKey ?? stringEnv('EDGE_API_KEY'),
     skipSubmitReview:
-      edge.skipSubmitReview ?? booleanEnv('EDGE_SKIP_SUBMIT_REVIEW') ?? false,
+      edge?.skipSubmitReview ?? booleanEnv('EDGE_SKIP_SUBMIT_REVIEW') ?? false,
   };
 }
 
 function buildOperaOptions(
   zip: string,
-  opera: Partial<OperaAddonsStoreOptions>,
+  opera: Partial<OperaAddonsStoreOptions> | undefined,
 ): Partial<OperaAddonsStoreOptions> {
   return {
     zip,
-    packageId: opera.packageId ?? intEnv('OPERA_PACKAGE_ID'),
-    sessionId: opera.sessionId ?? stringEnv('OPERA_SESSION_ID'),
+    packageId: opera?.packageId ?? intEnv('OPERA_PACKAGE_ID'),
+    sessionId: opera?.sessionId ?? stringEnv('OPERA_SESSION_ID'),
     skipSubmitReview:
-      opera.skipSubmitReview ?? booleanEnv('OPERA_SKIP_SUBMIT_REVIEW') ?? false,
+      opera?.skipSubmitReview ??
+      booleanEnv('OPERA_SKIP_SUBMIT_REVIEW') ??
+      false,
   };
 }
 
