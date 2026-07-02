@@ -169,7 +169,9 @@ export class ChromeWebStoreV2 implements Store {
   private checkUploadState(
     item: CwsApiV2.UploadItemPackageResponse,
   ): void | never {
-    if (item.uploadState === 'FAILED' || item.uploadState === 'NOT_FOUND')
+    // TODO: Unclear is v2 API needs polling or not, so throw if it's not a
+    // success - the rest of the submission pipeline expects immediate success.
+    if (item.uploadState !== 'SUCCEEDED')
       throw new ChromeWebStoreUploadStateError(item);
   }
 }
