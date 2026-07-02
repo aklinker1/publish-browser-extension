@@ -6,13 +6,14 @@ import { FirefoxAddonStoreV5 } from '../stores/firefox-addon-store-v5';
 import { OperaAddonsStore } from '../stores/opera-addons-store';
 import type { Store, SubmitResult } from '../stores/store';
 import { consola } from 'consola';
+import { ChromeWebStoreV2 } from '../stores/chrome-web-store-v2';
 
 export async function submit(config: InlineConfig): Promise<SubmitResults> {
   // Setup
 
   const internalConfig = validateConfig(resolveConfig(config));
 
-  console.log('');
+  console.log();
   consola.info('Publishing Extension');
   if (internalConfig.dryRun) {
     consola.warn('Dry run, skipping submission');
@@ -31,7 +32,10 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     stores.push({
       id: 'chrome',
       name: 'Chrome Web Store',
-      getStore: setStatus => new ChromeWebStoreV1_1(storeOptions, setStatus),
+      getStore: setStatus =>
+        storeOptions.apiVersion === 'v2'
+          ? new ChromeWebStoreV2(storeOptions, setStatus)
+          : new ChromeWebStoreV1_1(storeOptions, setStatus),
     });
   }
 

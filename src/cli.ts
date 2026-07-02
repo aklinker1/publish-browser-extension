@@ -1,10 +1,14 @@
 import { cac } from 'cac';
 import { version } from '../package.json';
 import { submit } from './commands/submit';
-import { InlineConfig } from './config';
+import { InlineConfig, type AllChromeOptions } from './config';
 import { init } from './commands/init';
 import { consola } from 'consola';
 import { config } from 'dotenv';
+import type { ChromeWebStoreV1_1Options } from './stores/chrome-web-store-v1.1';
+import type { ChromeWebStoreV2Options } from './stores/chrome-web-store-v2';
+import { status } from './commands/status';
+import { setDeployPercentage } from './commands/set-deploy-percentage';
 
 config({ path: '.env.submit', quiet: true });
 
@@ -17,39 +21,69 @@ cli.option(
   '--dry-run',
   "Check authentication, but don't upload the zip or submit for review",
 );
-// Chrome
+// Chrome (shared)
 cli.option('--chrome-zip [chromeZip]', 'Path to extension zip to upload');
 cli.option(
   '--chrome-extension-id [chromeExtensionId]',
   'The ID of the extension to be submitted',
 );
 cli.option(
-  '--chrome-client-id [chromeClientId]',
-  'Client ID used for authorizing requests to the Chrome Web Store',
-);
-cli.option(
-  '--chrome-client-secret [chromeClientSecret]',
-  'Client secret used for authorizing requests to the Chrome Web Store',
-);
-cli.option(
-  '--chrome-refresh-token [chromeRefreshToken]',
-  'Refresh token used for authorizing requests to the Chrome Web Store',
-);
-cli.option(
-  '--chrome-publish-target [chromePublishTarget]',
-  'Group to publish to, "default" or "trustedTesters"',
+  '--chrome-api-version',
+  'The API version to use for the Chrome Web Store: "v1.1" or "v2" (default: v1.1)',
 );
 cli.option(
   '--chrome-deploy-percentage [chromeDeployPercentage]',
   'An integer from 1-100',
 );
 cli.option(
-  '--chrome-review-exemption',
-  'Submit update using expedited review process',
-);
-cli.option(
   '--chrome-skip-submit-review',
   "Just upload the extension zip, don't submit it for review or publish it",
+);
+// Chrome (v1.1)
+cli.option(
+  '--chrome-client-id [chromeClientId]',
+  '[api v1.1 only] Client ID used for authorizing requests to the Chrome Web Store',
+);
+cli.option(
+  '--chrome-client-secret [chromeClientSecret]',
+  '[api v1.1 only] Client secret used for authorizing requests to the Chrome Web Store',
+);
+cli.option(
+  '--chrome-refresh-token [chromeRefreshToken]',
+  '[api v1.1 only] Refresh token used for authorizing requests to the Chrome Web Store',
+);
+cli.option(
+  '--chrome-publish-target [chromePublishTarget]',
+  '[api v1.1 only] Group to publish to, "default" or "trustedTesters"',
+);
+cli.option(
+  '--chrome-review-exemption',
+  '[api v1.1 only] Submit update using expedited review process',
+);
+// Chrome (v2)
+cli.option(
+  '--chrome-publisher-id [chromePublisherId]',
+  '[api v2 only] Publisher ID who owns the extension',
+);
+cli.option(
+  '--chrome-service-account-client-email [chromeServiceAccountClientEmail]',
+  '[api v2 only] Client email of the service account used for authorizing requests to the Chrome Web Store',
+);
+cli.option(
+  '--chrome-service-account-private-key [chromeServiceAccountPrivateKey]',
+  '[api v2 only] Private key of the service account used for authorizing requests to the Chrome Web Store',
+);
+cli.option(
+  '--chrome-skip-review',
+  '[api v2 only] Some updates, like ad-blocker rule updates, can skip the review process and be published immediately after submission',
+);
+cli.option(
+  '--chrome-publish-type [chromePublishType]',
+  '[api v2 only] Set to "STAGED_PUBLISH" to not publish the extension immediately after submission',
+);
+cli.option(
+  '--chrome-cancel-pending',
+  '[api v2 only] Cancel any pending review before submitting the new version',
 );
 // Firefox
 cli.option('--firefox-zip [firefoxZip]', 'Path to extension zip to upload');
@@ -133,19 +167,32 @@ function configFromFlags(flags: any): InlineConfig {
     }
   }
 
+  // TODO: Move back inline in the return once v1.1 support is dropped.
+  const chrome: AllChromeOptions = {
+    // Shared
+    zip: flags.chromeZip,
+    apiVersion: flags.chromeApiVersion,
+    extensionId: flags.chromeExtensionId,
+    deployPercentage: flags.chromeDeployPercentage,
+    skipSubmitReview: flags.chromeSkipSubmitReview,
+    // v1.1
+    clientId: flags.chromeClientId,
+    clientSecret: flags.chromeClientSecret,
+    refreshToken: flags.chromeRefreshToken,
+    publishTarget: flags.chromePublishTarget,
+    reviewExemption: flags.chromeReviewExemption,
+    // v2
+    publisherId: flags.chromePublisherId,
+    skipReview: flags.chromeSkipReview,
+    serviceAccountClientEmail: flags.chromeServiceAccountClientEmail,
+    serviceAccountPrivateKey: flags.chromeServiceAccountPrivateKey,
+    publishType: flags.chromePublishType,
+    cancelPending: flags.chromeCancelPending,
+  };
+
   return {
     dryRun: flags.dryRun,
-    chrome: {
-      zip: flags.chromeZip,
-      extensionId: flags.chromeExtensionId,
-      clientId: flags.chromeClientId,
-      clientSecret: flags.chromeClientSecret,
-      refreshToken: flags.chromeRefreshToken,
-      publishTarget: flags.chromePublishTarget,
-      deployPercentage: flags.chromeDeployPercentage,
-      reviewExemption: flags.chromeReviewExemption,
-      skipSubmitReview: flags.chromeSkipSubmitReview,
-    },
+    chrome: chrome as ChromeWebStoreV1_1Options | ChromeWebStoreV2Options,
     firefox: {
       zip: flags.firefoxZip,
       sourcesZip: flags.firefoxSourcesZip,
@@ -196,7 +243,7 @@ cli
   .action(async flags => {
     const config = configFromFlags({
       // Apply some placeholder flags so all the options resolve correctly (if zip doesn't exist,
-      // none of the related options are included, and init always things you haven't entered anything yet)
+      // none of the related options are included, and init always thinks you haven't entered anything yet)
       chromeZip: '...',
       firefoxZip: '...',
       edgeZip: '...',
@@ -206,6 +253,42 @@ cli
 
     try {
       await init(config);
+    } catch (err) {
+      consola.error(err);
+      process.exit(1);
+    }
+  });
+
+// SET DEPLOY PERCENTAGE
+
+cli
+  .command(
+    'set-deploy-percentage',
+    'Set the deploy percentage for the extension',
+  )
+  .action(async flags => {
+    const config = configFromFlags(flags);
+
+    try {
+      await setDeployPercentage(config);
+    } catch (err) {
+      consola.error(err);
+      process.exit(1);
+    }
+  });
+
+// STATUS
+
+cli
+  .command(
+    'status',
+    'Get the current published and submission status of the extension',
+  )
+  .action(async flags => {
+    const config = configFromFlags(flags);
+
+    try {
+      await status(config);
     } catch (err) {
       consola.error(err);
       process.exit(1);

@@ -1,7 +1,13 @@
 import { consola } from 'consola';
-import { InlineConfig, resolveConfig, type CustomEnv } from '../config';
+import {
+  InlineConfig,
+  resolveConfig,
+  type AllChromeOptions,
+  type CustomEnv,
+} from '../config';
 import { copyFile, writeFile, readFile } from 'node:fs/promises';
 import { ChromeWebStoreV1_1Options } from '../stores/chrome-web-store-v1.1';
+import { ChromeWebStoreV2Options } from '../stores/chrome-web-store-v2';
 import { FirefoxAddonStoreV5Options } from '../stores/firefox-addon-store-v5';
 import { EdgeAddonStoreV1_1Options } from '../stores/edge-addon-store-v1.1';
 import { OperaAddonsStoreOptions } from '../stores/opera-addons-store';
@@ -37,7 +43,9 @@ export async function init(config: InlineConfig) {
 
   const replacements: Entry[] = [];
   if (stores?.includes('chrome')) {
-    replacements.push(...(await initChrome(previousConfig.chrome)));
+    replacements.push(
+      ...(await initChrome(previousConfig.chrome as AllChromeOptions)),
+    );
   }
   if (stores?.includes('firefox')) {
     replacements.push(
@@ -83,12 +91,33 @@ async function prompt<T>(
 }
 
 async function initChrome(
-  previousOptions: Partial<ChromeWebStoreV1_1Options> | undefined,
+  previousOptions: Partial<AllChromeOptions> | undefined,
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 
   console.log();
   consola.start('Chrome Web Store\n');
+
+  const apiVersion = await prompt<string>(
+    'Which Chrome Web Store API version do you want to use?',
+    {
+      type: 'select',
+      options: [
+        {
+          label: 'v2 (recommended)',
+          value: 'v2',
+          hint: 'Uses a service account - required after October 15th, 2026',
+        },
+        {
+          label: 'v1.1 (deprecated)',
+          value: 'v1.1',
+          hint: 'Will stop working October 15th, 2026',
+        },
+      ],
+      initial: previousOptions?.apiVersion ?? 'v2',
+    },
+  );
+  entries.push(['CHROME_API_VERSION', apiVersion]);
 
   consola.log('`--chrome-extension-id` can be found:');
   consola.log('  1. Under the extension name in the CWS developer console');
@@ -96,12 +125,32 @@ async function initChrome(
   consola.log('Example: `ocfdgncpifmegplaglcnglhioflaimkd`');
   const extensionId = await prompt<string>(
     'Enter the extension ID:',
-    {
-      type: 'text',
-    },
+    { type: 'text' },
     previousOptions?.extensionId,
   );
   entries.push(['CHROME_EXTENSION_ID', extensionId]);
+
+  if (apiVersion === 'v2') {
+    entries.push(
+      ...(await initChromeV2(
+        previousOptions as Partial<ChromeWebStoreV2Options>,
+      )),
+    );
+  } else {
+    entries.push(
+      ...(await initChromeV1_1(
+        previousOptions as Partial<ChromeWebStoreV1_1Options>,
+      )),
+    );
+  }
+
+  return entries;
+}
+
+async function initChromeV1_1(
+  previousOptions: Partial<ChromeWebStoreV1_1Options> | undefined,
+): Promise<Entry[]> {
+  const entries: Entry[] = [];
 
   console.log();
   consola.log(
@@ -174,11 +223,144 @@ async function initChrome(
   entries.push(['CHROME_PUBLISH_TARGET', publishTarget]);
 
   const submitForReview = await prompt<boolean>(
-    'When uploading, automatically submit new update for review?',
+    'When uploading, automatically submit the new update for review?',
     { type: 'confirm' },
     String(!previousOptions?.skipSubmitReview),
   );
   entries.push(['CHROME_SKIP_SUBMIT_REVIEW', !submitForReview]);
+
+  return entries;
+}
+
+async function initChromeV2(
+  previousOptions: Partial<ChromeWebStoreV2Options> | undefined,
+): Promise<Entry[]> {
+  const entries: Entry[] = [];
+
+  console.log();
+  consola.log(
+    '`--chrome-publisher-id` is the publisher ID found in the CWS developer dashboard URL:',
+  );
+  consola.log('  1. Visit https://chrome.google.com/webstore/devconsole');
+  consola.log(
+    '  2. In the top right corner, select the publisher your extension is published under (you may only have one)',
+  );
+  consola.log('  3. The publisher ID is the UUID in the URL');
+  consola.log(
+    'Example: `https://chrome.google.com/webstore/devconsole/27416ae5-5dfd-41ec-bb34-8a385fddab89 -> 27416ae5-5dfd-41ec-bb34-8a385fddab89`',
+  );
+  const publisherId = await prompt<string>(
+    'Enter your publisher ID:',
+    { type: 'text' },
+    previousOptions?.publisherId,
+  );
+  entries.push(['CHROME_PUBLISHER_ID', publisherId]);
+
+  console.log();
+  consola.log(
+    'A Google Cloud service account with a JSON key is required for the v2 API.',
+  );
+  consola.log(
+    "  1. Follow Google's official guide to create a service account: https://developer.chrome.com/docs/webstore/service-accounts",
+  );
+  consola.log(
+    '  2. When you get to "Obtain access tokens", follow "Use a JSON Web Token" and stop after downloading the JSON file',
+  );
+  consola.log(
+    '    > WARNING: Google no longer recommends creating service worker keys, but this is the only form of auth accepted by publish-extension for now.',
+  );
+  consola.log(
+    '  3. Open the JSON file and use the `client_email` and `private_key` fields below.',
+  );
+  const serviceAccountClientEmail = await prompt<string>(
+    "Enter the service account's client email:",
+    { type: 'text' },
+    previousOptions?.serviceAccountClientEmail,
+  );
+  entries.push([
+    'CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL',
+    serviceAccountClientEmail,
+  ]);
+
+  const serviceAccountPrivateKey = await prompt<string>(
+    'Enter the service account\'s private key (copy it in as a single line, keeping the "\\n" characters as-is):',
+    { type: 'text' },
+    previousOptions?.serviceAccountPrivateKey,
+  );
+  entries.push([
+    'CHROME_SERVICE_ACCOUNT_PRIVATE_KEY',
+    serviceAccountPrivateKey,
+  ]);
+
+  const submitForReview = await prompt<boolean>(
+    'When uploading, automatically submit the new update for review?',
+    { type: 'confirm' },
+    String(!previousOptions?.skipSubmitReview),
+  );
+  entries.push(['CHROME_SKIP_SUBMIT_REVIEW', !submitForReview]);
+
+  if (submitForReview) {
+    const cancelPending = await prompt<boolean>(
+      '`--chrome-cancel-pending`: Cancel any pending review before submitting the new version?',
+      { type: 'confirm' },
+      String(previousOptions?.cancelPending ?? false),
+    );
+    entries.push(['CHROME_CANCEL_PENDING', cancelPending]);
+
+    const skipReview = await prompt<boolean>(
+      '`--chrome-skip-review`: Skip the review process and publish immediately? (Only valid for eligible updates like ad-blocker rule changes)',
+      { type: 'confirm' },
+      String(previousOptions?.skipReview ?? false),
+    );
+    entries.push(['CHROME_SKIP_REVIEW', skipReview]);
+
+    const publishType = await prompt<string>(
+      '`--chrome-publish-type`: When should the extension be published after review?',
+      {
+        type: 'select',
+        options: [
+          {
+            label: 'Default',
+            value: 'DEFAULT_PUBLISH',
+            hint: 'Publish immediately after approval',
+          },
+          {
+            label: 'Staged',
+            value: 'STAGED_PUBLISH',
+            hint: 'Stage for publishing later',
+          },
+        ],
+        initial: previousOptions?.publishType ?? 'DEFAULT_PUBLISH',
+      },
+    );
+    if (publishType !== 'DEFAULT_PUBLISH') {
+      entries.push(['CHROME_PUBLISH_TYPE', publishType]);
+    }
+
+    const setDeployPercentage = await prompt<boolean>(
+      'Set an initial deploy percentage for the rollout?',
+      { type: 'confirm' },
+    );
+    if (setDeployPercentage) {
+      let deployPercentage: number | undefined;
+      while (true) {
+        const input = await prompt<string>(
+          '`--chrome-deploy-percentage`: Enter a deploy percentage (1-100):',
+          { type: 'text' },
+          previousOptions?.deployPercentage
+            ? String(previousOptions.deployPercentage)
+            : undefined,
+        );
+        const parsed = Number(input.trim());
+        if (Number.isInteger(parsed) && parsed >= 1 && parsed <= 100) {
+          deployPercentage = parsed;
+          break;
+        }
+        consola.warn('Please enter a valid integer between 1 and 100.');
+      }
+      entries.push(['CHROME_DEPLOY_PERCENTAGE', deployPercentage!]);
+    }
+  }
 
   return entries;
 }

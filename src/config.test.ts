@@ -22,14 +22,16 @@ describe('resolveConfig', () => {
     const config = {
       dryRun: true,
       chrome: {
-        clientId: 'clientId',
-        clientSecret: 'clientSecret',
+        apiVersion: 'v2',
+        serviceAccountClientEmail: 'clientEmail',
+        serviceAccountPrivateKey: 'privateKey',
         deployPercentage: 50,
         extensionId: 'extensionId',
-        publishTarget: 'trustedTesters',
-        refreshToken: 'refreshToken',
-        reviewExemption: true,
+        publisherId: 'publisherId',
+        publishType: 'STAGED_PUBLISH',
+        skipReview: true,
         skipSubmitReview: true,
+        cancelPending: true,
         zip: 'zip',
       },
       firefox: {
@@ -65,18 +67,21 @@ describe('resolveConfig', () => {
     process.env.DRY_RUN = String(dryRun);
 
     process.env.CHROME_ZIP = 'CHROME_ZIP';
+    process.env.CHROME_API_VERSION = 'v2';
     process.env.CHROME_EXTENSION_ID = 'CHROME_EXTENSION_ID';
-    process.env.CHROME_CLIENT_ID = 'CHROME_CLIENT_ID';
-    process.env.CHROME_CLIENT_SECRET = 'CHROME_CLIENT_SECRET';
-    process.env.CHROME_REFRESH_TOKEN = 'CHROME_REFRESH_TOKEN';
-    const chromePublishTarget = 'trustedTesters';
-    process.env.CHROME_PUBLISH_TARGET = chromePublishTarget;
     const chromeSkipSubmitReview = true;
     process.env.CHROME_SKIP_SUBMIT_REVIEW = String(chromeSkipSubmitReview);
-    const chromeReviewExemption = true;
-    process.env.CHROME_REVIEW_EXEMPTION = String(chromeReviewExemption);
+    const chromeSkipReview = true;
+    process.env.CHROME_SKIP_REVIEW = String(chromeSkipReview);
     const chromeDeployPercentage = 75;
     process.env.CHROME_DEPLOY_PERCENTAGE = String(chromeDeployPercentage);
+    process.env.CHROME_PUBLISHER_ID = 'CHROME_PUBLISHER_ID';
+    process.env.CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL =
+      'CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL';
+    process.env.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY =
+      'CHROME_SERVICE_ACCOUNT_PRIVATE_KEY';
+    const chromePublishType = 'STAGED_PUBLISH';
+    process.env.CHROME_PUBLISH_TYPE = chromePublishType;
 
     process.env.FIREFOX_ZIP = 'FIREFOX_ZIP';
     process.env.FIREFOX_SOURCES_ZIP = 'FIREFOX_SOURCES_ZIP';
@@ -103,15 +108,19 @@ describe('resolveConfig', () => {
     const expected: InternalConfig = {
       dryRun,
       chrome: {
+        apiVersion: 'v2',
         zip: process.env.CHROME_ZIP!,
         extensionId: process.env.CHROME_EXTENSION_ID!,
-        clientId: process.env.CHROME_CLIENT_ID!,
-        clientSecret: process.env.CHROME_CLIENT_SECRET!,
-        refreshToken: process.env.CHROME_REFRESH_TOKEN!,
-        reviewExemption: chromeReviewExemption,
+        publisherId: process.env.CHROME_PUBLISHER_ID!,
+        serviceAccountClientEmail:
+          process.env.CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL!,
+        serviceAccountPrivateKey:
+          process.env.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY!,
+        publishType: chromePublishType,
+        skipReview: chromeSkipReview,
         deployPercentage: chromeDeployPercentage,
-        publishTarget: chromePublishTarget,
         skipSubmitReview: chromeSkipSubmitReview,
+        cancelPending: false,
       },
       firefox: {
         zip: process.env.FIREFOX_ZIP,
@@ -143,10 +152,11 @@ describe('resolveConfig', () => {
   it('should apply defaults', () => {
     const config: InlineConfig = {
       chrome: {
-        clientId: 'clientId',
-        clientSecret: 'clientSecret',
+        apiVersion: 'v2',
         extensionId: 'extensionId',
-        refreshToken: 'refreshToken',
+        publisherId: 'publisherId',
+        serviceAccountClientEmail: 'serviceAccountClientEmail',
+        serviceAccountPrivateKey: 'serviceAccountPrivateKey',
         zip: 'zip',
       },
       firefox: {
@@ -175,9 +185,10 @@ describe('resolveConfig', () => {
       chrome: {
         ...config.chrome,
         skipSubmitReview: false,
-        reviewExemption: false,
+        skipReview: undefined,
         deployPercentage: undefined,
-        publishTarget: 'default' as const,
+        publishType: undefined,
+        cancelPending: false,
       },
       firefox: {
         ...config.firefox,
@@ -233,11 +244,11 @@ describe('validateConfig', () => {
     const config: InlineConfig = {
       dryRun: true,
       chrome: {
-        clientId: 'clientId',
+        apiVersion: 'v2',
       },
     };
     expect(() => validateConfig(config)).toThrowError(
-      'Missing required config: CHROME_ZIP, CHROME_EXTENSION_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN',
+      'Missing required config: CHROME',
     );
   });
 });

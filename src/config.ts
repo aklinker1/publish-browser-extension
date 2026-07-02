@@ -4,6 +4,18 @@ import { EdgeAddonStoreV1_1Options } from './stores/edge-addon-store-v1.1';
 import { FirefoxAddonStoreV5Options } from './stores/firefox-addon-store-v5';
 import type { DeepPartial } from './utils/types';
 import { OperaAddonsStoreOptions } from './stores/opera-addons-store';
+import { ChromeWebStoreV2Options } from './stores/chrome-web-store-v2';
+
+/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
+export type AllChromeOptions = {
+  [key in
+    | keyof ChromeWebStoreV1_1Options
+    | keyof ChromeWebStoreV2Options]: key extends keyof ChromeWebStoreV1_1Options
+    ? ChromeWebStoreV1_1Options[key]
+    : key extends keyof ChromeWebStoreV2Options
+      ? ChromeWebStoreV2Options[key]
+      : never;
+};
 
 /**
  * Given inline config, read environment variables and apply defaults. Throws an error if any config
@@ -15,6 +27,8 @@ export function resolveConfig(
   const dryRun = config.dryRun ?? booleanEnv('DRY_RUN') ?? false;
 
   const chromeZip = config.chrome?.zip ?? stringEnv('CHROME_ZIP');
+  const chromeApiVersion =
+    config.chrome?.apiVersion ?? stringEnv('CHROME_API_VERSION');
   const firefoxZip = config.firefox?.zip ?? stringEnv('FIREFOX_ZIP');
   const edgeZip = config.edge?.zip ?? stringEnv('EDGE_ZIP');
   const operaZip = config.opera?.zip ?? stringEnv('OPERA_ZIP');
@@ -24,28 +38,33 @@ export function resolveConfig(
     chrome:
       chromeZip == null
         ? undefined
-        : buildChromeV1_1Options(
-            chromeZip,
-            config.chrome as Partial<ChromeWebStoreV1_1Options>,
-          ),
+        : chromeApiVersion === 'v2'
+          ? resolveChromeV2Options(
+              chromeZip,
+              config.chrome as Partial<ChromeWebStoreV2Options>,
+            )
+          : buildChromeV1_1Options(
+              chromeZip,
+              config.chrome as Partial<ChromeWebStoreV1_1Options>,
+            ),
     firefox:
       firefoxZip == null
         ? undefined
-        : buildFirefoxV5Options(
+        : resolveFirefoxV5Options(
             firefoxZip,
             config.firefox as Partial<FirefoxAddonStoreV5Options>,
           ),
     edge:
       edgeZip == null
         ? undefined
-        : buildEdgeV1_1Options(
+        : resolveEdgeV1_1Options(
             edgeZip,
             config.edge as Partial<EdgeAddonStoreV1_1Options>,
           ),
     opera:
       operaZip == null
         ? undefined
-        : buildOperaOptions(
+        : resolveOperaOptions(
             operaZip,
             config.opera as Partial<OperaAddonsStoreOptions>,
           ),
@@ -58,6 +77,7 @@ function buildChromeV1_1Options(
 ): Partial<ChromeWebStoreV1_1Options> {
   return {
     zip,
+    apiVersion: 'v1.1',
     clientId: chrome?.clientId ?? stringEnv('CHROME_CLIENT_ID'),
     clientSecret: chrome?.clientSecret ?? stringEnv('CHROME_CLIENT_SECRET'),
     refreshToken: chrome?.refreshToken ?? stringEnv('CHROME_REFRESH_TOKEN'),
@@ -75,7 +95,35 @@ function buildChromeV1_1Options(
   };
 }
 
-function buildFirefoxV5Options(
+export function resolveChromeV2Options(
+  zip: string,
+  chrome: Partial<ChromeWebStoreV2Options> | undefined,
+): Partial<ChromeWebStoreV2Options> {
+  return {
+    zip,
+    apiVersion: 'v2',
+    extensionId: chrome?.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
+    publisherId: chrome?.publisherId ?? stringEnv('CHROME_PUBLISHER_ID'),
+    serviceAccountClientEmail:
+      chrome?.serviceAccountClientEmail ??
+      stringEnv('CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL'),
+    serviceAccountPrivateKey:
+      chrome?.serviceAccountPrivateKey ??
+      stringEnv('CHROME_SERVICE_ACCOUNT_PRIVATE_KEY'),
+    publishType: chrome?.publishType ?? stringEnv('CHROME_PUBLISH_TYPE'),
+    deployPercentage:
+      chrome?.deployPercentage ?? numberEnv('CHROME_DEPLOY_PERCENTAGE'),
+    skipReview: chrome?.skipReview ?? booleanEnv('CHROME_SKIP_REVIEW'),
+    skipSubmitReview:
+      chrome?.skipSubmitReview ??
+      booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
+      false,
+    cancelPending:
+      chrome?.cancelPending ?? booleanEnv('CHROME_CANCEL_PENDING') ?? false,
+  };
+}
+
+function resolveFirefoxV5Options(
   zip: string,
   firefox: Partial<FirefoxAddonStoreV5Options> | undefined,
 ): Partial<FirefoxAddonStoreV5Options> {
@@ -92,7 +140,7 @@ function buildFirefoxV5Options(
   };
 }
 
-function buildEdgeV1_1Options(
+function resolveEdgeV1_1Options(
   zip: string,
   edge: Partial<EdgeAddonStoreV1_1Options> | undefined,
 ): Partial<EdgeAddonStoreV1_1Options> {
@@ -106,7 +154,7 @@ function buildEdgeV1_1Options(
   };
 }
 
-function buildOperaOptions(
+function resolveOperaOptions(
   zip: string,
   opera: Partial<OperaAddonsStoreOptions> | undefined,
 ): Partial<OperaAddonsStoreOptions> {
@@ -169,7 +217,12 @@ export const InlineConfig = z.object({
   /**
    * Options for publishing to chrome.
    */
-  chrome: ChromeWebStoreV1_1Options.partial().optional(),
+  chrome: z
+    .union([
+      ChromeWebStoreV1_1Options.partial(),
+      ChromeWebStoreV2Options.partial(),
+    ])
+    .optional(),
   /**
    * Options for publishing to Firefox.
    */
@@ -187,7 +240,9 @@ export type InlineConfig = z.infer<typeof InlineConfig>;
 
 export const InternalConfig = z.object({
   dryRun: z.boolean(),
-  chrome: ChromeWebStoreV1_1Options.optional(),
+  chrome: z
+    .union([ChromeWebStoreV1_1Options, ChromeWebStoreV2Options])
+    .optional(),
   firefox: FirefoxAddonStoreV5Options.optional(),
   edge: EdgeAddonStoreV1_1Options.optional(),
   opera: OperaAddonsStoreOptions.optional(),
@@ -197,15 +252,25 @@ export type InternalConfig = z.infer<typeof InternalConfig>;
 export interface CustomEnv {
   DRY_RUN: string | undefined;
 
+  // CWS
+  CHROME_EXTENSION_ID: string | undefined;
+  CHROME_DEPLOY_PERCENTAGE: string | undefined;
+  CHROME_SKIP_SUBMIT_REVIEW: string | undefined;
+  CHROME_ZIP: string | undefined;
+  CHROME_API_VERSION: 'v1.1' | 'v2' | undefined;
+  // CWS v1.1
   CHROME_CLIENT_ID: string | undefined;
   CHROME_CLIENT_SECRET: string | undefined;
-  CHROME_DEPLOY_PERCENTAGE: string | undefined;
-  CHROME_EXTENSION_ID: string | undefined;
   CHROME_PUBLISH_TARGET: string | undefined;
   CHROME_REFRESH_TOKEN: string | undefined;
   CHROME_REVIEW_EXEMPTION: string | undefined;
-  CHROME_SKIP_SUBMIT_REVIEW: string | undefined;
-  CHROME_ZIP: string | undefined;
+  // CWS v2
+  CHROME_PUBLISHER_ID: string | undefined;
+  CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: string | undefined;
+  CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: string | undefined;
+  CHROME_PUBLISH_TYPE: string | undefined;
+  CHROME_SKIP_REVIEW: string | undefined;
+  CHROME_CANCEL_PENDING: string | undefined;
 
   FIREFOX_ZIP: string | undefined;
   FIREFOX_SOURCES_ZIP: string | undefined;
