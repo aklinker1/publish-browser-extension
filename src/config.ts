@@ -82,9 +82,10 @@ function buildChromeV1_1Options(
     clientSecret: chrome?.clientSecret ?? stringEnv('CHROME_CLIENT_SECRET'),
     refreshToken: chrome?.refreshToken ?? stringEnv('CHROME_REFRESH_TOKEN'),
     extensionId: chrome?.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
-    publishTarget: chrome?.publishTarget ?? stringEnv('CHROME_PUBLISH_TARGET'),
+    publishTarget:
+      chrome?.publishTarget ?? stringEnv('CHROME_PUBLISH_TARGET') ?? 'default',
     reviewExemption:
-      chrome?.reviewExemption ?? booleanEnv('CHROME_REVIEW_EXEMPTION'),
+      chrome?.reviewExemption ?? booleanEnv('CHROME_REVIEW_EXEMPTION') ?? false,
     skipSubmitReview:
       chrome?.skipSubmitReview ??
       booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
