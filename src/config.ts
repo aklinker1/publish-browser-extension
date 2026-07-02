@@ -39,7 +39,7 @@ export function resolveConfig(
       chromeZip == null
         ? undefined
         : chromeApiVersion === 'v2'
-          ? buildChromeV2Options(
+          ? resolveChromeV2Options(
               chromeZip,
               config.chrome as Partial<ChromeWebStoreV2Options>,
             )
@@ -50,21 +50,21 @@ export function resolveConfig(
     firefox:
       firefoxZip == null
         ? undefined
-        : buildFirefoxV5Options(
+        : resolveFirefoxV5Options(
             firefoxZip,
             config.firefox as Partial<FirefoxAddonStoreV5Options>,
           ),
     edge:
       edgeZip == null
         ? undefined
-        : buildEdgeV1_1Options(
+        : resolveEdgeV1_1Options(
             edgeZip,
             config.edge as Partial<EdgeAddonStoreV1_1Options>,
           ),
     opera:
       operaZip == null
         ? undefined
-        : buildOperaOptions(
+        : resolveOperaOptions(
             operaZip,
             config.opera as Partial<OperaAddonsStoreOptions>,
           ),
@@ -95,7 +95,7 @@ function buildChromeV1_1Options(
   };
 }
 
-function buildChromeV2Options(
+export function resolveChromeV2Options(
   zip: string,
   chrome: Partial<ChromeWebStoreV2Options> | undefined,
 ): Partial<ChromeWebStoreV2Options> {
@@ -121,7 +121,7 @@ function buildChromeV2Options(
   };
 }
 
-function buildFirefoxV5Options(
+function resolveFirefoxV5Options(
   zip: string,
   firefox: Partial<FirefoxAddonStoreV5Options> | undefined,
 ): Partial<FirefoxAddonStoreV5Options> {
@@ -138,7 +138,7 @@ function buildFirefoxV5Options(
   };
 }
 
-function buildEdgeV1_1Options(
+function resolveEdgeV1_1Options(
   zip: string,
   edge: Partial<EdgeAddonStoreV1_1Options> | undefined,
 ): Partial<EdgeAddonStoreV1_1Options> {
@@ -152,7 +152,7 @@ function buildEdgeV1_1Options(
   };
 }
 
-function buildOperaOptions(
+function resolveOperaOptions(
   zip: string,
   opera: Partial<OperaAddonsStoreOptions> | undefined,
 ): Partial<OperaAddonsStoreOptions> {

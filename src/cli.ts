@@ -7,6 +7,8 @@ import { consola } from 'consola';
 import { config } from 'dotenv';
 import type { ChromeWebStoreV1_1Options } from './stores/chrome-web-store-v1.1';
 import type { ChromeWebStoreV2Options } from './stores/chrome-web-store-v2';
+import { status } from './commands/status';
+import { setDeployPercentage } from './commands/set-deploy-percentage';
 
 config({ path: '.env.submit', quiet: true });
 
@@ -236,7 +238,7 @@ cli
   .action(async flags => {
     const config = configFromFlags({
       // Apply some placeholder flags so all the options resolve correctly (if zip doesn't exist,
-      // none of the related options are included, and init always things you haven't entered anything yet)
+      // none of the related options are included, and init always thinks you haven't entered anything yet)
       chromeZip: '...',
       firefoxZip: '...',
       edgeZip: '...',
@@ -246,6 +248,42 @@ cli
 
     try {
       await init(config);
+    } catch (err) {
+      consola.error(err);
+      process.exit(1);
+    }
+  });
+
+// SET DEPLOY PERCENTAGE
+
+cli
+  .command(
+    'set-deploy-percentage',
+    'Set the deploy percentage for the extension',
+  )
+  .action(async flags => {
+    const config = configFromFlags(flags);
+
+    try {
+      await setDeployPercentage(config);
+    } catch (err) {
+      consola.error(err);
+      process.exit(1);
+    }
+  });
+
+// STATUS
+
+cli
+  .command(
+    'status',
+    'Get the current published and submission status of the extension',
+  )
+  .action(async flags => {
+    const config = configFromFlags(flags);
+
+    try {
+      await status(config);
     } catch (err) {
       consola.error(err);
       process.exit(1);
