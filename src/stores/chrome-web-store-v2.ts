@@ -4,6 +4,12 @@ import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { CwsApiV2 } from '../apis/cws-api-v2.gen';
 import { createGcpServiceAccountJwt } from '../utils/google-auth';
+import { createReadStream } from 'node:fs';
+import {
+  ChromeWebStoreUploadStateError,
+  type CwsTokenDetails,
+} from './chrome-web-store-v1.1';
+import consola from 'consola';
 
 type PublishType = NonNullable<CwsApiV2.PublishItemRequest['publishType']>;
 
@@ -12,8 +18,8 @@ export const ChromeWebStoreV2Options = z.object({
   zip: z.string().min(1),
   extensionId: z.string().min(1).trim(),
   publisherId: z.string().min(1).trim(),
-  clientEmail: z.string().min(1).trim(),
-  privateKey: z.string().min(1),
+  serviceAccountClientEmail: z.string().min(1).trim(),
+  serviceAccountPrivateKey: z.string().min(1),
   publishType: z
     .enum<
       PublishType[]
@@ -25,11 +31,9 @@ export const ChromeWebStoreV2Options = z.object({
 });
 export type ChromeWebStoreV2Options = z.infer<typeof ChromeWebStoreV2Options>;
 
-export interface CwsTokenDetails {
+export interface ServiceAccountTokenResponse {
   access_token: string;
   expires_in: number;
-  refresh_token: string;
-  scope: string;
   token_type: string;
 }
 
@@ -51,7 +55,55 @@ export class ChromeWebStoreV2 implements Store {
   }
 
   async submit(dryRun?: boolean): Promise<void> {
-    throw Error('TODO');
+    this.setStatus('Validating credentials');
+    console.log(1, '\n\n\n\n');
+    await this.client.get('/v2/{+name}:fetchStatus', {
+      params: { name: this.nameParam },
+    });
+    if (dryRun) {
+      this.setStatus('DRY RUN: Skipped upload and publishing');
+      return;
+    }
+
+    this.setStatus('Uploading new ZIP file');
+    const file = createReadStream(this.options.zip);
+    console.log(2, '\n\n\n\n');
+    const uploadRes = await this.client.post('/upload/v2/{+name}:upload', {
+      params: { name: this.nameParam },
+      body: file,
+    });
+    this.checkUploadState(uploadRes);
+
+    if (this.options.skipSubmitReview) {
+      this.setStatus('Skipping submission (skipSubmitReview=true)');
+      return;
+    }
+
+    this.setStatus('Submitting for review');
+    console.log(3, '\n\n\n\n');
+    const publishRes = await this.client.post('/v2/{+name}:publish', {
+      params: { name: this.nameParam },
+      body: {
+        blockOnWarnings: undefined,
+        deployInfos: this.options.deployPercentage
+          ? [{ deployPercentage: this.options.deployPercentage }]
+          : undefined,
+        publishType: this.options.publishType,
+        skipReview: this.options.skipReview,
+      },
+    });
+
+    console.log(4, '\n\n\n\n');
+    if (publishRes.warningInfo?.warnings?.length) {
+      console.log(5, '\n\n\n\n');
+      this.setStatus(
+        `Found ${publishRes.warningInfo.warnings.length} warning(s)`,
+      );
+      for (const warning of publishRes.warningInfo.warnings) {
+        consola.warn(`${warning.reason}: ${warning.description}`);
+      }
+    }
+    console.log(6, '\n\n\n\n');
   }
 
   async ensureZipsExist(): Promise<void> {
@@ -75,8 +127,8 @@ export class ChromeWebStoreV2 implements Store {
       body: new URLSearchParams({
         grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
         assertion: createGcpServiceAccountJwt(
-          this.options.clientEmail,
-          this.options.privateKey,
+          this.options.serviceAccountClientEmail,
+          this.options.serviceAccountPrivateKey,
           ['https://www.googleapis.com/auth/chromewebstore'],
         ),
       }),
@@ -89,5 +141,16 @@ export class ChromeWebStoreV2 implements Store {
     }
 
     return (await res.json()) as CwsTokenDetails;
+  }
+
+  private get nameParam(): string {
+    return `publishers/${this.options.publisherId}/items/${this.options.extensionId}`;
+  }
+
+  private checkUploadState(
+    item: CwsApiV2.UploadItemPackageResponse,
+  ): void | never {
+    if (item.uploadState === 'FAILED' || item.uploadState === 'NOT_FOUND')
+      throw new ChromeWebStoreUploadStateError(item);
   }
 }
