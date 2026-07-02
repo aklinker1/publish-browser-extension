@@ -118,6 +118,8 @@ export function resolveChromeV2Options(
       chrome?.skipSubmitReview ??
       booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
       false,
+    cancelPending:
+      chrome?.cancelPending ?? booleanEnv('CHROME_CANCEL_PENDING') ?? false,
   };
 }
 
@@ -268,6 +270,7 @@ export interface CustomEnv {
   CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: string | undefined;
   CHROME_PUBLISH_TYPE: string | undefined;
   CHROME_SKIP_REVIEW: string | undefined;
+  CHROME_CANCEL_PENDING: string | undefined;
 
   FIREFOX_ZIP: string | undefined;
   FIREFOX_SOURCES_ZIP: string | undefined;

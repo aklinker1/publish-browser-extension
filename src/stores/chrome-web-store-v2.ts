@@ -25,6 +25,7 @@ export const ChromeWebStoreV2Options = z.object({
   deployPercentage: z.int().min(1).max(100).optional(),
   skipReview: z.boolean().default(false),
   skipSubmitReview: z.boolean().default(false),
+  cancelPending: z.boolean().default(false),
 });
 export type ChromeWebStoreV2Options = z.infer<typeof ChromeWebStoreV2Options>;
 
@@ -54,12 +55,23 @@ export class ChromeWebStoreV2 implements Store {
   async submit(dryRun?: boolean): Promise<void> {
     this.setStatus?.('Validating credentials');
     console.log(1, '\n\n\n\n');
-    await this.client.get('/v2/{+name}:fetchStatus', {
+    const status = await this.client.get('/v2/{+name}:fetchStatus', {
       params: { name: this.nameParam },
     });
     if (dryRun) {
       this.setStatus?.('DRY RUN: Skipped upload and publishing');
       return;
+    }
+
+    if (
+      this.options.cancelPending &&
+      status.submittedItemRevisionStatus?.state === 'PENDING_REVIEW'
+    ) {
+      this.setStatus?.('Cancelling pending review');
+      await this.client.post('/v2/{+name}:cancelSubmission', {
+        params: { name: this.nameParam },
+        body: {},
+      });
     }
 
     this.setStatus?.('Uploading new ZIP file');

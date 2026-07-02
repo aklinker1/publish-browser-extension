@@ -300,6 +300,13 @@ async function initChromeV2(
   entries.push(['CHROME_SKIP_SUBMIT_REVIEW', !submitForReview]);
 
   if (submitForReview) {
+    const cancelPending = await prompt<boolean>(
+      '`--chrome-cancel-pending`: Cancel any pending review before submitting the new version?',
+      { type: 'confirm' },
+      String(previousOptions?.cancelPending ?? false),
+    );
+    entries.push(['CHROME_CANCEL_PENDING', cancelPending]);
+
     const skipReview = await prompt<boolean>(
       '`--chrome-skip-review`: Skip the review process and publish immediately? (Only valid for eligible updates like ad-blocker rule changes)',
       { type: 'confirm' },
