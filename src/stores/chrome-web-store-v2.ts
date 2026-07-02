@@ -5,10 +5,7 @@ import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { CwsApiV2 } from '../apis/cws-api-v2.gen';
 import { createGcpServiceAccountJwt } from '../utils/google-auth';
 import { createReadStream } from 'node:fs';
-import {
-  ChromeWebStoreUploadStateError,
-  type CwsTokenDetails,
-} from './chrome-web-store-v1.1';
+import { ChromeWebStoreUploadStateError } from './chrome-web-store-v1.1';
 import consola from 'consola';
 
 type PublishType = NonNullable<CwsApiV2.PublishItemRequest['publishType']>;
@@ -39,11 +36,11 @@ export interface ServiceAccountTokenResponse {
 
 export class ChromeWebStoreV2 implements Store {
   private client: HttpClient<CwsApiV2.Endpoints>;
-  private accessTokenCache: Promise<CwsTokenDetails> | undefined;
+  private accessTokenCache: Promise<ServiceAccountTokenResponse> | undefined;
 
   constructor(
     readonly options: ChromeWebStoreV2Options,
-    readonly setStatus: (text: string) => void,
+    readonly setStatus?: (text: string) => void,
   ) {
     this.client = createHttpClient<CwsApiV2.Endpoints>({
       baseUrl: CwsApiV2.BASE_URL,
@@ -55,17 +52,17 @@ export class ChromeWebStoreV2 implements Store {
   }
 
   async submit(dryRun?: boolean): Promise<void> {
-    this.setStatus('Validating credentials');
+    this.setStatus?.('Validating credentials');
     console.log(1, '\n\n\n\n');
     await this.client.get('/v2/{+name}:fetchStatus', {
       params: { name: this.nameParam },
     });
     if (dryRun) {
-      this.setStatus('DRY RUN: Skipped upload and publishing');
+      this.setStatus?.('DRY RUN: Skipped upload and publishing');
       return;
     }
 
-    this.setStatus('Uploading new ZIP file');
+    this.setStatus?.('Uploading new ZIP file');
     const file = createReadStream(this.options.zip);
     console.log(2, '\n\n\n\n');
     const uploadRes = await this.client.post('/upload/v2/{+name}:upload', {
@@ -75,11 +72,11 @@ export class ChromeWebStoreV2 implements Store {
     this.checkUploadState(uploadRes);
 
     if (this.options.skipSubmitReview) {
-      this.setStatus('Skipping submission (skipSubmitReview=true)');
+      this.setStatus?.('Skipping submission (skipSubmitReview=true)');
       return;
     }
 
-    this.setStatus('Submitting for review');
+    this.setStatus?.('Submitting for review');
     console.log(3, '\n\n\n\n');
     const publishRes = await this.client.post('/v2/{+name}:publish', {
       params: { name: this.nameParam },
@@ -96,7 +93,7 @@ export class ChromeWebStoreV2 implements Store {
     console.log(4, '\n\n\n\n');
     if (publishRes.warningInfo?.warnings?.length) {
       console.log(5, '\n\n\n\n');
-      this.setStatus(
+      this.setStatus?.(
         `Found ${publishRes.warningInfo.warnings.length} warning(s)`,
       );
       for (const warning of publishRes.warningInfo.warnings) {
@@ -110,6 +107,22 @@ export class ChromeWebStoreV2 implements Store {
     await ensureZipExists(this.options.zip);
   }
 
+  /**
+   * @param percentage A nonnegative number between 0 and 100.
+   */
+  async setDeploymentPercentage(percentage: number): Promise<void> {
+    await this.client.post('/v2/{+name}:setPublishedDeployPercentage', {
+      params: { name: this.nameParam },
+      body: { deployPercentage: percentage },
+    });
+  }
+
+  async getStatus(): Promise<CwsApiV2.FetchItemStatusResponse> {
+    return await this.client.get('/v2/{+name}:fetchStatus', {
+      params: { name: this.nameParam },
+    });
+  }
+
   private async getAccessToken(): Promise<string> {
     if (!this.accessTokenCache)
       this.accessTokenCache = this.getAccessTokenNoCache();
@@ -118,7 +131,7 @@ export class ChromeWebStoreV2 implements Store {
     return data.access_token;
   }
 
-  private async getAccessTokenNoCache(): Promise<CwsTokenDetails> {
+  private async getAccessTokenNoCache(): Promise<ServiceAccountTokenResponse> {
     const res = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
@@ -140,7 +153,7 @@ export class ChromeWebStoreV2 implements Store {
       );
     }
 
-    return (await res.json()) as CwsTokenDetails;
+    return (await res.json()) as ServiceAccountTokenResponse;
   }
 
   private get nameParam(): string {
