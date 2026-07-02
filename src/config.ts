@@ -24,77 +24,100 @@ export function resolveConfig(
     chrome:
       chromeZip == null
         ? undefined
-        : {
-            zip: chromeZip,
-            extensionId:
-              config.chrome?.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
-            clientId: config.chrome?.clientId ?? stringEnv('CHROME_CLIENT_ID'),
-            clientSecret:
-              config.chrome?.clientSecret ?? stringEnv('CHROME_CLIENT_SECRET'),
-            refreshToken:
-              config.chrome?.refreshToken ?? stringEnv('CHROME_REFRESH_TOKEN'),
-            publishTarget:
-              config.chrome?.publishTarget ??
-              stringEnv('CHROME_PUBLISH_TARGET') ??
-              'default',
-            deployPercentage:
-              config.chrome?.deployPercentage ??
-              intEnv('CHROME_DEPLOY_PERCENTAGE'),
-            reviewExemption:
-              config.chrome?.reviewExemption ??
-              booleanEnv('CHROME_REVIEW_EXEMPTION') ??
-              false,
-            skipSubmitReview:
-              config.chrome?.skipSubmitReview ??
-              booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
-              false,
-          },
+        : buildChromeV1_1Options(
+            chromeZip,
+            config.chrome as Partial<ChromeWebStoreV1_1Options>,
+          ),
     firefox:
       firefoxZip == null
         ? undefined
-        : {
-            zip: firefoxZip,
-            sourcesZip:
-              config.firefox?.sourcesZip ?? stringEnv('FIREFOX_SOURCES_ZIP'),
-            extensionId:
-              config.firefox?.extensionId ?? stringEnv('FIREFOX_EXTENSION_ID'),
-            jwtIssuer:
-              config.firefox?.jwtIssuer ?? stringEnv('FIREFOX_JWT_ISSUER'),
-            jwtSecret:
-              config.firefox?.jwtSecret ?? stringEnv('FIREFOX_JWT_SECRET'),
-            channel:
-              config.firefox?.channel ??
-              stringEnv('FIREFOX_CHANNEL') ??
-              'listed',
-            compatibility:
-              config.firefox?.compatibility ??
-              (stringEnv('FIREFOX_COMPATIBILITY')?.split(',') as any),
-          },
+        : buildFirefoxV5Options(
+            firefoxZip,
+            config.firefox as Partial<FirefoxAddonStoreV5Options>,
+          ),
     edge:
       edgeZip == null
         ? undefined
-        : {
-            zip: edgeZip,
-            productId: config.edge?.productId ?? stringEnv('EDGE_PRODUCT_ID'),
-            clientId: config.edge?.clientId ?? stringEnv('EDGE_CLIENT_ID'),
-            apiKey: config.edge?.apiKey ?? stringEnv('EDGE_API_KEY'),
-            skipSubmitReview:
-              config.edge?.skipSubmitReview ??
-              booleanEnv('EDGE_SKIP_SUBMIT_REVIEW') ??
-              false,
-          },
+        : buildEdgeV1_1Options(
+            edgeZip,
+            config.edge as Partial<EdgeAddonStoreV1_1Options>,
+          ),
     opera:
       operaZip == null
         ? undefined
-        : {
-            zip: operaZip,
-            packageId: config.opera?.packageId ?? intEnv('OPERA_PACKAGE_ID'),
-            sessionId: config.opera?.sessionId ?? stringEnv('OPERA_SESSION_ID'),
-            skipSubmitReview:
-              config.opera?.skipSubmitReview ??
-              booleanEnv('OPERA_SKIP_SUBMIT_REVIEW') ??
-              false,
-          },
+        : buildOperaOptions(
+            operaZip,
+            config.opera as Partial<OperaAddonsStoreOptions>,
+          ),
+  };
+}
+
+function buildChromeV1_1Options(
+  zip: string,
+  chrome: Partial<ChromeWebStoreV1_1Options> | undefined,
+): Partial<ChromeWebStoreV1_1Options> {
+  return {
+    zip,
+    clientId: chrome?.clientId ?? stringEnv('CHROME_CLIENT_ID'),
+    clientSecret: chrome?.clientSecret ?? stringEnv('CHROME_CLIENT_SECRET'),
+    refreshToken: chrome?.refreshToken ?? stringEnv('CHROME_REFRESH_TOKEN'),
+    extensionId: chrome?.extensionId ?? stringEnv('CHROME_EXTENSION_ID'),
+    publishTarget:
+      chrome?.publishTarget ?? stringEnv('CHROME_PUBLISH_TARGET') ?? 'default',
+    reviewExemption:
+      chrome?.reviewExemption ?? booleanEnv('CHROME_REVIEW_EXEMPTION') ?? false,
+    skipSubmitReview:
+      chrome?.skipSubmitReview ??
+      booleanEnv('CHROME_SKIP_SUBMIT_REVIEW') ??
+      false,
+    deployPercentage:
+      chrome?.deployPercentage ?? numberEnv('CHROME_DEPLOY_PERCENTAGE'),
+  };
+}
+
+function buildFirefoxV5Options(
+  zip: string,
+  firefox: Partial<FirefoxAddonStoreV5Options> | undefined,
+): Partial<FirefoxAddonStoreV5Options> {
+  return {
+    zip,
+    sourcesZip: firefox?.sourcesZip ?? stringEnv('FIREFOX_SOURCES_ZIP'),
+    extensionId: firefox?.extensionId ?? stringEnv('FIREFOX_EXTENSION_ID'),
+    jwtIssuer: firefox?.jwtIssuer ?? stringEnv('FIREFOX_JWT_ISSUER'),
+    jwtSecret: firefox?.jwtSecret ?? stringEnv('FIREFOX_JWT_SECRET'),
+    channel: firefox?.channel ?? stringEnv('FIREFOX_CHANNEL') ?? 'listed',
+    compatibility:
+      firefox?.compatibility ??
+      (stringEnv('FIREFOX_COMPATIBILITY')?.split(',') as any),
+  };
+}
+
+function buildEdgeV1_1Options(
+  zip: string,
+  edge: Partial<EdgeAddonStoreV1_1Options> | undefined,
+): Partial<EdgeAddonStoreV1_1Options> {
+  return {
+    zip,
+    productId: edge?.productId ?? stringEnv('EDGE_PRODUCT_ID'),
+    clientId: edge?.clientId ?? stringEnv('EDGE_CLIENT_ID'),
+    apiKey: edge?.apiKey ?? stringEnv('EDGE_API_KEY'),
+    skipSubmitReview:
+      edge?.skipSubmitReview ?? booleanEnv('EDGE_SKIP_SUBMIT_REVIEW') ?? false,
+  };
+}
+
+function buildOperaOptions(
+  zip: string,
+  opera: Partial<OperaAddonsStoreOptions> | undefined,
+): Partial<OperaAddonsStoreOptions> {
+  return {
+    zip,
+    packageId: opera?.packageId ?? intEnv('OPERA_PACKAGE_ID'),
+    sessionId: opera?.sessionId ?? stringEnv('OPERA_SESSION_ID'),
+    skipSubmitReview:
+      opera?.skipSubmitReview ??
+      booleanEnv('OPERA_SKIP_SUBMIT_REVIEW') ??
+      false,
   };
 }
 
@@ -128,6 +151,10 @@ function stringEnv<T extends string = string>(
   name: keyof CustomEnv,
 ): T | undefined {
   return !process.env[name] ? undefined : (process.env[name] as T);
+}
+
+function numberEnv(name: keyof CustomEnv): number | undefined {
+  return !process.env[name] ? undefined : parseFloat(process.env[name]!);
 }
 
 function intEnv(name: keyof CustomEnv): number | undefined {
