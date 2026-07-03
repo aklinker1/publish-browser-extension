@@ -94,9 +94,7 @@ export namespace CwsApiV2 {
      * Optional. Use this to control if the item is published immediately on approval or staged for publishing in the future. Defaults to `DEFAULT_PUBLISH` if unset.
      */
     publishType?:
-      | 'PUBLISH_TYPE_UNSPECIFIED'
-      | 'DEFAULT_PUBLISH'
-      | 'STAGED_PUBLISH';
+      'PUBLISH_TYPE_UNSPECIFIED' | 'DEFAULT_PUBLISH' | 'STAGED_PUBLISH';
     /**
      * Optional. Whether to attempt to skip item review. The API will validate if the item qualifies and return a validation error if the item requires review. Defaults to `false` if unset.
      */

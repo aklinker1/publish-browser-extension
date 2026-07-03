@@ -190,9 +190,9 @@ export type ChromeWebStoreV2Options = Infer<typeof ChromeWebStoreV2Options>;
 
 /** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
 export type AllChromeOptions = {
-  [key in
-    | keyof ChromeWebStoreV1_1Options
-    | keyof ChromeWebStoreV2Options]: key extends keyof ChromeWebStoreV1_1Options
+  [
+    key in keyof ChromeWebStoreV1_1Options | keyof ChromeWebStoreV2Options
+  ]: key extends keyof ChromeWebStoreV1_1Options
     ? ChromeWebStoreV1_1Options[key]
     : key extends keyof ChromeWebStoreV2Options
       ? ChromeWebStoreV2Options[key]

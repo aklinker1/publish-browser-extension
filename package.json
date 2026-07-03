@@ -6,14 +6,14 @@
   "scripts": {
     "check": "check",
     "build": "run-s build:*",
-    "build:lib": "tsdown src/index.ts src/cli.ts --inlineOnly superstruct",
-    "build:test-extension": "bun scripts/build-test-extension.js",
-    "dev:all": "bun ./scripts/dev.mjs all",
-    "dev:chrome": "bun ./scripts/dev.mjs chrome",
-    "dev:firefox": "bun ./scripts/dev.mjs firefox",
-    "dev:edge": "bun ./scripts/dev.mjs edge",
-    "dev:opera": "bun ./scripts/dev.mjs opera",
-    "dev:help": "bun ./scripts/dev.mjs help",
+    "build:lib": "tsdown src/index.ts src/cli.ts --deps.onlyBundle superstruct",
+    "build:test-extension": "bun scripts/build-test-extension.ts",
+    "dev:all": "bun ./scripts/dev.ts all",
+    "dev:chrome": "bun ./scripts/dev.ts chrome",
+    "dev:firefox": "bun ./scripts/dev.ts firefox",
+    "dev:edge": "bun ./scripts/dev.ts edge",
+    "dev:opera": "bun ./scripts/dev.ts opera",
+    "dev:help": "bun ./scripts/dev.ts help",
     "publish-extension": "bun src/cli.ts",
     "prepack": "bun run build",
     "prepare": "simple-git-hooks",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@aklinker1/check": "^2.4.0",
+    "@types/archiver": "^8.0.0",
     "@types/bun": "^1.3.14",
     "@types/node": "^26.1.0",
     "@typescript/native-preview": "^7.0.0-dev.20260703.1",
@@ -96,5 +97,6 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "sideEffects": false
 }

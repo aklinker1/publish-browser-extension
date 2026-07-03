@@ -1,6 +1,6 @@
 import { writeFile } from 'fs/promises';
 import { createWriteStream } from 'fs';
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 import { consola } from 'consola';
 
 // Utils
@@ -16,19 +16,15 @@ function getUniqueVersion() {
   return version;
 }
 
-async function createExtensionZip(file, customManifest) {
-  let res, rej;
-  const done = new Promise((r, j) => {
-    res = r;
-    rej = j;
-  });
+async function createExtensionZip(file: string, customManifest: any) {
+  const { resolve, reject, promise } = Promise.withResolvers<void>();
   const output = createWriteStream(file);
-  const archive = archiver('zip');
-  archive.on('close', res);
-  archive.on('end', res);
-  archive.on('finish', res);
-  archive.on('warning', rej);
-  archive.on('error', rej);
+  const archive = new ZipArchive();
+  archive.on('close', resolve);
+  archive.on('end', resolve);
+  archive.on('finish', resolve);
+  archive.on('warning', reject);
+  archive.on('error', reject);
   archive.pipe(output);
 
   const manifest = {
@@ -41,7 +37,7 @@ async function createExtensionZip(file, customManifest) {
 
   archive.finalize();
 
-  return done;
+  return promise;
 }
 
 consola.start('Creating extension ZIPs to upload...');

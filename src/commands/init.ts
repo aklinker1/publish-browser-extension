@@ -50,8 +50,7 @@ export async function init(config: InlineConfig) {
     replacements.push(
       ...(await initFirefox(
         previousConfig.firefox as
-          | Partial<FirefoxAddonStoreV5Options>
-          | undefined,
+          Partial<FirefoxAddonStoreV5Options> | undefined,
       )),
     );
   }

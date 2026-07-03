@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 
-function run(cmd, args = []) {
+function run(cmd: string, args: string[] = []) {
   const result = spawnSync(cmd, args, {
     stdio: 'inherit',
   });
@@ -15,13 +15,12 @@ try {
   run('bun', ['build:test-extension']);
 
   const TARGET = process.argv[2];
-  const ARGS = process.argv.slice(2); // allow flags override
-  const publish = (args = []) =>
-    run(process.env.DEV_RUNNER ?? 'node', [
+  const publish = (args: string[] = []) => {
+    return run(process.env.DEV_RUNNER ?? 'node', [
       'bin/publish-extension.mjs',
       ...args,
-      ...ARGS,
     ]);
+  };
 
   switch (TARGET) {
     case 'all':
