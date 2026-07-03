@@ -5,7 +5,7 @@ import { CwsApiV1_1 } from '../apis/cws-api-v1.1.gen';
 import { FetchError } from '../utils/errors';
 import { createReadStream } from 'node:fs';
 import consola from 'consola';
-import type { ChromeWebStoreV1_1Options } from '../utils/config-definitions';
+import type { ChromeWebStoreV1_1Options } from '../utils/config-schema';
 
 /** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
 export interface CwsTokenDetails {

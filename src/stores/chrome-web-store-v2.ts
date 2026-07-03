@@ -6,7 +6,7 @@ import { createGcpServiceAccountJwt } from '../utils/google-auth';
 import { createReadStream } from 'node:fs';
 import { ChromeWebStoreUploadStateError } from './chrome-web-store-v1.1';
 import consola from 'consola';
-import type { ChromeWebStoreV2Options } from '../utils/config-definitions';
+import type { ChromeWebStoreV2Options } from '../utils/config-schema';
 
 export interface ServiceAccountTokenResponse {
   access_token: string;

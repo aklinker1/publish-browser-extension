@@ -1,5 +1,5 @@
 import { validate } from 'superstruct';
-import { type InlineConfig, ResolvedConfig } from './utils/config-definitions';
+import { type InlineConfig, ResolvedConfig } from './utils/config-schema';
 
 export type {
   AllChromeOptions,
@@ -13,7 +13,7 @@ export type {
   InternalConfig,
   OperaAddonsStoreOptions,
   ResolvedConfig,
-} from './utils/config-definitions';
+} from './utils/config-schema';
 
 /// gen-start:config-resolver
 // prettier-ignore

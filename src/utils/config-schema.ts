@@ -60,6 +60,9 @@ const coercedNumber = coerce(number(), union([string(), number()]), v => {
   return v;
 });
 
+const commaArray = <T>(struct: Struct<T>) =>
+  coerce(array(struct), string(), v => v.split(','));
+
 const ChromeWebStoreSharedOptionsShape = {
   zip: meta(nonempty(string()), {
     path: 'chrome.zip',
@@ -207,10 +210,10 @@ export const FirefoxAddonStoreV5Options = object({
     path: 'firefox.channel',
     description: 'The channel to publish to, "listed" or "unlisted"',
   }),
-  compatibility: meta(optional(array(enums(['firefox', 'android']))), {
+  compatibility: meta(optional(commaArray(enums(['firefox', 'android']))), {
     path: 'firefox.compatibility',
     description:
-      'Comma-separated list of compatible applications, e.g. "firefox,android"',
+      'Comma-separated list of compatible applications, e.g. "firefox,android" - "firefox" for compatibility with Firefox desktop apps, "android" for Firefox Android apps',
   }),
 });
 

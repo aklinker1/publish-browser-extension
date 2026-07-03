@@ -8,7 +8,7 @@ import {
   ResolvedConfig,
   isMetaStruct,
   type MetaStruct,
-} from '../../src/utils/config-definitions';
+} from '../../src/utils/config-schema';
 
 const schemasWithOptions = [
   ...Object.values(ResolvedConfig.schema),

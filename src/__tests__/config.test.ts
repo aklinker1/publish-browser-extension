@@ -5,6 +5,7 @@ import {
   resolveConfig,
   validateConfig,
 } from '../config';
+import type { FirefoxAddonStoreV5Options } from '../utils/config-schema';
 
 const RESET_ENV_NAMES = /(^CHROME_|^FIREFOX_|^EDGE_|^OPERA_|^DRY_RUN$)/;
 
@@ -90,6 +91,11 @@ describe('resolveConfig', () => {
     process.env.FIREFOX_JWT_SECRET = 'FIREFOX_JWT_SECRET';
     const firefoxChannel = 'unlisted';
     process.env.FIREFOX_CHANNEL = firefoxChannel;
+    const firefoxCompatibility: FirefoxAddonStoreV5Options['compatibility'] = [
+      'android',
+      'firefox',
+    ];
+    process.env.FIREFOX_COMPATIBILITY = firefoxCompatibility.join(',');
 
     process.env.EDGE_ZIP = 'EDGE_ZIP';
     process.env.EDGE_PRODUCT_ID = 'EDGE_PRODUCT_ID';
@@ -129,6 +135,7 @@ describe('resolveConfig', () => {
         extensionId: process.env.FIREFOX_EXTENSION_ID,
         jwtIssuer: process.env.FIREFOX_JWT_ISSUER,
         jwtSecret: process.env.FIREFOX_JWT_SECRET,
+        compatibility: firefoxCompatibility,
       },
       edge: {
         zip: process.env.EDGE_ZIP,
