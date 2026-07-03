@@ -77,6 +77,4 @@ export class EdgeAddonStoreV1_1 implements Store {
 export {
   /** @deprecated Use EdgeAddonStoreV1_1 instead. */
   EdgeAddonStoreV1_1 as EdgeAddonStore,
-  /** @deprecated Use EdgeAddonStoreV1_1Options instead. */
-  EdgeAddonStoreV1_1Options as EdgeAddonStoreOptions,
 };

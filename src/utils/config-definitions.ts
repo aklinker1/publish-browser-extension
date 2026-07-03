@@ -286,9 +286,12 @@ export const ResolvedConfig = object({
   edge: optional(EdgeAddonStoreV1_1Options),
   opera: optional(OperaAddonsStoreOptions),
 });
+
 export {
   /** @deprecated Use FirefoxAddonStoreV5Options instead. */
   FirefoxAddonStoreV5Options as FirefoxAddonStoreOptions,
+  /** @deprecated Use EdgeAddonStoreV1_1Options instead. */
+  EdgeAddonStoreV1_1Options as EdgeAddonStoreOptions,
 };
 
 export type ResolvedConfig = Infer<typeof ResolvedConfig>;

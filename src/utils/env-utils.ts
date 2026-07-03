@@ -74,19 +74,3 @@ declare global {
     interface ProcessEnv extends CustomEnv {}
   }
 }
-
-export function booleanEnv(name: keyof CustomEnv): boolean | undefined {
-  return !process.env[name] ? undefined : process.env[name] === 'true';
-}
-
-export function stringEnv(name: keyof CustomEnv): string | undefined {
-  return !process.env[name] ? undefined : process.env[name];
-}
-
-export function stringArrayEnv(name: keyof CustomEnv): string[] | undefined {
-  return stringEnv(name)?.split(',');
-}
-
-export function numberEnv(name: keyof CustomEnv): number | undefined {
-  return !process.env[name] ? undefined : parseFloat(process.env[name]!);
-}
