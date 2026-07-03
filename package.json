@@ -17,9 +17,14 @@
     "publish-extension": "bun src/cli.ts",
     "prepack": "bun run build",
     "prepare": "simple-git-hooks",
-    "gen:cws": "bun run --sequential 'gen:cws:*'",
-    "gen:cws:v1.1": "bun run scripts/gen-cws-api.ts v1.1",
-    "gen:cws:v2": "bun run scripts/gen-cws-api.ts v2"
+    "gen": "bun run --sequential 'gen:*'",
+    "gen:config-docs": "bun run scripts/gen-config-docs.ts",
+    "gen:config-env": "bun run scripts/gen-config-env.ts",
+    "gen:resolve-config": "bun run scripts/gen-resolve-config.ts",
+    "gen:cli-flags": "bun run scripts/gen-cli-flags.ts",
+    "gen:config-from-flags": "bun run scripts/gen-config-from-flags.ts",
+    "gen:cws-v1.1": "bun run scripts/gen-cws-api.ts v1.1",
+    "gen:cws-v2": "bun run scripts/gen-cws-api.ts v2"
   },
   "dependencies": {
     "cac": "^6.7.14",
@@ -29,7 +34,8 @@
     "formdata-node": "^6.0.3",
     "listr2": "^10.1.0",
     "ofetch": "^1.5.1",
-    "zod": "3.25.76 || ^4.3.6"
+    "scule": "^1.3.0",
+    "superstruct": "^2.0.2"
   },
   "devDependencies": {
     "@aklinker1/check": "^2.2.0",
@@ -37,6 +43,7 @@
     "@types/node": "^25.2.2",
     "@typescript/native-preview": "^7.0.0-dev.20260208.1",
     "archiver": "^7.0.1",
+    "flat": "^6.0.1",
     "lint-staged": "^16.2.7",
     "npm-run-all": "^4.1.5",
     "oxlint": "^1.43.0",

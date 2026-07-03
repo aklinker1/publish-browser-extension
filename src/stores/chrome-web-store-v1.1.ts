@@ -1,29 +1,11 @@
 import type { Store } from './store';
-import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { CwsApiV1_1 } from '../apis/cws-api-v1.1.gen';
 import { FetchError } from '../utils/errors';
 import { createReadStream } from 'node:fs';
 import consola from 'consola';
-
-/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
-export const ChromeWebStoreV1_1Options = z.object({
-  apiVersion: z.literal('v1.1').optional(),
-  zip: z.string().min(1),
-  extensionId: z.string().min(1).trim(),
-  clientId: z.string().min(1).trim(),
-  clientSecret: z.string().min(1).trim(),
-  refreshToken: z.string().min(1).trim(),
-  publishTarget: z.enum(['default', 'trustedTesters']).default('default'),
-  deployPercentage: z.int().min(1).max(100).optional(),
-  reviewExemption: z.boolean().default(false),
-  skipSubmitReview: z.boolean().default(false),
-});
-/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
-export type ChromeWebStoreV1_1Options = z.infer<
-  typeof ChromeWebStoreV1_1Options
->;
+import type { ChromeWebStoreV1_1Options } from '../utils/config-definitions';
 
 /** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
 export interface CwsTokenDetails {
@@ -145,6 +127,4 @@ export class ChromeWebStoreUploadStateError extends Error {
 export {
   /** @deprecated Use ChromeWebStoreV1_1 instead. */
   ChromeWebStoreV1_1 as ChromeWebStore,
-  /** @deprecated Use ChromeWebStoreV1_1Options instead. */
-  ChromeWebStoreV1_1Options as ChromeWebStoreOptions,
 };

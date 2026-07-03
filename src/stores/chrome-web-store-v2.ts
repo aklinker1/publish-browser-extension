@@ -1,5 +1,4 @@
 import type { Store } from './store';
-import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { CwsApiV2 } from '../apis/cws-api-v2.gen';
@@ -7,27 +6,7 @@ import { createGcpServiceAccountJwt } from '../utils/google-auth';
 import { createReadStream } from 'node:fs';
 import { ChromeWebStoreUploadStateError } from './chrome-web-store-v1.1';
 import consola from 'consola';
-
-type PublishType = NonNullable<CwsApiV2.PublishItemRequest['publishType']>;
-
-export const ChromeWebStoreV2Options = z.object({
-  apiVersion: z.literal('v2'),
-  zip: z.string().min(1),
-  extensionId: z.string().min(1).trim(),
-  publisherId: z.string().min(1).trim(),
-  serviceAccountClientEmail: z.string().min(1).trim(),
-  serviceAccountPrivateKey: z.string().min(1),
-  publishType: z
-    .enum<
-      PublishType[]
-    >(['PUBLISH_TYPE_UNSPECIFIED', 'DEFAULT_PUBLISH', 'STAGED_PUBLISH'])
-    .optional(),
-  deployPercentage: z.int().min(1).max(100).optional(),
-  skipReview: z.boolean().default(false),
-  skipSubmitReview: z.boolean().default(false),
-  cancelPending: z.boolean().default(false),
-});
-export type ChromeWebStoreV2Options = z.infer<typeof ChromeWebStoreV2Options>;
+import type { ChromeWebStoreV2Options } from '../utils/config-definitions';
 
 export interface ServiceAccountTokenResponse {
   access_token: string;

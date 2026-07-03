@@ -1,6 +1,5 @@
 import { plural } from '../utils/plural';
 import type { Store } from './store';
-import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { FirefoxApiV5 } from '../apis/firefox-api-v5';
@@ -10,19 +9,7 @@ import { FormData } from 'formdata-node';
 import { fileFromPath } from 'formdata-node/file-from-path';
 import { FormDataEncoder } from 'form-data-encoder';
 import { Readable } from 'node:stream';
-
-export const FirefoxAddonStoreV5Options = z.object({
-  zip: z.string().min(1),
-  sourcesZip: z.string().min(1).optional(),
-  extensionId: z.string().min(1).trim(),
-  jwtIssuer: z.string().min(1).trim(),
-  jwtSecret: z.string().min(1).trim(),
-  channel: z.enum(['listed', 'unlisted']).default('listed'),
-  compatibility: z.enum(['firefox', 'android']).array().optional(),
-});
-export type FirefoxAddonStoreV5Options = z.infer<
-  typeof FirefoxAddonStoreV5Options
->;
+import type { FirefoxAddonStoreV5Options } from '../config';
 
 export class FirefoxAddonStoreV5 implements Store {
   private client: HttpClient<FirefoxApiV5.Endpoints>;
@@ -165,6 +152,4 @@ export class FirefoxAddonStoreV5 implements Store {
 export {
   /** @deprecated Use FirefoxAddonStoreV5 instead. */
   FirefoxAddonStoreV5 as FirefoxAddonStore,
-  /** @deprecated Use FirefoxAddonStoreV5Options instead. */
-  FirefoxAddonStoreV5Options as FirefoxAddonStoreOptions,
 };

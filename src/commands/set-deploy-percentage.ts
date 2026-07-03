@@ -1,9 +1,6 @@
 import consola from 'consola';
-import { resolveChromeV2Options, type InlineConfig } from '../config';
-import {
-  ChromeWebStoreV2,
-  ChromeWebStoreV2Options,
-} from '../stores/chrome-web-store-v2';
+import { resolveConfig, type InlineConfig } from '../config';
+import { ChromeWebStoreV2 } from '../stores/chrome-web-store-v2';
 
 export async function setDeployPercentage(config: InlineConfig): Promise<void> {
   console.log();
@@ -12,17 +9,19 @@ export async function setDeployPercentage(config: InlineConfig): Promise<void> {
   if (config.dryRun)
     throw Error('Dry run is not supported when setting the deploy percentage');
 
-  const resolved = ChromeWebStoreV2Options.parse(
-    resolveChromeV2Options(
-      '...',
-      (config.chrome ?? {}) as ChromeWebStoreV2Options,
-    ),
-  );
+  const { chrome: resolved } = resolveConfig(config);
+  if (!resolved)
+    throw Error(
+      'Chrome options are required when setting the deploy percentage',
+    );
 
   if (resolved.deployPercentage == null)
     throw Error(
       'Deploy percentage is required when setting the deploy percentage',
     );
+
+  if (resolved.apiVersion !== 'v2')
+    throw Error('Only v2 API is supported when setting the deploy percentage');
 
   const store = new ChromeWebStoreV2(resolved, consola.success);
   await store.setDeploymentPercentage(resolved.deployPercentage);

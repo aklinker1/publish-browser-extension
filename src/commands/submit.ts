@@ -1,6 +1,6 @@
 import { Listr } from 'listr2';
 import { ChromeWebStoreV1_1 } from '../stores/chrome-web-store-v1.1';
-import { InlineConfig, resolveConfig, validateConfig } from '../config';
+import { type InlineConfig, resolveConfig } from '../config';
 import { EdgeAddonStoreV1_1 } from '../stores/edge-addon-store-v1.1';
 import { FirefoxAddonStoreV5 } from '../stores/firefox-addon-store-v5';
 import { OperaAddonsStore } from '../stores/opera-addons-store';
@@ -11,7 +11,8 @@ import { ChromeWebStoreV2 } from '../stores/chrome-web-store-v2';
 export async function submit(config: InlineConfig): Promise<SubmitResults> {
   // Setup
 
-  const internalConfig = validateConfig(resolveConfig(config));
+  const internalConfig = resolveConfig(config);
+  console.log(internalConfig);
 
   console.log();
   consola.info('Publishing Extension');

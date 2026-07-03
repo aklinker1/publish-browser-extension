@@ -50,45 +50,18 @@ publish-extension \
 
 ## JS Usage
 
-<!-- prettier-ignore -->
 ```js
 import { publishExtension } from 'publish-browser-extension';
 
-publishExtension({
-  dryRun: true,
-  chrome: {
-    zip: 'dist/chrome.zip',
-    extensionId: '<cws-extension-id>',
-    clientId: '<gcp-client-id>',
-    clientSecret: '<gcp-client-secret>',
-    refreshToken: '<gcp-refresh-token>',
-    publishTarget: '<default|trustedTesters>',
-    skipSubmitReview: false,
-  },
-  firefox: {
-    zip: 'dist/firefox.zip',
-    sourcesZip: 'dist/sources.zip',
-    extensionId: '<addons-extension-id>',
-    jwtIssuer: '<addons-jwt-issuer>',
-    jwtSecret: '<addons-jwt-secret>',
-    channel: '<listed|unlisted>',
-  },
-  edge: {
-    zip: 'dist/chrome.zip',
-    productId: '<edge-product-id>',
-    clientId: '<edge-client-id>',
-    apiKey: '<edge-api-key>',
-    skipSubmitReview: false,
-  },
-  opera: {
-    zip: 'dist/opera.zip',
-    packageId: '<opera-package-id>',
-    sessionId: '<opera-session-id>',
-  },
-})
-  .then(results => console.log(results))
-  .catch(err => console.error(err));
+const results = await publishExtension({
+  // ...
+});
+console.log(results);
 ```
+
+## Options
+
+Refer to the dedicated documentation: [`./docs/config-reference.md`](./docs/config-reference.md)
 
 ## Contributing
 

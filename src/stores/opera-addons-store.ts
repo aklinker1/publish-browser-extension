@@ -1,16 +1,7 @@
-import { z } from 'zod/v4';
 import type { Store } from './store';
 import { ensureZipExists } from '../utils/fs';
 import { OperaAddonsApi } from '../apis/opera-api';
-
-export const OperaAddonsStoreOptions = z.object({
-  zip: z.string().min(1),
-  packageId: z.number().min(1),
-  sessionId: z.string().min(1).trim(),
-  skipSubmitReview: z.boolean().default(false),
-});
-
-export type OperaAddonsStoreOptions = z.infer<typeof OperaAddonsStoreOptions>;
+import type { OperaAddonsStoreOptions } from '../config';
 
 export class OperaAddonsStore implements Store {
   private api: OperaAddonsApi;

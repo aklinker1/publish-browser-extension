@@ -1,22 +1,10 @@
 import { EdgeApiV1_1 } from '../apis/edge-api-v1.1';
 import type { Store } from './store';
-import { z } from 'zod/v4';
 import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { pollUntil } from '../utils/polling';
 import { createReadStream } from 'node:fs';
-
-export const EdgeAddonStoreV1_1Options = z.object({
-  zip: z.string().min(1),
-  productId: z.string().min(1).trim(),
-  clientId: z.string().min(1).trim(),
-  skipSubmitReview: z.boolean().default(false),
-  apiKey: z.string().min(1).trim(),
-});
-
-export type EdgeAddonStoreV1_1Options = z.infer<
-  typeof EdgeAddonStoreV1_1Options
->;
+import type { EdgeAddonStoreV1_1Options } from '../config';
 
 export class EdgeAddonStoreV1_1 implements Store {
   private client: HttpClient<EdgeApiV1_1.Endpoints>;

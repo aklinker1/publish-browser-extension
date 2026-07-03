@@ -1,17 +1,17 @@
 import { consola } from 'consola';
 import {
-  InlineConfig,
+  type EdgeAddonStoreV1_1Options,
+  type ChromeWebStoreV1_1Options,
+  type ChromeWebStoreV2Options,
+  type FirefoxAddonStoreV5Options,
+  type OperaAddonsStoreOptions,
   resolveConfig,
   type AllChromeOptions,
-  type CustomEnv,
+  type InlineConfig,
 } from '../config';
 import { copyFile, writeFile, readFile } from 'node:fs/promises';
-import { ChromeWebStoreV1_1Options } from '../stores/chrome-web-store-v1.1';
-import { ChromeWebStoreV2Options } from '../stores/chrome-web-store-v2';
-import { FirefoxAddonStoreV5Options } from '../stores/firefox-addon-store-v5';
-import { EdgeAddonStoreV1_1Options } from '../stores/edge-addon-store-v1.1';
-import { OperaAddonsStoreOptions } from '../stores/opera-addons-store';
 import { ofetch } from 'ofetch';
+import type { CustomEnv } from '../utils/env-utils';
 
 type Entry = [key: keyof CustomEnv, value: string | number | boolean];
 
