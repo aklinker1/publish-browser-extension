@@ -9,12 +9,11 @@ export async function task<T>(
   fn: (task: Task) => Promise<T>,
 ): Promise<void> {
   // Use Tasuku for nice animations when possible
-  // if (process.stdout.isTTY && !process.env.CI) {
-  if (true) {
+  if (process.stdout.isTTY && !process.env.CI) {
     return tasuku(name, fn).then(() => {});
   }
 
-  // Otherwise, use consola
+  // Otherwise, use consola. Tasuku doesn't log anything in these environments
   consola.start(name);
   const t: Task = {
     setOutput: text => consola.log(`\x1b[2m  → [${String(id)}] ${text}\x1b[0m`),
