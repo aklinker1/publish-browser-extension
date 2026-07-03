@@ -12,7 +12,6 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
   // Setup
 
   const internalConfig = resolveConfig(config);
-  console.log(internalConfig);
 
   console.log();
   consola.info('Publishing Extension');
