@@ -1,7 +1,7 @@
 import { extname } from 'node:path';
-import { format } from 'prettier';
+import { formatCode } from './formatting';
 
-const comments: Record<string, (str: string) => string> = {
+const COMMENTS: Record<string, (str: string) => string> = {
   '.md': str => `<!-- ${str} -->`,
   '.ts': str => `/// ${str}`,
 };
@@ -13,7 +13,7 @@ export async function replaceGeneratedContent(
 ): Promise<void> {
   const file = Bun.file(path);
   const ext = extname(path);
-  const getComment = comments[ext];
+  const getComment = COMMENTS[ext];
   if (!getComment) throw Error(`Unsupported file extension: ${ext}`);
 
   const content = await file.text();
@@ -29,7 +29,7 @@ export async function replaceGeneratedContent(
   const updatedContent =
     content.slice(0, startIndex) + replacement + content.slice(endIndex);
 
-  const formatted = await format(updatedContent, { filepath: path });
+  const formatted = await formatCode(path, updatedContent);
 
   await file.write(formatted);
 }

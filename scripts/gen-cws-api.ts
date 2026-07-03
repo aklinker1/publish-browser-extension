@@ -1,4 +1,4 @@
-import { format } from 'prettier';
+import { formatCode } from './utils/formatting';
 
 const version = (process.argv[2] ?? 'v2') as 'v1.1' | 'v2';
 const url = `https://chromewebstore.googleapis.com/$discovery/rest?version=${version}`;
@@ -21,7 +21,7 @@ const mod = [
 ];
 
 const outputFile = `src/apis/cws-api-${version}.gen.ts`;
-const formatted = await format(mod.join('\n\n'), { filepath: outputFile });
+const formatted = await formatCode(outputFile, mod.join('\n\n'));
 await Bun.write(outputFile, formatted);
 
 namespace DiscoveryDoc {
