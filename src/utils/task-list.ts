@@ -9,7 +9,8 @@ export async function task<T>(
   fn: (task: Task) => Promise<T>,
 ): Promise<void> {
   // Use Tasuku for nice animations when possible
-  if (process.stdout.isTTY && !process.env.CI) {
+  // if (process.stdout.isTTY && !process.env.CI) {
+  if (true) {
     return tasuku(name, fn).then(() => {});
   }
 
