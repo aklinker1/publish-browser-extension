@@ -46,7 +46,7 @@ export interface CustomEnv {
   EDGE_ZIP: string | undefined;
   /** The channel to publish to, "listed" or "unlisted" */
   FIREFOX_CHANNEL: string | undefined;
-  /** Comma-separated list of compatible applications, e.g. "firefox,android" */
+  /** Comma-separated list of compatible applications, e.g. "firefox,android" - "firefox" for compatibility with Firefox desktop apps, "android" for Firefox Android apps */
   FIREFOX_COMPATIBILITY: string | undefined;
   /** The ID of the extension to be submitted */
   FIREFOX_EXTENSION_ID: string | undefined;

@@ -40,7 +40,7 @@ cli.help();
   cli.option('--edge-skip-submit-review [edgeSkipSubmitReview]', "Just upload the extension zip, don't submit it for review or publish it (default: false)")
   cli.option('--edge-zip [edgeZip]', "Path to extension zip to upload")
   cli.option('--firefox-channel [firefoxChannel]', "The channel to publish to, \"listed\" or \"unlisted\" (default: \"listed\")")
-  cli.option('--firefox-compatibility [firefoxCompatibility]', "Comma-separated list of compatible applications, e.g. \"firefox,android\"")
+  cli.option('--firefox-compatibility [firefoxCompatibility]', "Comma-separated list of compatible applications, e.g. \"firefox,android\" - \"firefox\" for compatibility with Firefox desktop apps, \"android\" for Firefox Android apps")
   cli.option('--firefox-extension-id [firefoxExtensionId]', "The ID of the extension to be submitted")
   cli.option('--firefox-jwt-issuer [firefoxJwtIssuer]', "Issuer used for authorizing requests to Addon Store APIs")
   cli.option('--firefox-jwt-secret [firefoxJwtSecret]', "Secret used for authorizing requests to Addon Store APIs")

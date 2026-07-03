@@ -234,7 +234,7 @@ The channel to publish to, "listed" or "unlisted"
 
 ### `firefox.compatibility`
 
-Comma-separated list of compatible applications, e.g. "firefox,android"
+Comma-separated list of compatible applications, e.g. "firefox,android" - "firefox" for compatibility with Firefox desktop apps, "android" for Firefox Android apps
 
 - _CLI Flag_: `--firefox-compatibility`
 - _Env Var_: `FIREFOX_COMPATIBILITY`
