@@ -25,7 +25,13 @@ const renderValue = (
   meta: { path: string; default?: any },
   padding = allPathsPadding,
 ) =>
-  `(config as any)?.${meta.path.replaceAll('.', '?.').padEnd(padding + 1)} ?? process.env.${snakeCase(meta.path).toUpperCase().padEnd(padding)}${meta.default == null ? `` : ` ?? ${JSON.stringify(meta.default)}`}`;
+  `(config as any)?.${meta.path.replaceAll('.', '?.').padEnd(padding + 1)} ?? process.env.${snakeCase(
+    meta.path,
+  )
+    .toUpperCase()
+    .padEnd(
+      meta.default == null ? 0 : padding,
+    )}${meta.default == null ? `` : ` ?? ${JSON.stringify(meta.default)}`}`;
 
 const lines: string[] = [
   `// prettier-ignore`,
