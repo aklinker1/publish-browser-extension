@@ -1,4 +1,4 @@
-import { Listr } from 'listr2';
+import { task } from '../utils/task-list';
 import { ChromeWebStoreV1_1 } from '../stores/chrome-web-store-v1.1';
 import { type InlineConfig, resolveConfig, validateConfig } from '../config';
 import { EdgeAddonStoreV1_1 } from '../stores/edge-addon-store-v1.1';
@@ -73,46 +73,38 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
   // Execute the tasks
 
   const results: SubmitResults = {};
-  const tasks = new Listr(
-    stores.map(({ id, name, getStore }) => ({
-      title: name,
-      async task(_ctx, task) {
+  await Promise.allSettled(
+    stores.map(({ id, name, getStore }) =>
+      task(id, name, async t => {
         try {
-          const setStatus = (text: string) => {
-            task.output = `[${id}] ${text}`;
-          };
-          const store = getStore(setStatus);
+          const store = getStore(t.setOutput);
 
-          setStatus('Checking ZIP files exist');
+          t.setOutput('Checking ZIP files exist');
           await store.ensureZipsExist();
+
           await store.submit(internalConfig.dryRun);
+
           results[id] = { success: true };
         } catch (err) {
           results[id] = { success: false, err: err };
           throw err;
         }
-      },
-    })),
-    {
-      exitOnError: false,
-      collectErrors: 'minimal',
-      concurrent: true,
-    },
+      }),
+    ),
   );
-  await tasks.run();
 
   // Check for errors
 
-  const errors = Object.entries(results).filter(([_id, result]) => {
-    return !result.success;
-  });
-  if (errors.length > 0) {
-    // Listr already logs the errors, just show a summary at the end
-    throw Error(`Submissions failed: ${errors.length}`);
+  const errors = Object.values(results).reduce(
+    (count, res) => count + (res.success ? 0 : 1),
+    0,
+  );
+  if (errors > 0) {
+    // Tasuku already logs the errors, just show a count at the end
+    throw Error(`Submissions failed: ${errors}`);
   }
 
   // Return the results
-
   return results;
 }
 
