@@ -1,7 +1,16 @@
 import { validate } from 'superstruct';
 import { type InlineConfig, ResolvedConfig } from './utils/config-definitions';
 
-export type * from './utils/config-definitions';
+export type {
+  ChromeWebStoreV2Options,
+  EdgeAddonStoreOptions,
+  EdgeAddonStoreV1_1Options,
+  FirefoxAddonStoreOptions,
+  FirefoxAddonStoreV5Options,
+  OperaAddonsStoreOptions,
+  ResolvedConfig,
+  InlineConfig,
+} from './utils/config-definitions';
 
 /// gen-start:config-resolver
 // prettier-ignore
