@@ -61,7 +61,7 @@ console.log(results);
 
 ## Options
 
-Refer to the dedicated documentation: [`./docs/config-reference.md`](./docs/config-reference.md)
+Refer to the [Config Reference](./docs/config-reference.md).
 
 ## Contributing
 
