@@ -2,7 +2,7 @@
 export interface CustomEnv {
   /** Check authentication, but don't upload the zip or submit for review */
   DRY_RUN: string | undefined;
-  /** The API version to use for the Chrome Web Store: "v1.1" or "v2" (default: v1.1) */
+  /** The API version to use for the Chrome Web Store: "v1.1" or "v2" */
   CHROME_API_VERSION: string | undefined;
   /** An integer from 0-100 */
   CHROME_DEPLOY_PERCENTAGE: string | undefined;

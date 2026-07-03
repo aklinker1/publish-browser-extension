@@ -8,6 +8,16 @@ on:
       - main
 
 jobs:
+  code-gen:
+    name: Generated Code Up-to-date
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: ./.github/actions/setup
+      - run: bun run gen
+      - name: Check for changes
+        run: git diff --exit-code || (git diff && exit 1)
+
   checks:
     name: Checks
     runs-on: ubuntu-24.04

@@ -47,10 +47,9 @@ export const nestedPaths = [
     configMetas
       .map(meta => meta.path.split('.').slice(0, -1))
       .filter(path => path.length > 0)
-      .map(parts => parts.join(''))
-      .toSorted(),
+      .map(parts => parts.join('')),
   ),
-];
+].toSorted();
 
 export function getDefaultValue<T>(schema: Struct<T>): T {
   const [_, defaultValue] = validate(undefined!, schema, { coerce: true });

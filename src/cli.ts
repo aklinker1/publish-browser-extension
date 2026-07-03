@@ -18,7 +18,7 @@ cli.help();
 // prettier-ignore
 {
   cli.option('--dry-run [dryRun]', "Check authentication, but don't upload the zip or submit for review (default: false)")
-  cli.option('--chrome-api-version [chromeApiVersion]', "The API version to use for the Chrome Web Store: \"v1.1\" or \"v2\" (default: v1.1)")
+  cli.option('--chrome-api-version [chromeApiVersion]', "The API version to use for the Chrome Web Store: \"v1.1\" or \"v2\"")
   cli.option('--chrome-deploy-percentage [chromeDeployPercentage]', "An integer from 0-100")
   cli.option('--chrome-extension-id [chromeExtensionId]', "The ID of the extension to be submitted")
   cli.option('--chrome-skip-submit-review [chromeSkipSubmitReview]', "Just upload the extension zip, don't submit it for review or publish it (default: false)")

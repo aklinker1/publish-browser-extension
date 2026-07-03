@@ -85,7 +85,7 @@ export const ChromeWebStoreV1_1Options = object({
   apiVersion: meta(optional(literal('v1.1')), {
     path: 'chrome.apiVersion',
     description:
-      'The API version to use for the Chrome Web Store: "v1.1" or "v2" (default: v1.1)',
+      'The API version to use for the Chrome Web Store: "v1.1" or "v2"',
   }),
   ...ChromeWebStoreSharedOptionsShape,
   clientId: meta(nonempty(trimmed(string())), {
@@ -125,7 +125,7 @@ export const ChromeWebStoreV2Options = object({
   apiVersion: meta(literal('v2'), {
     path: 'chrome.apiVersion',
     description:
-      'The API version to use for the Chrome Web Store: "v1.1" or "v2" (default: v1.1)',
+      'The API version to use for the Chrome Web Store: "v1.1" or "v2"',
   }),
   ...ChromeWebStoreSharedOptionsShape,
   publisherId: meta(nonempty(trimmed(string())), {

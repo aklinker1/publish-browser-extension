@@ -45,7 +45,7 @@ Check authentication, but don't upload the zip or submit for review
 
 ### `chrome.apiVersion`
 
-The API version to use for the Chrome Web Store: "v1.1" or "v2" (default: v1.1)
+The API version to use for the Chrome Web Store: "v1.1" or "v2"
 
 - _CLI Flag_: `--chrome-api-version`
 - _Env Var_: `CHROME_API_VERSION`
