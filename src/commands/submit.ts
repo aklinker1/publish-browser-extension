@@ -101,7 +101,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
   );
   if (errors > 0) {
     // Tasuku already logs the errors, just show a count at the end
-    throw Error(`Submissions failed: ${errors}`);
+    logger.fatal(`Submissions failed: ${errors}`);
   }
 
   // Return the results
