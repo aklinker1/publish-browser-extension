@@ -261,7 +261,7 @@ describe('validateConfig', () => {
       },
     };
     expect(() => validateConfig(config)).toThrowError(
-      'Invalid config:\n  - \x1b[36mchrome.zip\x1b[0m: Expected a string, but received: undefined\n  - \x1b[36mchrome.extensionId\x1b[0m: Expected a nonempty string but received an empty one\n  - \x1b[36mchrome.publisherId\x1b[0m: Expected a string, but received: undefined\n  - \x1b[36mchrome.serviceAccountClientEmail\x1b[0m: Expected a string, but received: undefined\n  - \x1b[36mchrome.serviceAccountPrivateKey\x1b[0m: Expected a string, but received: undefined',
+      'Invalid config:\n  - \u001B[36mchrome.zip\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.extensionId\u001B[39m: Expected a nonempty string but received an empty one\n  - \u001B[36mchrome.publisherId\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.serviceAccountClientEmail\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.serviceAccountPrivateKey\u001B[39m: Expected a string, but received: undefined',
     );
   });
 });
