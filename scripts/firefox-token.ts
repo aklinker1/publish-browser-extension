@@ -2,8 +2,8 @@
 //
 //   bun run --env=.env.submit scripts/firefox-token.ts
 //
-import { consola } from 'consola';
 import { createFirefoxJwt } from '../src/utils/firefox-auth';
+import { logger } from '../src/utils/logger';
 
 const token = createFirefoxJwt(
   process.env.FIREFOX_JWT_ISSUER ?? '',
@@ -11,4 +11,4 @@ const token = createFirefoxJwt(
   5 * 60e3, // 5 minutes
 );
 
-consola.info(token);
+logger.info(token);

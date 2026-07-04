@@ -1,8 +1,9 @@
+import { highlight, logger } from '../src/utils/logger';
 import { formatCode } from './utils/formatting';
 
 const version = (process.argv[2] ?? 'v2') as 'v1.1' | 'v2';
 const url = `https://chromewebstore.googleapis.com/$discovery/rest?version=${version}`;
-console.log('Generating types for: ' + url);
+logger.info('Generating types for: ' + highlight(url));
 
 const docRes = await fetch(url);
 if (!docRes.ok) throw Error('Fetch request failed', { cause: docRes });

@@ -1,5 +1,5 @@
-import consola from 'consola';
 import tasuku from 'tasuku';
+import { logger } from './logger';
 
 export type Task = { setOutput: (text: string) => void };
 
@@ -13,16 +13,16 @@ export async function task<T>(
     return tasuku(name, fn).then(() => {});
   }
 
-  // Otherwise, use consola. Tasuku doesn't log anything in these environments
-  consola.start(name);
+  // Otherwise, use logger. Tasuku doesn't log anything in these environments
+  logger.start(name);
   const t: Task = {
-    setOutput: text => consola.log(`\x1b[2m  → [${String(id)}] ${text}\x1b[0m`),
+    setOutput: text => logger.log(`\x1b[2m  → [${String(id)}] ${text}\x1b[0m`),
   };
   try {
     await fn(t);
-    consola.success(name);
+    logger.success(name);
   } catch (err) {
-    consola.error(name, err);
+    logger.error(name, err);
     throw err;
   }
 }

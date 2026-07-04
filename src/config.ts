@@ -4,6 +4,7 @@ import {
   type InlineConfig,
   ResolvedConfig,
 } from './utils/config-schema';
+import { highlight } from './utils/logger';
 
 export type {
   AllChromeOptions,
@@ -97,7 +98,7 @@ function validateConfigWith<T>(config: any, schema: Struct<T>): T {
       'Invalid config:',
       ...(res[0] as StructError)
         .failures()
-        .map(err => `  - \`${err.path.join('.')}\`: ${err.message}`),
+        .map(err => `  - ${highlight(err.path.join('.'))}: ${err.message}`),
     ].join('\n'),
   );
 }

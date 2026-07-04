@@ -2,11 +2,11 @@ import { cac } from 'cac';
 import { version } from '../package.json';
 import { submit } from './commands/submit';
 import { init } from './commands/init';
-import { consola } from 'consola';
 import { config } from 'dotenv';
 import type { InlineConfig } from './config';
 import { status } from './commands/status';
 import { setDeployPercentage } from './commands/set-deploy-percentage';
+import { logger } from './utils/logger';
 
 config({ path: '.env.submit', quiet: true });
 
@@ -138,8 +138,7 @@ cli
     try {
       await submit(config);
     } catch (err) {
-      consola.error(err);
-      process.exit(1);
+      logger.fatal(err);
     }
   });
 
@@ -161,8 +160,7 @@ cli
     try {
       await init(config);
     } catch (err) {
-      consola.error(err);
-      process.exit(1);
+      logger.fatal(err);
     }
   });
 
@@ -181,8 +179,7 @@ cli
     try {
       await setDeployPercentage(config);
     } catch (err) {
-      consola.error(err);
-      process.exit(1);
+      logger.fatal(err);
     }
   });
 
@@ -201,8 +198,7 @@ cli
     try {
       await status(config);
     } catch (err) {
-      consola.error(err);
-      process.exit(1);
+      logger.fatal(err);
     }
   });
 
