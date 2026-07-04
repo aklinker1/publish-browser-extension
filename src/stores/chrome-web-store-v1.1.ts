@@ -26,7 +26,7 @@ export class ChromeWebStoreV1_1 implements Store {
     readonly setStatus: (text: string) => void,
   ) {
     logger.warn(
-      `Chrome Web Store API v1.1 is deprecated and will stop working October 15th, 2026. Run ${highlight('publish-extension init')} or ${highlight('wxt submit init')} to walk through setting up your API v2 credentials.`,
+      `Chrome Web Store API v1.1 is deprecated and will stop working October 15th, 2026. Run ${highlight('publish-extension init')} or ${highlight('wxt submit init')} to set up your API v2 credentials.`,
     );
     this.client = createHttpClient<CwsApiV1_1.Endpoints>({
       baseUrl: CwsApiV1_1.BASE_URL,
