@@ -29,6 +29,7 @@
 - [`firefox.extensionId`](#firefoxextensionid)
 - [`firefox.jwtIssuer`](#firefoxjwtissuer)
 - [`firefox.jwtSecret`](#firefoxjwtsecret)
+- [`firefox.skipSubmitReview`](#firefoxskipsubmitreview)
 - [`firefox.sourcesZip`](#firefoxsourceszip)
 - [`firefox.zip`](#firefoxzip)
 - [`opera.packageId`](#operapackageid)
@@ -259,6 +260,13 @@ Secret used for authorizing requests to Addon Store APIs
 
 - _CLI Flag_: `--firefox-jwt-secret`
 - _Env Var_: `FIREFOX_JWT_SECRET`
+
+### `firefox.skipSubmitReview`
+
+Just upload the extension zip, don't submit it for review or publish it
+
+- _CLI Flag_: `--firefox-skip-submit-review`
+- _Env Var_: `FIREFOX_SKIP_SUBMIT_REVIEW`
 
 ### `firefox.sourcesZip`
 

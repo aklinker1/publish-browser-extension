@@ -2,12 +2,12 @@ import { cac } from 'cac';
 import { version } from '../package.json';
 import { submit } from './commands/submit';
 import { init } from './commands/init';
-import { consola } from 'consola';
 import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
 import type { InlineConfig } from './config';
 import { status } from './commands/status';
 import { setDeployPercentage } from './commands/set-deploy-percentage';
+import { logger } from './utils/logger';
 
 try {
   const env = parseEnv(readFileSync('.env.submit', 'utf8'));
@@ -52,6 +52,7 @@ cli.help();
   cli.option('--firefox-extension-id [firefoxExtensionId]', "The ID of the extension to be submitted")
   cli.option('--firefox-jwt-issuer [firefoxJwtIssuer]', "Issuer used for authorizing requests to Addon Store APIs")
   cli.option('--firefox-jwt-secret [firefoxJwtSecret]', "Secret used for authorizing requests to Addon Store APIs")
+  cli.option('--firefox-skip-submit-review [firefoxSkipSubmitReview]', "Just upload the extension zip, don't submit it for review or publish it (default: false)")
   cli.option('--firefox-sources-zip [firefoxSourcesZip]', "Path to sources zip to upload")
   cli.option('--firefox-zip [firefoxZip]', "Path to extension zip to upload")
   cli.option('--opera-package-id [operaPackageId]', "Package ID listed in the package developer URL: https://addons.opera.com/developer/package/<packageId>")
@@ -100,6 +101,7 @@ function configFromFlags(flags: any): InlineConfig {
   config.firefox.extensionId = flags.firefoxExtensionId
   config.firefox.jwtIssuer = flags.firefoxJwtIssuer
   config.firefox.jwtSecret = flags.firefoxJwtSecret
+  config.firefox.skipSubmitReview = flags.firefoxSkipSubmitReview
   config.firefox.sourcesZip = flags.firefoxSourcesZip
   config.firefox.zip = flags.firefoxZip
   config.opera.packageId = flags.operaPackageId
@@ -144,8 +146,7 @@ cli
     try {
       await submit(config);
     } catch (err) {
-      consola.error(err);
-      process.exit(1);
+      logger.fatal(err);
     }
   });
 
@@ -167,8 +168,7 @@ cli
     try {
       await init(config);
     } catch (err) {
-      consola.error(err);
-      process.exit(1);
+      logger.fatal(err);
     }
   });
 
@@ -187,8 +187,7 @@ cli
     try {
       await setDeployPercentage(config);
     } catch (err) {
-      consola.error(err);
-      process.exit(1);
+      logger.fatal(err);
     }
   });
 
@@ -207,8 +206,7 @@ cli
     try {
       await status(config);
     } catch (err) {
-      consola.error(err);
-      process.exit(1);
+      logger.fatal(err);
     }
   });
 

@@ -42,6 +42,7 @@ describe('resolveConfig', () => {
         channel: 'unlisted',
         zip: 'zip',
         sourcesZip: 'sourcesZip',
+        skipSubmitReview: true,
       },
       edge: {
         productId: 'productId',
@@ -96,6 +97,8 @@ describe('resolveConfig', () => {
       'firefox',
     ];
     process.env.FIREFOX_COMPATIBILITY = firefoxCompatibility.join(',');
+    const firefoxSkipSubmitReview = true;
+    process.env.FIREFOX_SKIP_SUBMIT_REVIEW = String(firefoxSkipSubmitReview);
 
     process.env.EDGE_ZIP = 'EDGE_ZIP';
     process.env.EDGE_PRODUCT_ID = 'EDGE_PRODUCT_ID';
@@ -136,6 +139,7 @@ describe('resolveConfig', () => {
         jwtIssuer: process.env.FIREFOX_JWT_ISSUER,
         jwtSecret: process.env.FIREFOX_JWT_SECRET,
         compatibility: firefoxCompatibility,
+        skipSubmitReview: firefoxSkipSubmitReview,
       },
       edge: {
         zip: process.env.EDGE_ZIP,
@@ -200,6 +204,7 @@ describe('resolveConfig', () => {
       firefox: {
         ...config.firefox,
         channel: 'listed' as const,
+        skipSubmitReview: false,
       },
       edge: {
         ...config.edge,
@@ -256,7 +261,7 @@ describe('validateConfig', () => {
       },
     };
     expect(() => validateConfig(config)).toThrowError(
-      'Invalid config:\n  - `chrome.zip`: Expected a string, but received: undefined\n  - `chrome.extensionId`: Expected a nonempty string but received an empty one\n  - `chrome.publisherId`: Expected a string, but received: undefined\n  - `chrome.serviceAccountClientEmail`: Expected a string, but received: undefined\n  - `chrome.serviceAccountPrivateKey`: Expected a string, but received: undefined',
+      'Invalid config:\n  - \u001B[36mchrome.zip\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.extensionId\u001B[39m: Expected a nonempty string but received an empty one\n  - \u001B[36mchrome.publisherId\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.serviceAccountClientEmail\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.serviceAccountPrivateKey\u001B[39m: Expected a string, but received: undefined',
     );
   });
 });

@@ -1,4 +1,3 @@
-import { consola } from 'consola';
 import {
   type EdgeAddonStoreV1_1Options,
   type ChromeWebStoreV1_1Options,
@@ -11,33 +10,35 @@ import {
 } from '../config';
 import { copyFile, writeFile, readFile } from 'node:fs/promises';
 import type { CustomEnv } from '../utils/env-utils';
+import { highlight, logger } from '../utils/logger';
+import { confirm, select, multiselect, question } from '@topcli/prompts';
+import { FetchError } from '../utils/errors';
 
 type Entry = [key: keyof CustomEnv, value: string | number | boolean];
 
-const envFile = '.env.submit';
+const ENV_FILE = '.env.submit';
+
+const ARROW = `\x1b[2m→\x1b[0m`;
 
 export async function init(config: InlineConfig) {
-  consola.info(`Initialize or update an existing \`${envFile}\` file.`);
+  logger.log();
+  logger.info(`Initialize or update an existing ${highlight(ENV_FILE)} file.`);
+  logger.log();
 
   const previousConfig = resolveConfig(config);
 
-  // Types are wrong? This actually returns a Promise<string[]>
-  const stores = await prompt<string[]>(
-    'What stores do you want to configure? \x1b[2m(use ↑/↓ and space to select)\x1b[0m',
-    {
-      type: 'multiselect',
-      options: [
-        { value: 'chrome', label: 'Chrome Web Store' },
-        { value: 'firefox', label: 'Firefox Addon Store' },
-        { value: 'edge', label: 'Edge Addon Store' },
-        { value: 'opera', label: 'Opera Addons' },
-      ],
-      required: true,
-    },
-  );
+  const stores = await multiselect('What stores do you want to configure?', {
+    choices: [
+      { value: 'chrome', label: 'Chrome Web Store' },
+      { value: 'firefox', label: 'Firefox Addon Store' },
+      { value: 'edge', label: 'Edge Addon Store' },
+      { value: 'opera', label: 'Opera Addons' },
+    ],
+    showHint: true,
+  });
   if (!stores?.length) {
-    consola.warn('No stores selected, exiting without making any changes.');
-    process.exit(1);
+    logger.log();
+    logger.fatal('No stores selected, exiting without making any changes.');
   }
 
   const replacements: Entry[] = [];
@@ -63,30 +64,12 @@ export async function init(config: InlineConfig) {
   }
 
   await updateEnvFile(replacements);
-  console.log();
-  consola.log(
-    'To submit an update, run:\n\n  `publish-extension --chrome-zip path/to/extension.zip \\`\n    `--firefox-zip path/to/extension.zip \\`\n    `--edge-zip path/to/extension.zip \\`\n    `--opera-zip path/to/extension.zip`',
-  );
-}
 
-async function prompt<T>(
-  message: Parameters<typeof consola.prompt>[0],
-  options: Parameters<typeof consola.prompt>[1],
-  previousValue?: string,
-): Promise<T> {
-  let result = await consola.prompt(message, {
-    default: previousValue,
-    placeholder: previousValue,
-    ...options,
-  });
-  // When canceling, a symbol is returned instead of the value.
-  if (typeof result === 'symbol') {
-    throw Error('Canceled');
-  }
-  if (typeof result === 'string') {
-    result = result.trim();
-  }
-  return result as T;
+  logger.log();
+  logger.log(
+    `To submit an update, run:\n\n  ${highlight('publish-extension --chrome-zip path/to/extension.zip')}\n    ${highlight('--firefox-zip path/to/extension.zip')}\n    ${highlight('--edge-zip path/to/extension.zip')}\n    ${highlight('--opera-zip path/to/extension.zip')}`,
+  );
+  logger.log();
 }
 
 async function initChrome(
@@ -95,39 +78,44 @@ async function initChrome(
   const entries: Entry[] = [];
 
   console.log();
-  consola.start('Chrome Web Store\n');
+  logger.info('\x1b[1mChrome Web Store Setup\x1b[0m');
 
-  const apiVersion = await prompt<string>(
-    'Which Chrome Web Store API version do you want to use?',
-    {
-      type: 'select',
-      options: [
-        {
-          label: 'v2 (recommended)',
-          value: 'v2',
-          hint: 'Uses a service account - required after October 15th, 2026',
-        },
-        {
-          label: 'v1.1 (deprecated)',
-          value: 'v1.1',
-          hint: 'Will stop working October 15th, 2026',
-        },
-      ],
-      initial: previousOptions?.apiVersion ?? 'v2',
-    },
-  );
-  entries.push(['CHROME_API_VERSION', apiVersion]);
+  const apiVersionEnvVar = 'CHROME_API_VERSION';
+  console.log();
+  logger.info(highlight(apiVersionEnvVar));
+  const apiVersion = await select('Select an option', {
+    choices: [
+      {
+        label: 'v2 (recommended)',
+        value: 'v2',
+      },
+      {
+        label: 'v1.1 (deprecated)',
+        value: 'v1.1',
+        description: 'will stop working October 15th, 2026',
+      },
+    ],
+  });
+  entries.push([apiVersionEnvVar, apiVersion]);
 
-  consola.log('`--chrome-extension-id` can be found:');
-  consola.log('  1. Under the extension name in the CWS developer console');
-  consola.log('  2. In the URL of the CWS page for the item');
-  consola.log('Example: `ocfdgncpifmegplaglcnglhioflaimkd`');
-  const extensionId = await prompt<string>(
-    'Enter the extension ID:',
-    { type: 'text' },
-    previousOptions?.extensionId,
+  const extensionIdEnvVar = 'CHROME_EXTENSION_ID';
+  logger.log();
+  logger.info(highlight(extensionIdEnvVar));
+  logger.log(`Your extension's ID can be found in multiple places:`);
+  logger.log(
+    '  - Under the extension name when editing it on the developer dashboard',
   );
-  entries.push(['CHROME_EXTENSION_ID', extensionId]);
+  logger.log(
+    `    ${ARROW} https://chrome.google.com/webstore/developer/dashboard`,
+  );
+  logger.log("  - In the URL of it's CWS listing");
+  logger.log(
+    `    ${ARROW} https://chrome.google.com/webstore/detail/${highlight('<extension-id>')}/<slug>`,
+  );
+  const extensionId = await question('Enter the extension ID', {
+    defaultValue: previousOptions?.extensionId,
+  });
+  entries.push([extensionIdEnvVar, extensionId]);
 
   if (apiVersion === 'v2') {
     entries.push(
@@ -151,38 +139,38 @@ async function initChromeV1_1(
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 
-  console.log();
-  consola.log(
-    '`--chrome-client-id` and `--chrome-client-secret` are generated by following the "Initial Setup" from:',
+  const clientIdEnvVar = 'CHROME_CLIENT_ID';
+  const clientSecretEnvVar = 'CHROME_CLIENT_SECRET';
+  logger.log();
+  logger.info(
+    `${highlight(clientIdEnvVar)} and ${highlight(clientSecretEnvVar)}`,
   );
-  console.log('https://developer.chrome.com/docs/webstore/using-api#setup');
-  const clientId = await prompt<string>(
-    'Enter your client ID:',
-    { type: 'text' },
-    previousOptions?.clientId,
+  logger.log(`Follow "Initial Setup" from:`);
+  logger.log(
+    `  ${ARROW} https://web.archive.org/web/20250211105307/https://developer.chrome.com/docs/webstore/using-api`,
   );
-  entries.push(['CHROME_CLIENT_ID', clientId]);
-  const clientSecret = await prompt<string>(
-    'Enter your client secret:',
-    { type: 'text' },
-    previousOptions?.clientSecret,
-  );
-  entries.push(['CHROME_CLIENT_SECRET', clientSecret]);
+  const clientId = await question('Enter your client ID', {
+    defaultValue: previousOptions?.clientId,
+  });
+  entries.push([clientIdEnvVar, clientId]);
+  const clientSecret = await question('Enter your client secret', {
+    defaultValue: previousOptions?.clientSecret,
+  });
+  entries.push([clientSecretEnvVar, clientSecret]);
 
-  const generateRefreshToken = await prompt<boolean>(
-    'Generate new refresh token?',
-    { type: 'confirm' },
-  );
+  logger.log();
+  const generateRefreshToken =
+    !previousOptions?.refreshToken ||
+    (await confirm('Generate a new refresh token?'));
+
   if (generateRefreshToken) {
-    const authCodeUrl = `https://accounts.google.com/o/oauth2/auth?response_type=code&scope=https://www.googleapis.com/auth/chromewebstore&client_id=${clientId}&redirect_uri=urn:ietf:wg:oauth:2.0:oob`;
-    consola.log(authCodeUrl);
-    const authCode = await consola.prompt(
-      'Open the above URL, login, and enter the auth code:',
-      {
-        type: 'text',
-        required: true,
-      },
+    const refreshTokenEnvVar = 'CHROME_REFRESH_TOKEN';
+    logger.log('Open the below URL and login to get an auth code');
+    logger.log(
+      `  ${ARROW} https://accounts.google.com/o/oauth2/auth?response_type=code&scope=https://www.googleapis.com/auth/chromewebstore&client_id=${clientId}&redirect_uri=urn:ietf:wg:oauth:2.0:oob`,
     );
+    const authCode = await question('Enter the auth code');
+
     const data = new URLSearchParams();
     data.set('client_id', clientId);
     data.set('client_secret', clientSecret);
@@ -191,39 +179,41 @@ async function initChromeV1_1(
     data.set('redirect_uri', 'urn:ietf:wg:oauth:2.0:oob');
     const tokenUrl = `https://accounts.google.com/o/oauth2/token`;
     const res = await fetch(tokenUrl, { method: 'POST', body: data });
+
+    if (!res.ok) throw await FetchError.from(res);
+
     const json = (await res.json()) as { refresh_token: string };
-    consola.info(`Refresh token: \`${json.refresh_token}\``);
+    logger.info(`${highlight(refreshTokenEnvVar)}: ${json.refresh_token}`);
     entries.push(['CHROME_REFRESH_TOKEN', json.refresh_token]);
   }
 
-  const publishTarget = await prompt<string>(
-    '`--chrome-publish-target`: Where do you want to release to?',
-    {
-      type: 'select',
-      options: [
-        {
-          label: 'Default',
-          value: 'default',
-          hint: 'Public release channel',
-        },
-        {
-          label: 'Trusted Testers',
-          value: 'trustedTesters',
-          hint: 'Prerelease, internal channel',
-        },
-      ],
-      initial: previousOptions?.publishTarget,
-    },
-    previousOptions?.publishTarget,
-  );
-  entries.push(['CHROME_PUBLISH_TARGET', publishTarget]);
+  const publishTargetEnvVar = 'CHROME_PUBLISH_TARGET';
+  logger.log();
+  logger.info(highlight(publishTargetEnvVar));
+  const publishTarget = await select(`Select an option`, {
+    choices: [
+      {
+        label: 'default',
+        value: 'default',
+        description: 'Public release channel',
+      },
+      {
+        label: 'trustedTesters',
+        value: 'trustedTesters',
+        description: 'Prerelease, internal channel',
+      },
+    ],
+  });
+  entries.push([publishTargetEnvVar, publishTarget]);
 
-  const submitForReview = await prompt<boolean>(
-    'When uploading, automatically submit the new update for review?',
-    { type: 'confirm' },
-    String(!previousOptions?.skipSubmitReview),
+  const skipSubmitReviewEnvVar = 'CHROME_SKIP_SUBMIT_REVIEW';
+  logger.log();
+  logger.info(highlight(skipSubmitReviewEnvVar));
+  const submitForReview = await confirm(
+    'After uploading, submit new version for review?',
+    { initial: !previousOptions?.skipSubmitReview },
   );
-  entries.push(['CHROME_SKIP_SUBMIT_REVIEW', !submitForReview]);
+  entries.push([skipSubmitReviewEnvVar, !submitForReview]);
 
   return entries;
 }
@@ -233,129 +223,132 @@ async function initChromeV2(
 ): Promise<Entry[]> {
   const entries: Entry[] = [];
 
+  const publisherIdEnvVar = 'CHROME_PUBLISHER_ID';
   console.log();
-  consola.log(
-    '`--chrome-publisher-id` is the publisher ID found in the CWS developer dashboard URL:',
+  logger.info(highlight(publisherIdEnvVar));
+  logger.log(
+    `Found in the URL of the developer dashboard after selecting the correct publisher`,
   );
-  consola.log('  1. Visit https://chrome.google.com/webstore/devconsole');
-  consola.log(
-    '  2. In the top right corner, select the publisher your extension is published under (you may only have one)',
+  logger.log(
+    `  ${ARROW} https://chrome.google.com/webstore/devconsole/${highlight('<publisher-id>')}`,
   );
-  consola.log('  3. The publisher ID is the UUID in the URL');
-  consola.log(
-    'Example: `https://chrome.google.com/webstore/devconsole/27416ae5-5dfd-41ec-bb34-8a385fddab89 -> 27416ae5-5dfd-41ec-bb34-8a385fddab89`',
-  );
-  const publisherId = await prompt<string>(
-    'Enter your publisher ID:',
-    { type: 'text' },
-    previousOptions?.publisherId,
-  );
-  entries.push(['CHROME_PUBLISHER_ID', publisherId]);
+  const publisherId = await question('Enter your publisher ID', {
+    defaultValue: previousOptions?.publisherId,
+  });
+  entries.push([publisherIdEnvVar, publisherId]);
 
+  const serviceAccountClientEmailEnvVar = 'CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL';
+  const serviceAccountPrivateKeyEnvVar = 'CHROME_SERVICE_ACCOUNT_PRIVATE_KEY';
   console.log();
-  consola.log(
-    'A Google Cloud service account with a JSON key is required for the v2 API.',
+  logger.info(
+    `${highlight(serviceAccountClientEmailEnvVar)} and ${highlight(serviceAccountPrivateKeyEnvVar)}`,
   );
-  consola.log(
-    "  1. Follow Google's official guide to create a service account: https://developer.chrome.com/docs/webstore/service-accounts",
+  logger.log('The CWS API uses service accounts for authentication.');
+  logger.log("  1. Create a service account following Google's official guide");
+  logger.log(
+    `     ${ARROW} https://developer.chrome.com/docs/webstore/service-accounts`,
   );
-  consola.log(
+  logger.log(
     '  2. When you get to "Obtain access tokens", follow "Use a JSON Web Token" and stop after downloading the JSON file',
   );
-  consola.log(
-    '    > WARNING: Google no longer recommends creating service worker keys, but this is the only form of auth accepted by publish-extension for now.',
+  logger.log(
+    '     \x1b[2m> WARNING: Google does not recommend service worker keys for day-to-day work, but they are still the correct form of authentication for CI\x1b[0m',
   );
-  consola.log(
-    '  3. Open the JSON file and use the `client_email` and `private_key` fields below.',
+  logger.log(
+    `  3. Open the JSON file and use the ${highlight('client_email')} and ${highlight('private_key')} fields below`,
   );
-  const serviceAccountClientEmail = await prompt<string>(
-    "Enter the service account's client email:",
-    { type: 'text' },
-    previousOptions?.serviceAccountClientEmail,
+  const serviceAccountClientEmail = await question(
+    `Enter the ${highlight('client_email')}`,
+    {
+      defaultValue: previousOptions?.serviceAccountClientEmail,
+    },
   );
-  entries.push([
-    'CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL',
-    serviceAccountClientEmail,
-  ]);
+  entries.push([serviceAccountClientEmailEnvVar, serviceAccountClientEmail]);
 
-  const serviceAccountPrivateKey = await prompt<string>(
-    'Enter the service account\'s private key (copy it in as a single line, keeping the "\\n" characters as-is):',
-    { type: 'text' },
-    previousOptions?.serviceAccountPrivateKey,
+  const serviceAccountPrivateKey = await question(
+    `Enter the ${highlight('private_key')} (copy the JSON value, minus the surrounding quotes, keeping the "\\n" characters as-is)`,
+    { defaultValue: previousOptions?.serviceAccountPrivateKey },
   );
-  entries.push([
-    'CHROME_SERVICE_ACCOUNT_PRIVATE_KEY',
-    serviceAccountPrivateKey,
-  ]);
+  entries.push([serviceAccountPrivateKeyEnvVar, serviceAccountPrivateKey]);
 
-  const submitForReview = await prompt<boolean>(
-    'When uploading, automatically submit the new update for review?',
-    { type: 'confirm' },
-    String(!previousOptions?.skipSubmitReview),
+  const skipSubmitReviewEnvVar = 'CHROME_SKIP_SUBMIT_REVIEW';
+  logger.log();
+  logger.info(highlight(skipSubmitReviewEnvVar));
+  const submitForReview = await confirm(
+    'After uploading, submit new version for review?',
+    { initial: !previousOptions?.skipSubmitReview },
   );
-  entries.push(['CHROME_SKIP_SUBMIT_REVIEW', !submitForReview]);
+  entries.push([skipSubmitReviewEnvVar, !submitForReview]);
 
   if (submitForReview) {
-    const cancelPending = await prompt<boolean>(
-      '`--chrome-cancel-pending`: Cancel any pending review before submitting the new version?',
-      { type: 'confirm' },
-      String(previousOptions?.cancelPending ?? false),
-    );
-    entries.push(['CHROME_CANCEL_PENDING', cancelPending]);
+    const cancelPendingEnvVar = 'CHROME_CANCEL_PENDING';
+    logger.log();
+    logger.info(highlight(cancelPendingEnvVar));
+    logger.log('  Yes - if another review is in-progress, cancel it');
+    logger.log('  No  - if another review is in-progress, throw an error');
+    const cancelPending = await confirm('', {
+      initial: previousOptions?.cancelPending ?? false,
+    });
+    entries.push([cancelPendingEnvVar, cancelPending]);
 
-    const skipReview = await prompt<boolean>(
-      '`--chrome-skip-review`: Skip the review process and publish immediately? (Only valid for eligible updates like ad-blocker rule changes)',
-      { type: 'confirm' },
-      String(previousOptions?.skipReview ?? false),
+    const skipReviewEnvVar = 'CHROME_SKIP_REVIEW';
+    logger.log();
+    logger.info(highlight(skipReviewEnvVar));
+    logger.log(
+      '  Yes - Only available for eligible changes (https://developer.chrome.com/docs/webstore/skip-review)',
     );
-    entries.push(['CHROME_SKIP_REVIEW', skipReview]);
+    logger.log("  No  - Most extensions can't skip the review process");
 
-    const publishType = await prompt<string>(
-      '`--chrome-publish-type`: When should the extension be published after review?',
+    const skipReview = await confirm('', {
+      initial: previousOptions?.skipReview ?? false,
+    });
+    entries.push([skipReviewEnvVar, skipReview]);
+
+    const publishTypeEnvVar = 'CHROME_PUBLISH_TYPE';
+    logger.log();
+    logger.info(highlight(publishTypeEnvVar));
+    const publishType = await select(`Select an option`, {
+      choices: [
+        {
+          label: 'DEFAULT_PUBLISH',
+          value: 'DEFAULT_PUBLISH',
+          description: 'Publish immediately after review approval',
+        },
+        {
+          label: 'STAGED_PUBLISH',
+          value: 'STAGED_PUBLISH',
+          description:
+            'Leave the update as staged after review approval, allowing it to be published later manually',
+        },
+      ],
+    });
+    entries.push([publishTypeEnvVar, publishType]);
+
+    const deployPercentageEnvVar = 'CHROME_DEPLOY_PERCENTAGE';
+    logger.log();
+    logger.info(highlight(deployPercentageEnvVar));
+    const deployPercentage = await question<number>(
+      'Enter a percentage, from 0 to 100',
       {
-        type: 'select',
-        options: [
-          {
-            label: 'Default',
-            value: 'DEFAULT_PUBLISH',
-            hint: 'Publish immediately after approval',
+        defaultValue:
+          previousOptions?.deployPercentage != null
+            ? String(previousOptions.deployPercentage)
+            : '100',
+        transformer: {
+          transform: input => {
+            const n = Number(input);
+            if (isNaN(n)) return { isValid: false, error: 'Enter a number' };
+            if (n < 0 || n > 100)
+              return {
+                isValid: false,
+                error: 'Enter a number between 0 and 100',
+              };
+            return { isValid: true as const, transformed: n };
           },
-          {
-            label: 'Staged',
-            value: 'STAGED_PUBLISH',
-            hint: 'Stage for publishing later',
-          },
-        ],
-        initial: previousOptions?.publishType ?? 'DEFAULT_PUBLISH',
+        },
       },
     );
-    if (publishType !== 'DEFAULT_PUBLISH') {
-      entries.push(['CHROME_PUBLISH_TYPE', publishType]);
-    }
-
-    const setDeployPercentage = await prompt<boolean>(
-      'Set an initial deploy percentage for the rollout?',
-      { type: 'confirm' },
-    );
-    if (setDeployPercentage) {
-      let deployPercentage: number | undefined;
-      while (true) {
-        const input = await prompt<string>(
-          '`--chrome-deploy-percentage`: Enter a deploy percentage (1-100):',
-          { type: 'text' },
-          previousOptions?.deployPercentage
-            ? String(previousOptions.deployPercentage)
-            : undefined,
-        );
-        const parsed = Number(input.trim());
-        if (Number.isInteger(parsed) && parsed >= 1 && parsed <= 100) {
-          deployPercentage = parsed;
-          break;
-        }
-        consola.warn('Please enter a valid integer between 1 and 100.');
-      }
-      entries.push(['CHROME_DEPLOY_PERCENTAGE', deployPercentage!]);
-    }
+    entries.push([deployPercentageEnvVar, deployPercentage]);
   }
 
   return entries;
@@ -367,56 +360,69 @@ async function initFirefox(
   const entries: Entry[] = [];
 
   console.log();
-  consola.start('Firefox Addon Store\n');
+  logger.info('\x1b[1mFirefox Addon Store Setup\x1b[0m');
 
-  consola.info(
-    'Your `--firefox-extension-id` is listed at the bottom of the details page on:',
-  );
-  console.log('https://addons.mozilla.org/en-US/developers/');
-  const extensionId = await prompt<string>(
-    'Enter extension ID:',
-    {
-      type: 'text',
-    },
-    previousOptions?.extensionId,
-  );
-  entries.push(['FIREFOX_EXTENSION_ID', extensionId]);
-
+  const extensionIdEnvVar = 'FIREFOX_EXTENSION_ID';
   console.log();
-  consola.log(
-    '`--firefox-jwt-issuer` and `--firefox-jwt-secret` are available at:',
+  logger.info(highlight(extensionIdEnvVar));
+  logger.log(
+    'When editing the product page on the developer dashboard, the ID is in the URL',
   );
-  console.log('https://addons.mozilla.org/developers/addon/api/key/');
-  const jwtIssuer = await prompt<string>(
-    'Enter your JWT issuer:',
-    { type: 'text' },
-    previousOptions?.jwtIssuer,
+  logger.log(
+    `   ${ARROW} https://addons.mozilla.org/en-US/developers/addon/${highlight('<extension-id>')}/edit`,
   );
-  entries.push(['FIREFOX_JWT_ISSUER', jwtIssuer]);
-  const jwtSecret = await prompt<string>(
-    'Enter your JWT secret:',
-    { type: 'text' },
-    previousOptions?.jwtSecret,
-  );
-  entries.push(['FIREFOX_JWT_SECRET', jwtSecret]);
+  const extensionId = await question('Enter extension ID', {
+    defaultValue: previousOptions?.extensionId,
+  });
+  entries.push([extensionIdEnvVar, extensionId]);
 
-  const channel = await prompt<string>(
-    '`--firefox-channel`: Which channel do you want to release to?',
-    {
-      type: 'select',
-      options: [
-        {
-          label: 'Listed',
-          value: 'listed',
-          hint: 'Hosted on addons.mozilla.com',
-        },
-        { label: 'Unlisted', value: 'unlisted', hint: 'For self-hosting' },
-      ],
-      initial: previousOptions?.channel,
-    },
-    previousOptions?.channel,
+  const jwtIssuerEnvVar = 'FIREFOX_JWT_ISSUER';
+  const jwtSecretEnvVar = 'FIREFOX_JWT_SECRET';
+  console.log();
+  logger.info(
+    `${highlight(jwtIssuerEnvVar)} and ${highlight(jwtSecretEnvVar)}`,
   );
+  logger.log(`Values can be created at`);
+  console.log(
+    `  ${ARROW} https://addons.mozilla.org/developers/addon/api/key/`,
+  );
+  const jwtIssuer = await question('Enter the JWT issuer', {
+    defaultValue: previousOptions?.jwtIssuer,
+  });
+  entries.push([jwtIssuerEnvVar, jwtIssuer]);
+
+  const jwtSecret = await question('Enter the JWT secret', {
+    defaultValue: previousOptions?.jwtSecret,
+  });
+  entries.push([jwtSecretEnvVar, jwtSecret]);
+
+  const channelEnvVar = 'FIREFOX_CHANNEL';
+  console.log();
+  logger.info(highlight(channelEnvVar));
+  const channel = await select('Select an option', {
+    choices: [
+      {
+        label: 'listed',
+        value: 'listed',
+        description: 'Hosted on addons.mozilla.com',
+      },
+      {
+        label: 'unlisted',
+        value: 'unlisted',
+        description: 'For self-hosting',
+      },
+    ],
+  });
   entries.push(['FIREFOX_CHANNEL', channel]);
+
+  const skipSubmitReviewEnvVar = 'FIREFOX_SKIP_SUBMIT_REVIEW';
+  logger.log();
+  logger.info(highlight(skipSubmitReviewEnvVar));
+  const submitForReview = await confirm(
+    'After uploading, submit new version for review?',
+    { initial: !previousOptions?.skipSubmitReview },
+  );
+  entries.push([skipSubmitReviewEnvVar, !submitForReview]);
 
   return entries;
 }
@@ -427,50 +433,54 @@ async function initOpera(
   const entries: Entry[] = [];
 
   console.log();
-  consola.start('Opera Addons\n');
+  logger.info('\x1b[1mOpera Addons Setup\x1b[0m');
 
-  consola.info(
-    'Your `--opera-package-id` is listed in the URL of your addon developer dashboard, example:\n' +
-      'https://addons.opera.com/developer/package/<packageId>',
+  const packageIdEnvVar = 'OPERA_PACKAGE_ID';
+  console.log();
+  logger.info(highlight(packageIdEnvVar));
+  logger.log("Found in the developer dashboard's URL");
+  logger.log(
+    `  ${ARROW} https://addons.opera.com/developer/package/${highlight('<package-id>')}`,
   );
+  const packageId = await question<number>('Enter the package ID', {
+    defaultValue: previousOptions?.packageId
+      ? String(previousOptions.packageId)
+      : undefined,
+    transformer: {
+      transform: input => {
+        const n = parseInt(input);
+        if (isNaN(n)) return { isValid: false, error: 'Enter an integer' };
+        if (n < 0)
+          return {
+            isValid: false,
+            error: 'Package ID must be a positive integer',
+          };
+        return { isValid: true, transformed: n };
+      },
+    },
+  });
+  entries.push([packageIdEnvVar, packageId]);
 
-  let packageId: number | undefined;
-  while (true) {
-    const input = await prompt<string>(
-      'Enter the package ID (packageId):',
-      { type: 'text' },
-      previousOptions?.packageId
-        ? String(previousOptions.packageId)
-        : undefined,
-    );
-
-    const parsed = Number(input.trim());
-    if (Number.isInteger(parsed) && parsed > 0) {
-      packageId = parsed;
-      break;
-    }
-
-    consola.warn('Please enter a valid positive integer for the package ID.');
-  }
-  entries.push(['OPERA_PACKAGE_ID', packageId]);
-
-  consola.info(
-    'Your `--opera-session-id` is the `sessionid` cookie available on the Opera Addons website: ' +
-      'https://addons.opera.com/developer/',
+  const sessionIdEnvVar = 'OPERA_SESSION_ID';
+  logger.log();
+  logger.info(highlight(sessionIdEnvVar));
+  logger.log(
+    `The value of the ${highlight('sessionid')} cookie available on the developer dashboard`,
   );
-  const sessionId = await prompt<string>(
-    'Enter the session ID (sessionid):',
-    { type: 'text' },
-    previousOptions?.sessionId,
-  );
-  entries.push(['OPERA_SESSION_ID', sessionId]);
+  logger.log(`  ${ARROW} https://addons.opera.com/developer/`);
+  const sessionId = await question('Enter the session ID', {
+    defaultValue: previousOptions?.sessionId,
+  });
+  entries.push([sessionIdEnvVar, sessionId]);
 
-  const submitForReview = await prompt<boolean>(
-    'When uploading, automatically submit new update for review?',
-    { type: 'confirm' },
-    String(!previousOptions?.skipSubmitReview),
+  const skipSubmitReviewEnvVar = 'OPERA_SKIP_SUBMIT_REVIEW';
+  logger.log();
+  logger.info(highlight(skipSubmitReviewEnvVar));
+  const submitForReview = await confirm(
+    'After uploading, submit new version for review?',
+    { initial: !previousOptions?.skipSubmitReview },
   );
-  entries.push(['OPERA_SKIP_SUBMIT_REVIEW', !submitForReview]);
+  entries.push([skipSubmitReviewEnvVar, !submitForReview]);
 
   return entries;
 }
@@ -481,59 +491,57 @@ async function initEdge(
   const entries: Entry[] = [];
 
   console.log();
-  consola.start('Edge Addon Store\n');
+  logger.info('\x1b[1mEdge Addon Store Setup\x1b[0m');
 
-  consola.info(
-    'Your `--edge-product-id` is listed On the developer dashboard, at the top of the page under the extension name',
+  const productIdEnvVar = 'EDGE_PRODUCT_ID';
+  logger.log();
+  logger.info(highlight(productIdEnvVar));
+  logger.info(
+    'The product ID is listed on the developer dashboard at the top of the page, under the extension name',
   );
-  console.log('https://partner.microsoft.com/dashboard/microsoftedge/overview');
-  const productId = await prompt<string>(
-    'Enter product ID:',
-    {
-      type: 'text',
-    },
-    previousOptions?.productId,
+  logger.log(
+    `  ${ARROW} https://partner.microsoft.com/dashboard/microsoftedge/overview`,
   );
-  entries.push(['EDGE_PRODUCT_ID', productId]);
+  const productId = await question('Enter product ID:', {
+    defaultValue: previousOptions?.productId,
+  });
+  entries.push([productIdEnvVar, productId]);
 
-  console.log();
-  consola.log(
-    '`--edge-client-id` and either `--edge-api-key` (API v1.1) or `--edge-client-secret` and `--edge-access-token-url` (API v1.0) can be created following:',
+  const clientIdEnvVar = 'EDGE_CLIENT_ID';
+  const apiKeyEnvVar = 'EDGE_API_KEY';
+  logger.log();
+  logger.info(`${highlight(clientIdEnvVar)} and ${highlight(apiKeyEnvVar)}`);
+  logger.log("Follow Microsoft's guide to get your client ID and API key");
+  logger.log(
+    `  ${ARROW} https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api#before-you-begin`,
   );
-  console.log(
-    'https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api#before-you-begin',
-  );
-  const clientId = await prompt<string>(
-    'Enter your client ID:',
-    { type: 'text' },
-    previousOptions?.clientId,
-  );
-  entries.push(['EDGE_CLIENT_ID', clientId]);
+  const clientId = await question('Enter the client ID', {
+    defaultValue: previousOptions?.clientId,
+  });
+  entries.push([clientIdEnvVar, clientId]);
 
-  const apiKey = await prompt<string>(
-    'Enter your API key:',
-    { type: 'text' },
-    previousOptions?.apiKey,
-  );
-  entries.push(['EDGE_API_KEY', apiKey]);
+  const apiKey = await question('Enter the API key', {
+    defaultValue: previousOptions?.apiKey,
+  });
+  entries.push([apiKeyEnvVar, apiKey]);
 
-  const submitForReview = await prompt<boolean>(
-    'When uploading, automatically submit new update for review?',
-    { type: 'confirm' },
-    String(!previousOptions?.skipSubmitReview),
+  const skipSubmitReviewEnvVar = 'EDGE_SKIP_SUBMIT_REVIEW';
+  logger.log();
+  logger.info(highlight(skipSubmitReviewEnvVar));
+  const submitForReview = await confirm(
+    'After uploading, submit new version for review?',
+    { initial: !previousOptions?.skipSubmitReview },
   );
-  entries.push(['EDGE_SKIP_SUBMIT_REVIEW', !submitForReview]);
+  entries.push([skipSubmitReviewEnvVar, !submitForReview]);
 
   return entries;
 }
 
 async function updateEnvFile(entries: Entry[]) {
-  consola.start(`Writing to \`${envFile}\`...`);
-  let template = await readFile(envFile, 'utf-8').catch(() => '');
+  let template = await readFile(ENV_FILE, 'utf-8').catch(() => '');
 
   for (const [name, value] of entries) {
-    const formattedValue = typeof value === 'string' ? `"${value}"` : value;
-    const replacement = `${name}=${formattedValue}`;
+    const replacement = `${name}=${JSON.stringify(value)}`;
     const pattern = new RegExp(`^${name}=.*$`, 'm');
     const existing = template.match(pattern);
     if (existing) {
@@ -543,17 +551,18 @@ async function updateEnvFile(entries: Entry[]) {
     }
   }
 
-  const backupFilename = `${envFile}.backup-${Date.now()}`;
-  await copyFile(envFile, backupFilename)
+  const backupFilename = `${ENV_FILE}.backup-${Date.now()}`;
+  await copyFile(ENV_FILE, backupFilename)
     .then(() => {
-      consola.info(`Backed up old \`${envFile}\` to \`${backupFilename}\``);
+      logger.log();
+      logger.info(
+        `Backed up old ${highlight(ENV_FILE)} to ${highlight(backupFilename)}`,
+      );
     })
     .catch(() => {
       // If the file doesn't exist, continue
     });
 
-  await writeFile(envFile, template, 'utf-8');
-
-  console.log();
-  consola.success('Wrote config to `.env.submit`');
+  await writeFile(ENV_FILE, template, 'utf-8');
+  logger.success(`${highlight(ENV_FILE)} updated!`);
 }

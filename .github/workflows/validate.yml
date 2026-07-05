@@ -9,7 +9,7 @@ on:
 
 jobs:
   code-gen:
-    name: Generated Code Up-to-date
+    name: Generated Code
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -31,22 +31,29 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-24.04
+    strategy:
+      max-parallel: 1
+      matrix:
+        node-version: [22, 24, 26]
+
     # If PR is from a fork, secrets aren't available, so skip this job.
     if: github.event.pull_request.head.repo.fork != true
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: ./.github/actions/setup
       - run: |
-          bun dev:chrome
-          # bun dev:firefox
-          bun dev:edge
-          bun dev:opera
+          echo 'Testing with node...'
+          DEV_RUNNER=node bun dev:all
+          echo
+          echo 'Testing with bun...'
+          DEV_RUNNER=bun bun dev:all
         env:
           # Chrome
+          CHROME_API_VERSION: v2
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
-          CHROME_CLIENT_ID: ${{ secrets.TEST_CHROME_CLIENT_ID }}
-          CHROME_CLIENT_SECRET: ${{ secrets.TEST_CHROME_CLIENT_SECRET }}
-          CHROME_REFRESH_TOKEN: ${{ secrets.TEST_CHROME_REFRESH_TOKEN }}
+          CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+          CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: ${{ secrets.CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL }}
+          CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY }}
           CHROME_SKIP_SUBMIT_REVIEW: 'true'
           CHROME_PUBLISH_TARGET: trustedTesters
           # Firefox
@@ -55,6 +62,7 @@ jobs:
           FIREFOX_JWT_SECRET: ${{ secrets.TEST_FIREFOX_JWT_SECRET }}
           FIREFOX_CHANNEL: unlisted
           FIREFOX_COMPATIBILITY: firefox,android
+          FIREFOX_SKIP_SUBMIT_REVIEW: 'true'
           # Edge
           EDGE_PRODUCT_ID: ${{ secrets.TEST_EDGE_PRODUCT_ID }}
           EDGE_CLIENT_ID: ${{ secrets.TEST_EDGE_CLIENT_ID }}

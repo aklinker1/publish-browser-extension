@@ -5,8 +5,8 @@ import { EdgeAddonStoreV1_1 } from '../stores/edge-addon-store-v1.1';
 import { FirefoxAddonStoreV5 } from '../stores/firefox-addon-store-v5';
 import { OperaAddonsStore } from '../stores/opera-addons-store';
 import type { Store, SubmitResult } from '../stores/store';
-import { consola } from 'consola';
 import { ChromeWebStoreV2 } from '../stores/chrome-web-store-v2';
+import { logger } from '../utils/logger';
 
 export async function submit(config: InlineConfig): Promise<SubmitResults> {
   // Setup
@@ -14,9 +14,9 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
   const internalConfig = validateConfig(resolveConfig(config));
 
   console.log();
-  consola.info('Publishing Extension');
+  logger.info('Publishing Extension');
   if (internalConfig.dryRun) {
-    consola.warn('Dry run, skipping submission');
+    logger.warn('Dry run, skipping submission');
   }
 
   // Get list of stores that need released
@@ -101,7 +101,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
   );
   if (errors > 0) {
     // Tasuku already logs the errors, just show a count at the end
-    throw Error(`Submissions failed: ${errors}`);
+    logger.fatal(`Submissions failed: ${errors}`);
   }
 
   // Return the results

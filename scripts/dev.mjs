@@ -17,7 +17,11 @@ try {
   const TARGET = process.argv[2];
   const ARGS = process.argv.slice(2); // allow flags override
   const publish = (args = []) =>
-    run('bun', ['bin/publish-extension.mjs', ...args, ...ARGS]);
+    run(process.env.DEV_RUNNER ?? 'node', [
+      'bin/publish-extension.mjs',
+      ...args,
+      ...ARGS,
+    ]);
 
   switch (TARGET) {
     case 'all':

@@ -104,14 +104,14 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
       });
     }
 
-    let body: { type?: string; value: BodyInit } | undefined;
+    let body: { type?: string; value: BodyInit; duplex?: 'half' } | undefined;
     if ('body' in inputs && inputs.body) {
       if (inputs.body instanceof FormData) {
         body = { value: inputs.body };
       } else if (inputs.body instanceof ReadStream) {
-        body = { value: inputs.body };
+        body = { value: inputs.body, duplex: 'half' };
       } else if (inputs.body instanceof Readable) {
-        body = { value: inputs.body };
+        body = { value: inputs.body, duplex: 'half' };
       } else {
         body = { type: 'application/json', value: JSON.stringify(inputs.body) };
       }
@@ -127,6 +127,7 @@ export function createHttpClient<TEndpoints extends Endpoints>(options: {
         ...inputs.headers,
       },
       body: body?.value,
+      duplex: body?.duplex,
     };
     // console.log({ url: url.href, ...init }, '\n\n'); // Uncomment to debug
 

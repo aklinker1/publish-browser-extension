@@ -4,6 +4,7 @@ import {
   type InlineConfig,
   ResolvedConfig,
 } from './utils/config-schema';
+import { highlight } from './utils/logger';
 
 export type {
   AllChromeOptions,
@@ -68,6 +69,7 @@ export function resolveConfig(config?: InlineConfig): PartialResolvedConfig {
   if (raw.firefox) raw.firefox.extensionId              = (config as any)?.firefox?.extensionId              ?? process.env.FIREFOX_EXTENSION_ID
   if (raw.firefox) raw.firefox.jwtIssuer                = (config as any)?.firefox?.jwtIssuer                ?? process.env.FIREFOX_JWT_ISSUER
   if (raw.firefox) raw.firefox.jwtSecret                = (config as any)?.firefox?.jwtSecret                ?? process.env.FIREFOX_JWT_SECRET
+  if (raw.firefox) raw.firefox.skipSubmitReview         = (config as any)?.firefox?.skipSubmitReview         ?? process.env.FIREFOX_SKIP_SUBMIT_REVIEW
   if (raw.firefox) raw.firefox.sourcesZip               = (config as any)?.firefox?.sourcesZip               ?? process.env.FIREFOX_SOURCES_ZIP
   if (raw.firefox) raw.firefox.zip                      = (config as any)?.firefox?.zip                      ?? process.env.FIREFOX_ZIP
   if (raw.opera)   raw.opera.packageId                  = (config as any)?.opera?.packageId                  ?? process.env.OPERA_PACKAGE_ID
@@ -96,7 +98,7 @@ function validateConfigWith<T>(config: any, schema: Struct<T>): T {
       'Invalid config:',
       ...(res[0] as StructError)
         .failures()
-        .map(err => `  - \`${err.path.join('.')}\`: ${err.message}`),
+        .map(err => `  - ${highlight(err.path.join('.'))}: ${err.message}`),
     ].join('\n'),
   );
 }

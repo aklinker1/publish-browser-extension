@@ -72,6 +72,11 @@ export class FirefoxAddonStoreV5 implements Store {
       return polledUpload;
     });
 
+    if (this.options.skipSubmitReview) {
+      this.setStatus('Skipping submission (skipSubmitReview=true)');
+      return;
+    }
+
     this.setStatus('Submitting new version');
     const versionBody = this.createForm({
       upload: upload.uuid,

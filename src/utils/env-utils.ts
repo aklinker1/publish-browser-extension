@@ -54,6 +54,8 @@ export interface CustomEnv {
   FIREFOX_JWT_ISSUER: string | undefined;
   /** Secret used for authorizing requests to Addon Store APIs */
   FIREFOX_JWT_SECRET: string | undefined;
+  /** Just upload the extension zip, don't submit it for review or publish it */
+  FIREFOX_SKIP_SUBMIT_REVIEW: string | undefined;
   /** Path to sources zip to upload */
   FIREFOX_SOURCES_ZIP: string | undefined;
   /** Path to extension zip to upload */

@@ -1,5 +1,38 @@
 # Changelog
 
+## v5.1.0
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v5.0.0...v5.1.0)
+
+### 🚀 Enhancements
+
+- Add support for `firefox.skipSubmitReview` ([6f4d889](https://github.com/aklinker1/publish-browser-extension/commit/6f4d889))
+
+### 🩹 Fixes
+
+- Refactor config validation using code generation and `superstruct` ([#77](https://github.com/aklinker1/publish-browser-extension/pull/77))
+- Fix init regression around config validation ([4f1b1ad](https://github.com/aklinker1/publish-browser-extension/commit/4f1b1ad))
+- Pass `duplex: half` when uploading streams ([010f94e](https://github.com/aklinker1/publish-browser-extension/commit/010f94e))
+
+### 💅 Refactors
+
+- Refactor opera API client ([#78](https://github.com/aklinker1/publish-browser-extension/pull/78))
+
+### 🏡 Chore
+
+- Remove ofetch ([23f2fd7](https://github.com/aklinker1/publish-browser-extension/commit/23f2fd7))
+- Replace `listr2` with `tasuku` ([#79](https://github.com/aklinker1/publish-browser-extension/pull/79))
+
+### 🤖 CI
+
+- Run tests with node, not bun, in CI ([d2d83b0](https://github.com/aklinker1/publish-browser-extension/commit/d2d83b0))
+- Update job name ([10af132](https://github.com/aklinker1/publish-browser-extension/commit/10af132))
+- Run E2E tests for both node and bun ([2c6e267](https://github.com/aklinker1/publish-browser-extension/commit/2c6e267))
+
+### ❤️ Contributors
+
+- Aaron ([@aklinker1](https://github.com/aklinker1))
+
 ## v5.0.0
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v4.0.5...v5.0.0)

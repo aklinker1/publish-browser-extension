@@ -229,6 +229,11 @@ export const FirefoxAddonStoreV5Options = object({
     description:
       'Comma-separated list of compatible applications, e.g. "firefox,android" - "firefox" for compatibility with Firefox desktop apps, "android" for Firefox Android apps',
   }),
+  skipSubmitReview: meta(defaulted(stringbool, false), {
+    path: 'firefox.skipSubmitReview',
+    description:
+      "Just upload the extension zip, don't submit it for review or publish it",
+  }),
 });
 
 export type FirefoxAddonStoreV5Options = Infer<
