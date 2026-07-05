@@ -29,12 +29,23 @@ jobs:
       - run: bun test
       - run: bun bin/publish-extension.mjs --help
   e2e-tests:
-    name: E2E Tests
+    name: E2E Tests (${{ matrix.runtime.name }}, ${{ matrix.browser }})
     runs-on: ubuntu-24.04
     strategy:
       max-parallel: 1
       matrix:
-        runtime: [node-22, node-24, node-26, bun]
+        runtime:
+          - name: Node 22
+            version: 22
+            bin: node
+          - name: Node 24
+            version: 24
+            bin: node
+          - name: Node 26
+            version: 26
+            bin: node
+          - name: Bun
+            bin: bun
         browser:
           - chrome
           # - firefox
@@ -47,11 +58,11 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: ./.github/actions/setup
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # 6.4.0
-        if: matrix.runtime.startsWith('node')
+        if: matrix.runtime.bin == 'node'
         with:
-          node-version: ${{ matrix.runtime.slice(5) }}
+          node-version: ${{ matrix.runtime.version }}
       - run: |
-          if [[ "${{ matrix.runtime }}" == "bun" ]]; then
+          if [[ "${{ matrix.runtime.bin }}" == "bun" ]]; then
             echo "Running with bun $(bun --version)"
             DEV_RUNNER=bun bun dev:${{ matrix.browser }}
           else
