@@ -29,7 +29,7 @@ jobs:
       - run: bun test
       - run: bun bin/publish-extension.mjs --help
   e2e-tests:
-    name: E2E Tests (${{ matrix.runtime.name }}, ${{ matrix.browser }})
+    name: E2E Tests (${{ matrix.runtime.name }})
     runs-on: ubuntu-24.04
     strategy:
       max-parallel: 1 # Can't run E2E tests at the same time
@@ -46,12 +46,6 @@ jobs:
             bin: node
           - name: Bun
             bin: bun
-        browser:
-          - chrome
-          # - firefox
-          - edge
-          - opera
-
     # If PR is from a fork, secrets aren't available, so skip this job.
     if: github.event.pull_request.head.repo.fork != true
     steps:
@@ -61,12 +55,18 @@ jobs:
         if: matrix.runtime.bin == 'node'
         with:
           node-version: ${{ matrix.runtime.version }}
+      - run: bun run build
       - name: Run E2E test
         run: |
-          echo "Running with ${{ matrix.runtime.name }} $(${{ matrix.runtime.bin }} --version)"
-          bun dev:${{ matrix.browser }}
+          ${{ matrix.runtime.bin }} --version
+          ${{ matrix.runtime.bin }} bin/publish-extension.mjs
         env:
           DEV_RUNNER: ${{ matrix.runtime.bin }}
+          # ZIPs - comment out to disable store
+          CHROME_ZIP: extension/chrome.zip
+          # FIREFOX_ZIP: extension/firefox.zip
+          EDGE_ZIP: extension/chrome.zip
+          OPERA_ZIP: extension/chrome.zip
           # Chrome
           CHROME_API_VERSION: v2
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
