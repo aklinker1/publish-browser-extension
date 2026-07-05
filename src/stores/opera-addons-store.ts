@@ -104,6 +104,8 @@ export class OperaAddonsStore implements Store {
 
     this.setStatus('Updating new addon version details');
 
+    console.log('\n\n\n\n\n', previousVersionDetails, '\n\n\n\n\n');
+
     // As said above, we need to copy the previous version short summary/description
     // details to the new version
     const updatedDetails = await this.client.fetch(
