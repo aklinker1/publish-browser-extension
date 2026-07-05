@@ -32,7 +32,7 @@ jobs:
     name: E2E Tests (${{ matrix.runtime.name }}, ${{ matrix.browser }})
     runs-on: ubuntu-24.04
     strategy:
-      max-parallel: 1
+      max-parallel: 1 # Can't run E2E tests at the same time
       matrix:
         runtime:
           - name: Node 22
@@ -50,7 +50,7 @@ jobs:
           - chrome
           # - firefox
           - edge
-          # - opera
+          - opera
 
     # If PR is from a fork, secrets aren't available, so skip this job.
     if: github.event.pull_request.head.repo.fork != true
