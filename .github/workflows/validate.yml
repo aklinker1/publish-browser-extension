@@ -61,7 +61,8 @@ jobs:
         if: matrix.runtime.bin == 'node'
         with:
           node-version: ${{ matrix.runtime.version }}
-      - run: |
+      - name: Run E2E test
+        run: |
           echo "Running with ${{ matrix.runtime.name }} $(${{ matrix.runtime.bin }} --version)"
           bun dev:${{ matrix.browser }}
         env:
