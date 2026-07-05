@@ -76,7 +76,8 @@ export class OperaAddonsStore implements Store {
       throw new Error(
         'The previous version is missing the English short description, ' +
           'which is required to be copied to the new version. ' +
-          'Please add it in Opera Developer Dashboard and try again.',
+          'Please add it in Opera Developer Dashboard and try again:\n' +
+          `https://addons.opera.com/developer/package/${this.options.packageId}/version/${previousVersion}?language=en&tab=translations`,
       );
     }
 
