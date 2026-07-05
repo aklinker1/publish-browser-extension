@@ -1,7 +1,7 @@
 import { writeFile } from 'fs/promises';
 import { createWriteStream } from 'fs';
 import { ZipArchive } from 'archiver';
-import { consola } from 'consola';
+import { logger } from '../src/utils/logger';
 
 // Utils
 
@@ -12,7 +12,7 @@ function getUniqueVersion() {
   const patch = Number(time.substring(5, 9));
   const number = Number(time.substring(9));
   const version = `${major}.${minor}.${patch}.${number}`;
-  consola.info('Using version:', version);
+  logger.info('Using version:', version);
   return version;
 }
 
@@ -40,7 +40,7 @@ async function createExtensionZip(file: string, customManifest: any) {
   return promise;
 }
 
-consola.start('Creating extension ZIPs to upload...');
+logger.start('Creating extension ZIPs to upload...');
 
 const chromeZip = 'extension/chrome.zip';
 const firefoxZip = 'extension/firefox.zip';
@@ -66,4 +66,4 @@ await createExtensionZip(firefoxZip, {
     },
   },
 });
-consola.success('Done');
+logger.success('Done');

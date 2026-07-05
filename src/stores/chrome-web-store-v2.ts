@@ -5,8 +5,8 @@ import { CwsApiV2 } from '../apis/cws-api-v2.gen';
 import { createGcpServiceAccountJwt } from '../utils/google-auth';
 import { createReadStream } from 'node:fs';
 import { ChromeWebStoreUploadStateError } from './chrome-web-store-v1.1';
-import consola from 'consola';
 import type { ChromeWebStoreV2Options } from '../utils/config-schema';
+import { logger } from '../utils/logger';
 
 export interface ServiceAccountTokenResponse {
   access_token: string;
@@ -83,7 +83,7 @@ export class ChromeWebStoreV2 implements Store {
         `Found ${publishRes.warningInfo.warnings.length} warning(s)`,
       );
       for (const warning of publishRes.warningInfo.warnings) {
-        consola.warn(`${warning.reason}: ${warning.description}`);
+        logger.warn(`${warning.reason}: ${warning.description}`);
       }
     }
   }
