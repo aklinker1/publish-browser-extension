@@ -1,5 +1,3 @@
-import { Readable } from 'node:stream';
-
 export namespace FirefoxApiV5 {
   export const BASE_URL = 'https://addons.mozilla.org';
 
@@ -58,7 +56,7 @@ export namespace FirefoxApiV5 {
        * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
        */
       '/api/v5/addons/upload/': {
-        body: FormData;
+        body: Bun.BodyInit;
         response: { type: 'json'; value: UploadDetails };
       };
 
@@ -69,7 +67,7 @@ export namespace FirefoxApiV5 {
         params: {
           idOrSlugOrGuid: string | number;
         };
-        body: FormData;
+        body: Bun.BodyInit;
         response: { type: 'json'; value: AddonVersion };
       };
     };

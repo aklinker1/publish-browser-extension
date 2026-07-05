@@ -1,4 +1,3 @@
-import { Readable } from 'node:stream';
 import type {
   OperaAddonApiError,
   OperaAddonDetails,
@@ -58,7 +57,7 @@ export namespace OperaApi {
        * Upload a chunk of a new package version for an Opera Addon.
        */
       '/api/file-upload/': {
-        body: FormData;
+        body: Bun.BodyInit;
         response: { type: 'json'; value: void };
       };
 

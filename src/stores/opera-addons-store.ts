@@ -3,8 +3,6 @@ import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { OperaApi } from '../apis/opera-api';
 import { pollUntil } from '../utils/polling';
-import { FormDataEncoder } from 'form-data-encoder';
-import { Readable } from 'node:stream';
 import { Blob } from 'node:buffer';
 import fs from 'node:fs';
 import path from 'node:path';
