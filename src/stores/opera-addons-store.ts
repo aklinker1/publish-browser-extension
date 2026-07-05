@@ -67,7 +67,6 @@ export class OperaAddonsStore implements Store {
         },
       },
     );
-    console.log('\n\n\n\n\n', previousVersionDetails, '\n\n\n\n\n');
 
     if ('detail' in previousVersionDetails) {
       throw new Error(previousVersionDetails.detail);
