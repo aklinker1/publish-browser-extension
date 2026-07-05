@@ -58,7 +58,7 @@ export namespace OperaApi {
        * Upload a chunk of a new package version for an Opera Addon.
        */
       '/api/file-upload/': {
-        body: Readable;
+        body: FormData;
         response: { type: 'json'; value: void };
       };
 

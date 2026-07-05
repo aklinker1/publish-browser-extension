@@ -58,7 +58,7 @@ export namespace FirefoxApiV5 {
        * Docs: https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
        */
       '/api/v5/addons/upload/': {
-        body: Readable;
+        body: FormData;
         response: { type: 'json'; value: UploadDetails };
       };
 
@@ -69,7 +69,7 @@ export namespace FirefoxApiV5 {
         params: {
           idOrSlugOrGuid: string | number;
         };
-        body: Readable;
+        body: FormData;
         response: { type: 'json'; value: AddonVersion };
       };
     };

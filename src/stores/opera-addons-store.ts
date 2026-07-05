@@ -3,7 +3,6 @@ import { ensureZipExists } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { OperaApi } from '../apis/opera-api';
 import { pollUntil } from '../utils/polling';
-import { FormData } from 'formdata-node';
 import { FormDataEncoder } from 'form-data-encoder';
 import { Readable } from 'node:stream';
 import { Blob } from 'node:buffer';
@@ -203,14 +202,11 @@ export class OperaAddonsStore implements Store {
       form.append('flowRelativePath', fileInfo.name);
       form.append('flowTotalChunks', String(totalChunks));
 
-      const encoder = new FormDataEncoder(form);
-
       await this.client.post('/api/file-upload/', {
         headers: {
-          ...encoder.headers,
           Referer: `https://addons.opera.com/developer/package/${this.options.packageId}/`,
         },
-        body: Readable.from(encoder),
+        body: form,
         // The chunk upload responses aren't JSON, so skip parsing the body -
         // the http client still throws on non-2xx responses.
         mapResponse: async () => {},

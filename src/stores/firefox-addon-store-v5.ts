@@ -5,11 +5,8 @@ import { createHttpClient, type HttpClient } from '../utils/http-client';
 import { FirefoxApiV5 } from '../apis/firefox-api-v5';
 import { createFirefoxJwt } from '../utils/firefox-auth';
 import { pollUntil } from '../utils/polling';
-import { FormData } from 'formdata-node';
-import { fileFromPath } from 'formdata-node/file-from-path';
-import { FormDataEncoder } from 'form-data-encoder';
-import { Readable } from 'node:stream';
 import type { FirefoxAddonStoreV5Options } from '../config';
+import { openAsBlob } from 'node:fs';
 
 export class FirefoxAddonStoreV5 implements Store {
   private client: HttpClient<FirefoxApiV5.Endpoints>;
@@ -46,15 +43,13 @@ export class FirefoxAddonStoreV5 implements Store {
     }
 
     this.setStatus('Uploading new ZIP file');
-    const uploadBody = this.createForm({
-      channel: this.options.channel,
-      upload: await fileFromPath(this.options.zip),
-    });
+    const uploadBody = new FormData();
+    uploadBody.set('channel', this.options.channel);
+    uploadBody.set('upload', await openAsBlob(this.options.zip));
     const { uuid: uploadUuid } = await this.client.post(
       '/api/v5/addons/upload/',
       {
-        body: uploadBody.body,
-        headers: uploadBody.encoder.headers,
+        body: uploadBody,
       },
     );
 
@@ -78,18 +73,17 @@ export class FirefoxAddonStoreV5 implements Store {
     }
 
     this.setStatus('Submitting new version');
-    const versionBody = this.createForm({
-      upload: upload.uuid,
-      source: this.options.sourcesZip
-        ? await fileFromPath(this.options.sourcesZip)
-        : '',
-    });
+    const versionBody = new FormData();
+    versionBody.set('upload', upload.uuid);
+    versionBody.set(
+      'source',
+      this.options.sourcesZip ? await openAsBlob(this.options.sourcesZip) : '',
+    );
     const version = await this.client.post(
       '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/',
       {
         params: { idOrSlugOrGuid: this.extensionId },
-        body: versionBody.body,
-        headers: versionBody.encoder.headers,
+        body: versionBody,
       },
     );
 
@@ -131,18 +125,6 @@ export class FirefoxAddonStoreV5 implements Store {
     if (id.startsWith('{')) id = id.slice(1);
     if (id.endsWith('}')) id = id.slice(0, -1);
     return id;
-  }
-
-  private createForm(value: Record<string, unknown>): {
-    body: Readable;
-    encoder: FormDataEncoder;
-  } {
-    const form = new FormData();
-    for (const [key, val] of Object.entries(value)) {
-      if (val != null) form.set(key, val);
-    }
-    const encoder = new FormDataEncoder(form);
-    return { body: Readable.from(encoder), encoder };
   }
 
   private buildValidationSummary(upload: FirefoxApiV5.UploadDetails): string {
