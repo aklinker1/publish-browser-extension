@@ -62,14 +62,10 @@ jobs:
         with:
           node-version: ${{ matrix.runtime.version }}
       - run: |
-          if [[ "${{ matrix.runtime.bin }}" == "bun" ]]; then
-            echo "Running with bun $(bun --version)"
-            DEV_RUNNER=bun bun dev:${{ matrix.browser }}
-          else
-            echo "Running with node $(node --version)"
-            DEV_RUNNER=node bun dev:${{ matrix.browser }}
-          fi
+          echo "Running with ${{ matrix.runtime.name }} $(${{ matrix.runtime.bin }} --version)"
+          bun dev:${{ matrix.browser }}
         env:
+          DEV_RUNNER: ${{ matrix.runtime.bin }}
           # Chrome
           CHROME_API_VERSION: v2
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
