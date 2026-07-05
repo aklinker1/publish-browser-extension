@@ -34,7 +34,12 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        node-version: [22, 24, 26]
+        runtime: [node-22, node-24, node-26, bun]
+        browser:
+          - chrome
+          # - firefox
+          - edge
+          # - opera
 
     # If PR is from a fork, secrets aren't available, so skip this job.
     if: github.event.pull_request.head.repo.fork != true
@@ -42,14 +47,17 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: ./.github/actions/setup
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # 6.4.0
+        if: matrix.runtime.startsWith('node')
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.runtime.slice(5) }}
       - run: |
-          echo 'Testing with node...'
-          DEV_RUNNER=node bun dev:all
-          echo
-          echo 'Testing with bun...'
-          DEV_RUNNER=bun bun dev:all
+          if [[ "${{ matrix.runtime }}" == "bun" ]]; then
+            echo "Running with bun $(bun --version)"
+            DEV_RUNNER=bun bun dev:${{ matrix.browser }}
+          else
+            echo "Running with node $(node --version)"
+            DEV_RUNNER=node bun dev:${{ matrix.browser }}
+          fi
         env:
           # Chrome
           CHROME_API_VERSION: v2
