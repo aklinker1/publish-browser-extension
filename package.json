@@ -6,7 +6,7 @@
   "scripts": {
     "check": "check",
     "build": "bun run --sequential 'build:*'",
-    "build:lib": "tsdown src/index.ts src/cli.ts --deps.onlyBundle superstruct",
+    "build:lib": "tsdown src/index.ts src/cli.ts --deps.onlyBundle superstruct --deps.onlyBundle tasuku",
     "build:test-extension": "bun scripts/build-test-extension.ts",
     "dev:all": "bun ./scripts/dev.ts all",
     "dev:chrome": "bun ./scripts/dev.ts chrome",
@@ -28,8 +28,7 @@
   },
   "dependencies": {
     "@topcli/prompts": "^4.0.0",
-    "cac": "^7.0.0",
-    "tasuku": "^2.3.0"
+    "cac": "^7.0.0"
   },
   "devDependencies": {
     "@aklinker1/check": "^2.4.0",
@@ -45,6 +44,7 @@
     "scule": "^1.3.0",
     "simple-git-hooks": "^2.13.1",
     "superstruct": "^2.0.2",
+    "tasuku": "^2.3.0",
     "tsdown": "^0.22.3",
     "typescript": "^6.0.3"
   },
