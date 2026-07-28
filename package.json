@@ -6,7 +6,7 @@
   "scripts": {
     "check": "check",
     "build": "bun run --sequential 'build:*'",
-    "build:lib": "tsdown src/index.ts src/cli.ts --deps.onlyBundle superstruct --deps.onlyBundle tasuku --deps.onlyBundle cac",
+    "build:lib": "tsdown src/index.ts src/cli.ts --deps.onlyBundle superstruct --deps.onlyBundle tasuku --deps.onlyBundle cac --deps.onlyBundle @topcli/prompts",
     "build:test-extension": "bun scripts/build-test-extension.ts",
     "dev:all": "bun ./scripts/dev.ts all",
     "dev:chrome": "bun ./scripts/dev.ts chrome",
