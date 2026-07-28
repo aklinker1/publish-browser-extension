@@ -4,11 +4,9 @@
   "workspaces": {
     "": {
       "name": "publish-browser-extension",
-      "dependencies": {
-        "@topcli/prompts": "^4.0.0",
-      },
       "devDependencies": {
         "@aklinker1/check": "^2.4.0",
+        "@topcli/prompts": "^4.0.0",
         "@types/archiver": "^8.0.0",
         "@types/bun": "^1.3.14",
         "@types/node": "^26.1.0",
