@@ -6,7 +6,6 @@
       "name": "publish-browser-extension",
       "dependencies": {
         "@topcli/prompts": "^4.0.0",
-        "cac": "^7.0.0",
       },
       "devDependencies": {
         "@aklinker1/check": "^2.4.0",
@@ -15,6 +14,7 @@
         "@types/node": "^26.1.0",
         "@typescript/native-preview": "^7.0.0-dev.20260705.1",
         "archiver": "^8.0.0",
+        "cac": "^7.0.0",
         "lint-staged": "^17.0.8",
         "oxlint": "^1.72.0",
         "prettier": "^3.9.4",
