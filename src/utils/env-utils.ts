@@ -44,6 +44,8 @@ export interface CustomEnv {
   EDGE_SKIP_SUBMIT_REVIEW: string | undefined;
   /** Path to extension zip to upload */
   EDGE_ZIP: string | undefined;
+  /** Path to a JSON file containing AMO listing and version metadata */
+  FIREFOX_AMO_METADATA_FILE: string | undefined;
   /** The channel to publish to, "listed" or "unlisted" */
   FIREFOX_CHANNEL: string | undefined;
   /** Comma-separated list of compatible applications, e.g. "firefox,android" - "firefox" for compatibility with Firefox desktop apps, "android" for Firefox Android apps */

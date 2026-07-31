@@ -66,7 +66,7 @@ export type Endpoints = {
       params: {
         idOrSlugOrGuid: string | number;
       };
-      body: Bun.BodyInit;
+      body: Bun.BodyInit | Record<string, unknown>;
       response: { type: 'json'; value: AddonVersion };
     };
   };
@@ -76,9 +76,19 @@ export type Endpoints = {
         idOrSlugOrGuid: string | number;
         versionId: number;
       };
-      body: {
-        compatibility: string[];
+      body:
+        | FormData
+        | {
+            compatibility: string[];
+          };
+    };
+
+    '/api/v5/addons/addon/{idOrSlugOrGuid}': {
+      params: {
+        idOrSlugOrGuid: string | number;
       };
+      body: Record<string, unknown>;
+      response: { type: 'json'; value: AddonDetails };
     };
   };
 };

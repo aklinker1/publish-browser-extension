@@ -24,6 +24,7 @@
 - [`edge.productId`](#edgeproductid)
 - [`edge.skipSubmitReview`](#edgeskipsubmitreview)
 - [`edge.zip`](#edgezip)
+- [`firefox.amoMetadataFile`](#firefoxamometadatafile)
 - [`firefox.channel`](#firefoxchannel)
 - [`firefox.compatibility`](#firefoxcompatibility)
 - [`firefox.extensionId`](#firefoxextensionid)
@@ -223,6 +224,13 @@ Path to extension zip to upload
 
 - _CLI Flag_: `--edge-zip`
 - _Env Var_: `EDGE_ZIP`
+
+### `firefox.amoMetadataFile`
+
+Path to a JSON file containing AMO listing and version metadata
+
+- _CLI Flag_: `--firefox-amo-metadata-file`
+- _Env Var_: `FIREFOX_AMO_METADATA_FILE`
 
 ### `firefox.channel`
 

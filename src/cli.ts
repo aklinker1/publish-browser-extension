@@ -47,6 +47,7 @@ cli.help();
   cli.option('--edge-product-id [edgeProductId]', "Product ID listed on the developer dashboard")
   cli.option('--edge-skip-submit-review [edgeSkipSubmitReview]', "Just upload the extension zip, don't submit it for review or publish it (default: false)")
   cli.option('--edge-zip [edgeZip]', "Path to extension zip to upload")
+  cli.option('--firefox-amo-metadata-file [firefoxAmoMetadataFile]', "Path to a JSON file containing AMO listing and version metadata")
   cli.option('--firefox-channel [firefoxChannel]', "The channel to publish to, \"listed\" or \"unlisted\" (default: \"listed\")")
   cli.option('--firefox-compatibility [firefoxCompatibility]', "Comma-separated list of compatible applications, e.g. \"firefox,android\" - \"firefox\" for compatibility with Firefox desktop apps, \"android\" for Firefox Android apps")
   cli.option('--firefox-extension-id [firefoxExtensionId]', "The ID of the extension to be submitted")
@@ -96,6 +97,7 @@ function configFromFlags(flags: any): InlineConfig {
   config.edge.productId = flags.edgeProductId
   config.edge.skipSubmitReview = flags.edgeSkipSubmitReview
   config.edge.zip = flags.edgeZip
+  config.firefox.amoMetadataFile = flags.firefoxAmoMetadataFile
   config.firefox.channel = flags.firefoxChannel
   config.firefox.compatibility = flags.firefoxCompatibility
   config.firefox.extensionId = flags.firefoxExtensionId

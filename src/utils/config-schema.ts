@@ -204,6 +204,11 @@ export const FirefoxAddonStoreV5Options = object({
     path: 'firefox.zip',
     description: 'Path to extension zip to upload',
   }),
+  amoMetadataFile: meta(optional(nonempty(string())), {
+    path: 'firefox.amoMetadataFile',
+    description:
+      'Path to a JSON file containing AMO listing and version metadata',
+  }),
   sourcesZip: meta(optional(nonempty(string())), {
     path: 'firefox.sourcesZip',
     description: 'Path to sources zip to upload',

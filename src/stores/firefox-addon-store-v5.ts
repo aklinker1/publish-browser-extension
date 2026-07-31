@@ -6,6 +6,7 @@ import * as FirefoxApiV5 from '../apis/firefox-api-v5';
 import { createFirefoxJwt } from '../utils/firefox-auth';
 import { pollUntil } from '../utils/polling';
 import type { FirefoxAddonStoreV5Options } from '../config';
+import { readFile } from 'node:fs/promises';
 import { openAsBlob } from 'node:fs';
 
 export class FirefoxAddonStoreV5 implements Store {
@@ -31,6 +32,10 @@ export class FirefoxAddonStoreV5 implements Store {
   }
 
   async submit(dryRun?: boolean): Promise<void> {
+    const metadata = this.options.amoMetadataFile
+      ? await this.readMetadata(this.options.amoMetadataFile)
+      : undefined;
+
     this.setStatus('Getting addon details');
     const addon = await this.client.get(
       '/api/v5/addons/addon/{idOrSlugOrGuid}',
@@ -73,19 +78,63 @@ export class FirefoxAddonStoreV5 implements Store {
     }
 
     this.setStatus('Submitting new version');
-    const versionBody = new FormData();
-    versionBody.set('upload', upload.uuid);
-    versionBody.set(
-      'source',
-      this.options.sourcesZip ? await openAsBlob(this.options.sourcesZip) : '',
-    );
-    const version = await this.client.post(
-      '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/',
-      {
-        params: { idOrSlugOrGuid: this.extensionId },
-        body: versionBody,
-      },
-    );
+    let version: FirefoxApiV5.AddonVersion;
+    if (metadata) {
+      const { version: versionMetadata = {}, ...addonMetadata } = metadata;
+      if (Object.keys(addonMetadata).length > 0) {
+        await this.client.fetch(
+          'PATCH',
+          '/api/v5/addons/addon/{idOrSlugOrGuid}',
+          {
+            params: { idOrSlugOrGuid: this.extensionId },
+            body: addonMetadata,
+          },
+        );
+      }
+
+      version = await this.client.post(
+        '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/',
+        {
+          params: { idOrSlugOrGuid: this.extensionId },
+          body: {
+            upload: upload.uuid,
+            ...versionMetadata,
+          },
+        },
+      );
+
+      if (this.options.sourcesZip) {
+        const sourceBody = new FormData();
+        sourceBody.set('source', await openAsBlob(this.options.sourcesZip));
+        await this.client.fetch(
+          'PATCH',
+          '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/{versionId}/',
+          {
+            params: {
+              idOrSlugOrGuid: this.extensionId,
+              versionId: version.id,
+            },
+            body: sourceBody,
+          },
+        );
+      }
+    } else {
+      const versionBody = new FormData();
+      versionBody.set('upload', upload.uuid);
+      versionBody.set(
+        'source',
+        this.options.sourcesZip
+          ? await openAsBlob(this.options.sourcesZip)
+          : '',
+      );
+      version = await this.client.post(
+        '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/',
+        {
+          params: { idOrSlugOrGuid: this.extensionId },
+          body: versionBody,
+        },
+      );
+    }
 
     const validationUrl = `https://addons.mozilla.org/en-US/developers/addon/${addon.id}/file/${version.file.id}/validation`;
     if (!upload.valid) {
@@ -133,5 +182,25 @@ export class FirefoxAddonStoreV5 implements Store {
       plural(upload.validation.warnings, 'warning'),
       plural(upload.validation.notices, 'notice'),
     ].join(', ');
+  }
+
+  private async readMetadata(
+    path: string,
+  ): Promise<Record<string, unknown> & { version?: Record<string, unknown> }> {
+    const metadata = JSON.parse(await readFile(path, 'utf8'));
+    if (
+      metadata == null ||
+      typeof metadata !== 'object' ||
+      Array.isArray(metadata)
+    ) {
+      throw Error('Firefox AMO metadata must be a JSON object');
+    }
+    if (
+      metadata.version != null &&
+      (typeof metadata.version !== 'object' || Array.isArray(metadata.version))
+    ) {
+      throw Error('Firefox AMO version metadata must be a JSON object');
+    }
+    return metadata;
   }
 }
