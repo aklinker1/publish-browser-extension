@@ -6,8 +6,14 @@ const lines: string[] = [];
 
 lines.push('export interface CustomEnv {');
 for (const meta of configMetas) {
+  const description =
+    `${meta.note ? `[${meta.note}] ` : ''}${meta.extendedDescription ?? meta.description}`.split(
+      '\n',
+    );
   lines.push(
-    `  /** ${meta.note ? `[${meta.note}] ` : ''}${meta.description} */`,
+    ...(description.length === 1
+      ? [`  /** ${description[0]} */`]
+      : ['  /**', ...description.map(line => '   * ' + line), '   */']),
     `  ${snakeCase(meta.path).toUpperCase()}: string | undefined,`,
   );
 }
