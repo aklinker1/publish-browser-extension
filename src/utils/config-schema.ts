@@ -230,8 +230,7 @@ Example:
   // https://mozilla.github.io/addons-server/topics/api/addons.html#edit
   "description": "...",
 }
-\`\`\`
-`,
+\`\`\``,
   }),
   sourcesZip: meta(optional(nonempty(string())), {
     path: 'firefox.sourcesZip',

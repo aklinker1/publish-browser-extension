@@ -61,7 +61,6 @@ export interface CustomEnv {
    *   "description": "...",
    * }
    * ```
-   *
    */
   FIREFOX_AMO_METADATA_FILE: string | undefined;
   /** The channel to publish to, "listed" or "unlisted" */
