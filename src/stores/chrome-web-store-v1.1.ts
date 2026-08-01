@@ -78,7 +78,7 @@ export class ChromeWebStoreV1_1 implements Store {
     this.checkUploadState(publishItem);
   }
 
-  async ensureZipsExist(): Promise<void> {
+  async ensureFilesExist(): Promise<void> {
     await ensureZipExists(this.options.zip);
   }
 

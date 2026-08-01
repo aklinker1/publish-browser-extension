@@ -4,6 +4,7 @@ import {
   type ChromeWebStoreV2Options,
   type FirefoxAddonStoreV5Options,
   type OperaAddonsStoreOptions,
+  type SafariAddonStoreOptions,
   resolveConfig,
   type AllChromeOptions,
   type InlineConfig,
@@ -33,6 +34,7 @@ export async function init(config: InlineConfig) {
       { value: 'firefox', label: 'Firefox Addon Store' },
       { value: 'edge', label: 'Edge Addon Store' },
       { value: 'opera', label: 'Opera Addons' },
+      { value: 'safari', label: 'Safari (App Store Connect)' },
     ],
     showHint: true,
   });
@@ -62,11 +64,19 @@ export async function init(config: InlineConfig) {
     replacements.push(...(await initOpera(previousConfig.opera)));
   }
 
+  if (stores?.includes('safari')) {
+    replacements.push(
+      ...(await initSafari(
+        previousConfig.safari as Partial<SafariAddonStoreOptions> | undefined,
+      )),
+    );
+  }
+
   await updateEnvFile(replacements);
 
   logger.log();
   logger.log(
-    `To submit an update, run:\n\n  ${highlight('publish-extension --chrome-zip path/to/extension.zip')}\n    ${highlight('--firefox-zip path/to/extension.zip')}\n    ${highlight('--edge-zip path/to/extension.zip')}\n    ${highlight('--opera-zip path/to/extension.zip')}`,
+    `To submit an update, run:\n\n  ${highlight('publish-extension --chrome-zip path/to/extension.zip')}\n    ${highlight('--firefox-zip path/to/extension.zip')}\n    ${highlight('--edge-zip path/to/extension.zip')}\n    ${highlight('--opera-zip path/to/extension.zip')}\n    ${highlight('--safari-bundle-path path/to/extension.pkg')}`,
   );
   logger.log();
 }
@@ -532,6 +542,78 @@ async function initEdge(
     { initial: !previousOptions?.skipSubmitReview },
   );
   entries.push([skipSubmitReviewEnvVar, !submitForReview]);
+
+  return entries;
+}
+
+async function initSafari(
+  previousOptions: Partial<SafariAddonStoreOptions> | undefined,
+): Promise<Entry[]> {
+  const entries: Entry[] = [];
+
+  console.log();
+  logger.info('\x1b[1mSafari (App Store Connect) Setup\x1b[0m');
+
+  const bundleTypeEnvVar = 'SAFARI_BUNDLE_TYPE';
+  console.log();
+  logger.info(highlight(bundleTypeEnvVar));
+  const bundleType = await select('Select the bundle type', {
+    choices: [
+      {
+        label: 'macos',
+        value: 'macos',
+        description: 'A .pkg installer for the Mac App Store',
+      },
+      {
+        label: 'ios',
+        value: 'ios',
+        description: 'An .ipa for the iOS App Store',
+      },
+      {
+        label: 'osx',
+        value: 'osx',
+        description: 'Alias for macOS (legacy name)',
+      },
+    ],
+  });
+  entries.push([bundleTypeEnvVar, bundleType]);
+
+  const apiKeyIdEnvVar = 'SAFARI_API_KEY_ID';
+  logger.log();
+  logger.info(highlight(apiKeyIdEnvVar));
+  logger.log('Your App Store Connect API Key ID. Create one at:');
+  logger.log(
+    `  ${ARROW} https://appstoreconnect.apple.com/access/integrations/api`,
+  );
+  const apiKeyId = await question('Enter the API Key ID', {
+    defaultValue: previousOptions?.apiKeyId,
+  });
+  entries.push([apiKeyIdEnvVar, apiKeyId]);
+
+  const apiIssuerIdEnvVar = 'SAFARI_API_ISSUER_ID';
+  logger.log();
+  logger.info(highlight(apiIssuerIdEnvVar));
+  logger.log(
+    'The Issuer ID shown at the top of the App Store Connect API Keys page.',
+  );
+  const apiIssuerId = await question('Enter the API Issuer ID', {
+    defaultValue: previousOptions?.apiIssuerId,
+  });
+  entries.push([apiIssuerIdEnvVar, apiIssuerId]);
+
+  const apiPrivateKeyPathEnvVar = 'SAFARI_API_PRIVATE_KEY_PATH';
+  logger.log();
+  logger.info(highlight(apiPrivateKeyPathEnvVar));
+  logger.log(
+    'Path to the .p8 private key file downloaded from App Store Connect.',
+  );
+  logger.log(
+    `  ${ARROW} The file is named AuthKey_${highlight('<KEY_ID>')}.p8`,
+  );
+  const apiPrivateKeyPath = await question('Enter path to .p8 key file', {
+    defaultValue: previousOptions?.apiPrivateKeyPath,
+  });
+  entries.push([apiPrivateKeyPathEnvVar, apiPrivateKeyPath]);
 
   return entries;
 }

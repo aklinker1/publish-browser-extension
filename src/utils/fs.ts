@@ -7,3 +7,11 @@ export async function ensureZipExists(path: string) {
     throw Error('ZIP file does not exist: ' + path);
   }
 }
+
+export async function ensureFileExists(path: string) {
+  try {
+    await fs.lstat(path);
+  } catch {
+    throw Error('File does not exist: ' + path);
+  }
+}

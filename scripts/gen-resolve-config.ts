@@ -27,6 +27,11 @@ const renderValue = (meta: { path: string }, padding = allPathsPadding) => {
   ).toUpperCase()}`;
 };
 
+const getArtifactKey = (storePath: string) =>
+  storePath === 'safari' ? 'bundlePath' : 'zip';
+const getArtifactVarName = (storePath: string) =>
+  storePath === 'safari' ? 'safariBundlePath' : storePath + 'Zip';
+
 const lines: string[] = [
   `// prettier-ignore`,
   `/**`,
@@ -40,12 +45,12 @@ const lines: string[] = [
   '  // Init store objects',
   ...nestedPaths.map(
     path =>
-      `  const ${(path + 'Zip').padEnd(storeNamePadding + 3)} = ${renderValue({ path: path + '.zip' }, storeNamePadding + 4)}`,
+      `  const ${getArtifactVarName(path).padEnd(storeNamePadding + 11)} = ${renderValue({ path: path + '.' + getArtifactKey(path) }, storeNamePadding + 12)}`,
   ),
   ``,
   ...nestedPaths.map(
     path =>
-      `  if ${('(' + path + 'Zip)').padEnd(storeNamePadding + 5)} raw.${path.padEnd(storeNamePadding)} ??= {}`,
+      `  if ${('(' + getArtifactVarName(path) + ')').padEnd(storeNamePadding + 13)} raw.${path.padEnd(storeNamePadding)} ??= {}`,
   ),
   ``,
   '  // Set values',

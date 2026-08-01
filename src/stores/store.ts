@@ -15,5 +15,5 @@ export interface Store {
   /**
    * Throw an error if the provided files do not exist.
    */
-  ensureZipsExist(): Promise<void>;
+  ensureFilesExist(): Promise<void>;
 }

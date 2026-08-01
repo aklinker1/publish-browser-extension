@@ -68,6 +68,16 @@ export interface CustomEnv {
   OPERA_SKIP_SUBMIT_REVIEW: string | undefined;
   /** Path to extension zip to upload */
   OPERA_ZIP: string | undefined;
+  /** App Store Connect API Issuer ID */
+  SAFARI_API_ISSUER_ID: string | undefined;
+  /** App Store Connect API Key ID */
+  SAFARI_API_KEY_ID: string | undefined;
+  /** Path to the .p8 App Store Connect API private key file */
+  SAFARI_API_PRIVATE_KEY_PATH: string | undefined;
+  /** Path to the .pkg (macOS) or .ipa (iOS) bundle to upload */
+  SAFARI_BUNDLE_PATH: string | undefined;
+  /** The type of bundle being uploaded: "macos", "ios", or "osx" (default: "macos") */
+  SAFARI_BUNDLE_TYPE: string | undefined;
 }
 /// gen-end:config-env
 

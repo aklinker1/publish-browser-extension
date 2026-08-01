@@ -22,7 +22,7 @@ export class EdgeAddonStoreV1_1 implements Store {
     });
   }
 
-  async ensureZipsExist(): Promise<void> {
+  async ensureFilesExist(): Promise<void> {
     await ensureZipExists(this.options.zip);
   }
 

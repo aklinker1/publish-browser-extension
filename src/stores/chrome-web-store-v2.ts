@@ -88,7 +88,7 @@ export class ChromeWebStoreV2 implements Store {
     }
   }
 
-  async ensureZipsExist(): Promise<void> {
+  async ensureFilesExist(): Promise<void> {
     await ensureZipExists(this.options.zip);
   }
 

@@ -162,7 +162,7 @@ export class OperaAddonsStore implements Store {
     }
   }
 
-  async ensureZipsExist(): Promise<void> {
+  async ensureFilesExist(): Promise<void> {
     await ensureZipExists(this.options.zip);
   }
 

@@ -19,15 +19,24 @@ jobs:
         run: git diff --exit-code || (git diff && exit 1)
 
   checks:
-    name: Checks
+    name: Checks (Linux)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: ./.github/actions/setup
       - run: bun run build
       - run: bun check
-      - run: bun test
+      - run: bun test src/__tests__/config.test.ts
       - run: bun bin/publish-extension.mjs --help
+
+  safari-checks:
+    name: Safari Checks (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: ./.github/actions/setup
+      - run: bun run build
+      - run: bun test src/__tests__/safari-addon-store.test.ts
   e2e-tests:
     name: E2E Tests (${{ matrix.runtime.name }})
     runs-on: ubuntu-24.04

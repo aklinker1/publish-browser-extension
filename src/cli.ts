@@ -59,6 +59,11 @@ cli.help();
   cli.option('--opera-session-id [operaSessionId]', "Session ID used for authorizing requests to Opera Addons API")
   cli.option('--opera-skip-submit-review [operaSkipSubmitReview]', "Just upload the extension zip, don't submit it for review or publish it (default: false)")
   cli.option('--opera-zip [operaZip]', "Path to extension zip to upload")
+  cli.option('--safari-api-issuer-id [safariApiIssuerId]', "App Store Connect API Issuer ID")
+  cli.option('--safari-api-key-id [safariApiKeyId]', "App Store Connect API Key ID")
+  cli.option('--safari-api-private-key-path [safariApiPrivateKeyPath]', "Path to the .p8 App Store Connect API private key file")
+  cli.option('--safari-bundle-path [safariBundlePath]', "Path to the .pkg (macOS) or .ipa (iOS) bundle to upload")
+  cli.option('--safari-bundle-type [safariBundleType]', "The type of bundle being uploaded: \"macos\", \"ios\", or \"osx\" (default: \"macos\") (default: \"macos\")")
 }
 /// gen-end:cli-flags
 
@@ -72,6 +77,7 @@ function configFromFlags(flags: any): InlineConfig {
   config.edge ??= {}
   config.firefox ??= {}
   config.opera ??= {}
+  config.safari ??= {}
 
   // Set values
   config.dryRun = flags.dryRun
@@ -108,30 +114,37 @@ function configFromFlags(flags: any): InlineConfig {
   config.opera.sessionId = flags.operaSessionId
   config.opera.skipSubmitReview = flags.operaSkipSubmitReview
   config.opera.zip = flags.operaZip
+  config.safari.apiIssuerId = flags.safariApiIssuerId
+  config.safari.apiKeyId = flags.safariApiKeyId
+  config.safari.apiPrivateKeyPath = flags.safariApiPrivateKeyPath
+  config.safari.bundlePath = flags.safariBundlePath
+  config.safari.bundleType = flags.safariBundleType
 
   return config
 }
 /// gen-end:config-from-flags
 
 /**
- * Same as `configFromFlags`, but add fake ZIP file paths for stores that don't have a ZIP file specified.
+ * Same as `configFromFlags`, but add fake file paths for stores that don't have a file specified.
  *
- * `resolveConfig` will return `undefined` for store options unless a ZIP file is specified.
+ * `resolveConfig` will return `undefined` for store options unless a file path is specified.
  */
 function configFromFlagsWithFakeZip(
   flags: any,
-  zips: {
+  files: {
     chrome?: boolean;
     firefox?: boolean;
     edge?: boolean;
     opera?: boolean;
+    safari?: boolean;
   },
 ) {
   return configFromFlags({
-    chromeZip: zips.chrome ? '...' : undefined,
-    firefoxZip: zips.firefox ? '...' : undefined,
-    edgeZip: zips.edge ? '...' : undefined,
-    operaZip: zips.opera ? '...' : undefined,
+    chromeZip: files.chrome ? '...' : undefined,
+    firefoxZip: files.firefox ? '...' : undefined,
+    edgeZip: files.edge ? '...' : undefined,
+    operaZip: files.opera ? '...' : undefined,
+    safariBundlePath: files.safari ? '...' : undefined,
     ...flags,
   });
 }
@@ -163,6 +176,7 @@ cli
       firefox: true,
       opera: true,
       edge: true,
+      safari: true,
     });
 
     try {

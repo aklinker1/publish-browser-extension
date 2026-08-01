@@ -7,7 +7,8 @@ import {
 } from '../config';
 import type { FirefoxAddonStoreV5Options } from '../utils/config-schema';
 
-const RESET_ENV_NAMES = /(^CHROME_|^FIREFOX_|^EDGE_|^OPERA_|^DRY_RUN$)/;
+const RESET_ENV_NAMES =
+  /(^CHROME_|^FIREFOX_|^EDGE_|^OPERA_|^SAFARI_|^DRY_RUN$)/;
 
 describe('resolveConfig', () => {
   beforeEach(() => {
@@ -56,6 +57,13 @@ describe('resolveConfig', () => {
         packageId: 1,
         sessionId: 'sessionId',
         skipSubmitReview: true,
+      },
+      safari: {
+        bundlePath: 'bundle.pkg',
+        bundleType: 'macos',
+        apiKeyId: 'keyId',
+        apiIssuerId: 'issuerId',
+        apiPrivateKeyPath: 'AuthKey.p8',
       },
     } satisfies ResolvedConfig;
 
@@ -114,6 +122,12 @@ describe('resolveConfig', () => {
     const operaSkipSubmitReview = true;
     process.env.OPERA_SKIP_SUBMIT_REVIEW = String(operaSkipSubmitReview);
 
+    process.env.SAFARI_BUNDLE_PATH = 'SAFARI_BUNDLE_PATH';
+    process.env.SAFARI_BUNDLE_TYPE = 'macos';
+    process.env.SAFARI_API_KEY_ID = 'SAFARI_API_KEY_ID';
+    process.env.SAFARI_API_ISSUER_ID = 'SAFARI_API_ISSUER_ID';
+    process.env.SAFARI_API_PRIVATE_KEY_PATH = 'SAFARI_API_PRIVATE_KEY_PATH';
+
     const expected: ResolvedConfig = {
       dryRun,
       chrome: {
@@ -154,6 +168,13 @@ describe('resolveConfig', () => {
         sessionId: process.env.OPERA_SESSION_ID!,
         skipSubmitReview: operaSkipSubmitReview,
       },
+      safari: {
+        bundlePath: process.env.SAFARI_BUNDLE_PATH!,
+        bundleType: 'macos',
+        apiKeyId: process.env.SAFARI_API_KEY_ID!,
+        apiIssuerId: process.env.SAFARI_API_ISSUER_ID!,
+        apiPrivateKeyPath: process.env.SAFARI_API_PRIVATE_KEY_PATH!,
+      },
     };
 
     const actual = resolveConfig({});
@@ -188,6 +209,12 @@ describe('resolveConfig', () => {
         packageId: 1,
         sessionId: 'sessionId',
       },
+      safari: {
+        bundlePath: 'bundle.pkg',
+        apiKeyId: 'keyId',
+        apiIssuerId: 'issuerId',
+        apiPrivateKeyPath: 'AuthKey.p8',
+      },
     };
 
     const expected = {
@@ -214,6 +241,10 @@ describe('resolveConfig', () => {
         ...config.opera,
         skipSubmitReview: false,
       },
+      safari: {
+        ...config.safari,
+        bundleType: 'macos' as const,
+      },
     } as ResolvedConfig;
 
     const actual = resolveConfig(config);
@@ -221,7 +252,7 @@ describe('resolveConfig', () => {
     expect(actual).toEqual(expected);
   });
 
-  it('should exclude chrome, firefox, edge and opera objects when their zip option is not passed', () => {
+  it('should exclude chrome, firefox, edge, opera and safari objects when their zip/bundlePath option is not passed', () => {
     const config: InlineConfig = {
       dryRun: false,
       chrome: {
@@ -236,6 +267,9 @@ describe('resolveConfig', () => {
       opera: {
         packageId: 1,
       },
+      safari: {
+        apiKeyId: 'keyId',
+      },
     };
     const expected: ResolvedConfig = {
       dryRun: false,
@@ -243,6 +277,7 @@ describe('resolveConfig', () => {
       edge: undefined,
       firefox: undefined,
       opera: undefined,
+      safari: undefined,
     };
 
     const actual = resolveConfig(config);

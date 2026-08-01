@@ -291,6 +291,32 @@ export const OperaAddonsStoreOptions = object({
 
 export type OperaAddonsStoreOptions = Infer<typeof OperaAddonsStoreOptions>;
 
+export const SafariAddonStoreOptions = object({
+  bundlePath: meta(nonempty(string()), {
+    path: 'safari.bundlePath',
+    description: 'Path to the .pkg (macOS) or .ipa (iOS) bundle to upload',
+  }),
+  bundleType: meta(defaulted(enums(['macos', 'ios', 'osx']), 'macos'), {
+    path: 'safari.bundleType',
+    description:
+      'The type of bundle being uploaded: "macos", "ios", or "osx" (default: "macos")',
+  }),
+  apiKeyId: meta(nonempty(trimmed(string())), {
+    path: 'safari.apiKeyId',
+    description: 'App Store Connect API Key ID',
+  }),
+  apiIssuerId: meta(nonempty(trimmed(string())), {
+    path: 'safari.apiIssuerId',
+    description: 'App Store Connect API Issuer ID',
+  }),
+  apiPrivateKeyPath: meta(nonempty(trimmed(string())), {
+    path: 'safari.apiPrivateKeyPath',
+    description: 'Path to the .p8 App Store Connect API private key file',
+  }),
+});
+
+export type SafariAddonStoreOptions = Infer<typeof SafariAddonStoreOptions>;
+
 export const ResolvedConfig = object({
   dryRun: meta(defaulted(stringbool, false), {
     path: 'dryRun',
@@ -307,6 +333,7 @@ export const ResolvedConfig = object({
   firefox: optional(FirefoxAddonStoreV5Options),
   edge: optional(EdgeAddonStoreV1_1Options),
   opera: optional(OperaAddonsStoreOptions),
+  safari: optional(SafariAddonStoreOptions),
 });
 
 export type ResolvedConfig = Infer<typeof ResolvedConfig>;

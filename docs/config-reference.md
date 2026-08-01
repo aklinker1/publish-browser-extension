@@ -36,6 +36,11 @@
 - [`opera.sessionId`](#operasessionid)
 - [`opera.skipSubmitReview`](#operaskipsubmitreview)
 - [`opera.zip`](#operazip)
+- [`safari.apiIssuerId`](#safariapiissuerid)
+- [`safari.apiKeyId`](#safariapikeyid)
+- [`safari.apiPrivateKeyPath`](#safariapiprivatekeypath)
+- [`safari.bundlePath`](#safaribundlepath)
+- [`safari.bundleType`](#safaribundletype)
 
 ### `dryRun`
 
@@ -309,5 +314,42 @@ Path to extension zip to upload
 
 - _CLI Flag_: `--opera-zip`
 - _Env Var_: `OPERA_ZIP`
+
+### `safari.apiIssuerId`
+
+App Store Connect API Issuer ID
+
+- _CLI Flag_: `--safari-api-issuer-id`
+- _Env Var_: `SAFARI_API_ISSUER_ID`
+
+### `safari.apiKeyId`
+
+App Store Connect API Key ID
+
+- _CLI Flag_: `--safari-api-key-id`
+- _Env Var_: `SAFARI_API_KEY_ID`
+
+### `safari.apiPrivateKeyPath`
+
+Path to the .p8 App Store Connect API private key file
+
+- _CLI Flag_: `--safari-api-private-key-path`
+- _Env Var_: `SAFARI_API_PRIVATE_KEY_PATH`
+
+### `safari.bundlePath`
+
+Path to the .pkg (macOS) or .ipa (iOS) bundle to upload
+
+- _CLI Flag_: `--safari-bundle-path`
+- _Env Var_: `SAFARI_BUNDLE_PATH`
+
+### `safari.bundleType`
+
+**Default:** `"macos"`
+
+The type of bundle being uploaded: "macos", "ios", or "osx" (default: "macos")
+
+- _CLI Flag_: `--safari-bundle-type`
+- _Env Var_: `SAFARI_BUNDLE_TYPE`
 
 <!-- gen-end:config-docs -->

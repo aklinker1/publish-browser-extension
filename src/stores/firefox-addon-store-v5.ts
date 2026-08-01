@@ -23,7 +23,7 @@ export class FirefoxAddonStoreV5 implements Store {
     });
   }
 
-  async ensureZipsExist(): Promise<void> {
+  async ensureFilesExist(): Promise<void> {
     await ensureZipExists(this.options.zip);
     if (this.options.sourcesZip) {
       await ensureZipExists(this.options.sourcesZip);
