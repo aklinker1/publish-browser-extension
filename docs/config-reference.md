@@ -234,7 +234,7 @@ Example:
 ```jsonc
 {
   "version": {
-    // Version-specific fields go in the "version" field.
+    // Version-specific fields go in the "version" field
     // https://mozilla.github.io/addons-server/topics/api/addons.html#version-create
     "release_notes": "...",
   },
