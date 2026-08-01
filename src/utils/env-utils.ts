@@ -44,7 +44,7 @@ export interface CustomEnv {
   EDGE_SKIP_SUBMIT_REVIEW: string | undefined;
   /** Path to extension zip to upload */
   EDGE_ZIP: string | undefined;
-  /** Path to a JSON file containing AMO listing and version metadata */
+  /** Path to JSON with AMO add-on edit fields at the top level and version create fields under "version": https://mozilla.github.io/addons-server/topics/api/addons.html#edit and https://mozilla.github.io/addons-server/topics/api/addons.html#version-create */
   FIREFOX_AMO_METADATA_FILE: string | undefined;
   /** The channel to publish to, "listed" or "unlisted" */
   FIREFOX_CHANNEL: string | undefined;

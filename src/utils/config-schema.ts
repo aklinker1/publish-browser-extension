@@ -207,7 +207,7 @@ export const FirefoxAddonStoreV5Options = object({
   amoMetadataFile: meta(optional(nonempty(string())), {
     path: 'firefox.amoMetadataFile',
     description:
-      'Path to a JSON file containing AMO listing and version metadata',
+      'Path to JSON with AMO add-on edit fields at the top level and version create fields under "version": https://mozilla.github.io/addons-server/topics/api/addons.html#edit and https://mozilla.github.io/addons-server/topics/api/addons.html#version-create',
   }),
   sourcesZip: meta(optional(nonempty(string())), {
     path: 'firefox.sourcesZip',

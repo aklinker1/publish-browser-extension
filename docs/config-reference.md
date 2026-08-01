@@ -227,7 +227,7 @@ Path to extension zip to upload
 
 ### `firefox.amoMetadataFile`
 
-Path to a JSON file containing AMO listing and version metadata
+Path to JSON with AMO add-on edit fields at the top level and version create fields under "version": https://mozilla.github.io/addons-server/topics/api/addons.html#edit and https://mozilla.github.io/addons-server/topics/api/addons.html#version-create
 
 - _CLI Flag_: `--firefox-amo-metadata-file`
 - _Env Var_: `FIREFOX_AMO_METADATA_FILE`
