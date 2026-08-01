@@ -61,6 +61,7 @@ export function resolveConfig(config?: InlineConfig): PartialResolvedConfig {
   if (raw.edge)    raw.edge.productId                   = (config as any)?.edge?.productId                   ?? process.env.EDGE_PRODUCT_ID
   if (raw.edge)    raw.edge.skipSubmitReview            = (config as any)?.edge?.skipSubmitReview            ?? process.env.EDGE_SKIP_SUBMIT_REVIEW
   if (raw.edge)    raw.edge.zip                         = (config as any)?.edge?.zip                         ?? process.env.EDGE_ZIP
+  if (raw.firefox) raw.firefox.amoMetadataFile          = (config as any)?.firefox?.amoMetadataFile          ?? process.env.FIREFOX_AMO_METADATA_FILE
   if (raw.firefox) raw.firefox.channel                  = (config as any)?.firefox?.channel                  ?? process.env.FIREFOX_CHANNEL
   if (raw.firefox) raw.firefox.compatibility            = (config as any)?.firefox?.compatibility            ?? process.env.FIREFOX_COMPATIBILITY
   if (raw.firefox) raw.firefox.extensionId              = (config as any)?.firefox?.extensionId              ?? process.env.FIREFOX_EXTENSION_ID

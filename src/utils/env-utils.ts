@@ -44,6 +44,25 @@ export interface CustomEnv {
   EDGE_SKIP_SUBMIT_REVIEW: string | undefined;
   /** Path to extension zip to upload */
   EDGE_ZIP: string | undefined;
+  /**
+   * Path to a JSON file with metadata to update.
+   *
+   * Example:
+   *
+   * ```jsonc
+   * {
+   *   "version": {
+   *     // Version-specific fields go in the "version" field
+   *     // https://mozilla.github.io/addons-server/topics/api/addons.html#version-create
+   *     "release_notes": "...",
+   *   },
+   *   // General addon fields go in the root
+   *   // https://mozilla.github.io/addons-server/topics/api/addons.html#edit
+   *   "description": "...",
+   * }
+   * ```
+   */
+  FIREFOX_AMO_METADATA_FILE: string | undefined;
   /** The channel to publish to, "listed" or "unlisted" */
   FIREFOX_CHANNEL: string | undefined;
   /** Comma-separated list of compatible applications, e.g. "firefox,android" - "firefox" for compatibility with Firefox desktop apps, "android" for Firefox Android apps */

@@ -42,6 +42,7 @@ describe('resolveConfig', () => {
         channel: 'unlisted',
         zip: 'zip',
         sourcesZip: 'sourcesZip',
+        amoMetadataFile: 'amoMetadataFile',
         skipSubmitReview: true,
       },
       edge: {
@@ -87,6 +88,7 @@ describe('resolveConfig', () => {
 
     process.env.FIREFOX_ZIP = 'FIREFOX_ZIP';
     process.env.FIREFOX_SOURCES_ZIP = 'FIREFOX_SOURCES_ZIP';
+    process.env.FIREFOX_AMO_METADATA_FILE = 'FIREFOX_AMO_METADATA_FILE';
     process.env.FIREFOX_EXTENSION_ID = 'FIREFOX_EXTENSION_ID';
     process.env.FIREFOX_JWT_ISSUER = 'FIREFOX_JWT_ISSUER';
     process.env.FIREFOX_JWT_SECRET = 'FIREFOX_JWT_SECRET';
@@ -134,6 +136,7 @@ describe('resolveConfig', () => {
       firefox: {
         zip: process.env.FIREFOX_ZIP,
         sourcesZip: process.env.FIREFOX_SOURCES_ZIP,
+        amoMetadataFile: process.env.FIREFOX_AMO_METADATA_FILE,
         channel: firefoxChannel,
         extensionId: process.env.FIREFOX_EXTENSION_ID,
         jwtIssuer: process.env.FIREFOX_JWT_ISSUER,

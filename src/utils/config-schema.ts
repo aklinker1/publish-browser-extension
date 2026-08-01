@@ -24,6 +24,7 @@ import type { DeepPartial } from './types';
 export interface MetaStruct<T> extends Struct<T> {
   '~meta': {
     description: string;
+    extendedDescription?: string;
     path: string;
     note?: string;
   };
@@ -31,12 +32,18 @@ export interface MetaStruct<T> extends Struct<T> {
 
 function meta<T>(
   struct: Struct<T>,
-  options: { path: string; description: string; note?: string },
+  options: {
+    path: string;
+    description: string;
+    extendedDescription?: string;
+    note?: string;
+  },
 ): MetaStruct<T> {
   const s = struct as MetaStruct<T>;
   s['~meta'] = {
     path: options.path,
     description: options.description,
+    extendedDescription: options.extendedDescription,
     note: options.note,
   };
   return s;
@@ -203,6 +210,27 @@ export const FirefoxAddonStoreV5Options = object({
   zip: meta(nonempty(string()), {
     path: 'firefox.zip',
     description: 'Path to extension zip to upload',
+  }),
+  amoMetadataFile: meta(optional(nonempty(string())), {
+    path: 'firefox.amoMetadataFile',
+    description:
+      'See: https://github.com/aklinker1/publish-browser-extension/blob/main/docs/config-reference.md#firefoxamometadatafile',
+    extendedDescription: `Path to a JSON file with metadata to update.
+
+Example:
+
+\`\`\`jsonc
+{
+  "version": {
+    // Version-specific fields go in the "version" field
+    // https://mozilla.github.io/addons-server/topics/api/addons.html#version-create
+    "release_notes": "...",
+  },
+  // General addon fields go in the root
+  // https://mozilla.github.io/addons-server/topics/api/addons.html#edit
+  "description": "...",
+}
+\`\`\``,
   }),
   sourcesZip: meta(optional(nonempty(string())), {
     path: 'firefox.sourcesZip',
