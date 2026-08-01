@@ -20,7 +20,7 @@ const lines = [
       ...(defaultValue
         ? [`**Default:** \`${JSON.stringify(defaultValue)}\``, '']
         : []),
-      meta.description,
+      meta.extendedDescription ?? meta.description,
       '',
       `- _CLI Flag_: \`--${kebabCase(meta.path)}\``,
       `- _Env Var_: \`${snakeCase(meta.path).toUpperCase()}\``,

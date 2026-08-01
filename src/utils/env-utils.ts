@@ -44,7 +44,7 @@ export interface CustomEnv {
   EDGE_SKIP_SUBMIT_REVIEW: string | undefined;
   /** Path to extension zip to upload */
   EDGE_ZIP: string | undefined;
-  /** Path to JSON with AMO add-on edit fields at the top level and version create fields under "version": https://mozilla.github.io/addons-server/topics/api/addons.html#edit and https://mozilla.github.io/addons-server/topics/api/addons.html#version-create */
+  /** See: https://github.com/aklinker1/publish-browser-extension/blob/main/docs/config-reference.md#firefoxamometadatafile */
   FIREFOX_AMO_METADATA_FILE: string | undefined;
   /** The channel to publish to, "listed" or "unlisted" */
   FIREFOX_CHANNEL: string | undefined;
