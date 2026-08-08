@@ -1,5 +1,3 @@
-import { writeFile } from 'fs/promises';
-import { createWriteStream } from 'fs';
 import { createZip } from '@aklinker1/zero-zip';
 import { logger } from '../src/utils/logger';
 
