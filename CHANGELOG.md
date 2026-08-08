@@ -1,5 +1,22 @@
 # Changelog
 
+## v6.1.0
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v6.0.0...v6.1.0)
+
+### 🚀 Enhancements
+
+- Support Firefox AMO metadata ([#88](https://github.com/aklinker1/publish-browser-extension/pull/88))
+
+### 🩹 Fixes
+
+- **firefox:** Include filename in zip uploads ([#91](https://github.com/aklinker1/publish-browser-extension/pull/91))
+
+### ❤️ Contributors
+
+- Aaron ([@aklinker1](https://github.com/aklinker1))
+- Guflly ([@Guflly](https://github.com/Guflly))
+
 ## v6.0.0
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v5.1.0...v6.0.0)
