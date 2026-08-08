@@ -67,7 +67,7 @@ jobs:
           # FIREFOX_ZIP: extension/firefox.zip
           # FIREFOX_SOURCES_ZIP: extension/firefox.zip
           EDGE_ZIP: extension/chrome.zip
-          OPERA_ZIP: extension/chrome.zip
+          # OPERA_ZIP: extension/chrome.zip
           # Chrome
           CHROME_API_VERSION: v2
           CHROME_EXTENSION_ID: ${{ secrets.TEST_CHROME_EXTENSION_ID }}
