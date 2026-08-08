@@ -1,13 +1,12 @@
 import { plural } from '../utils/plural';
 import type { Store } from './store';
-import { ensureZipExists } from '../utils/fs';
+import { ensureZipExists, openAsFile } from '../utils/fs';
 import { createHttpClient, type HttpClient } from '../utils/http-client';
 import * as FirefoxApiV5 from '../apis/firefox-api-v5';
 import { createFirefoxJwt } from '../utils/firefox-auth';
 import { pollUntil } from '../utils/polling';
 import type { FirefoxAddonStoreV5Options } from '../config';
 import { readFile } from 'node:fs/promises';
-import { openAsBlob } from 'node:fs';
 
 export class FirefoxAddonStoreV5 implements Store {
   private client: HttpClient<FirefoxApiV5.Endpoints>;
@@ -50,7 +49,7 @@ export class FirefoxAddonStoreV5 implements Store {
     this.setStatus('Uploading new ZIP file');
     const uploadBody = new FormData();
     uploadBody.set('channel', this.options.channel);
-    uploadBody.set('upload', await openAsBlob(this.options.zip));
+    uploadBody.set('upload', await openAsFile(this.options.zip));
     const { uuid: uploadUuid } = await this.client.post(
       '/api/v5/addons/upload/',
       {
@@ -105,7 +104,7 @@ export class FirefoxAddonStoreV5 implements Store {
 
       if (this.options.sourcesZip) {
         const sourceBody = new FormData();
-        sourceBody.set('source', await openAsBlob(this.options.sourcesZip));
+        sourceBody.set('source', await openAsFile(this.options.sourcesZip));
         await this.client.fetch(
           'PATCH',
           '/api/v5/addons/addon/{idOrSlugOrGuid}/versions/{versionId}/',
@@ -124,7 +123,7 @@ export class FirefoxAddonStoreV5 implements Store {
       versionBody.set(
         'source',
         this.options.sourcesZip
-          ? await openAsBlob(this.options.sourcesZip)
+          ? await openAsFile(this.options.sourcesZip)
           : '',
       );
       version = await this.client.post(
