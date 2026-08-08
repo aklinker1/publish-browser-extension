@@ -1,6 +1,6 @@
 import { writeFile } from 'fs/promises';
 import { createWriteStream } from 'fs';
-import { ZipArchive } from 'archiver';
+import { createZip } from '@aklinker1/zero-zip';
 import { logger } from '../src/utils/logger';
 
 // Utils
@@ -17,34 +17,27 @@ function getUniqueVersion() {
 }
 
 async function createExtensionZip(file: string, customManifest: any) {
-  const { resolve, reject, promise } = Promise.withResolvers<void>();
-  const output = createWriteStream(file);
-  const archive = new ZipArchive();
-  archive.on('close', resolve);
-  archive.on('end', resolve);
-  archive.on('finish', resolve);
-  archive.on('warning', reject);
-  archive.on('error', reject);
-  archive.pipe(output);
+  const zip = createZip();
 
-  const manifest = {
-    name: 'CI/CD Test',
-    ...customManifest,
-  };
-  await writeFile(extensionManifest, JSON.stringify(manifest, null, 2));
-  archive.file(extensionManifest, { name: 'manifest.json' });
-  archive.file('extension/background.js', { name: 'background.js' });
+  zip.addFile(
+    'manifest.json',
+    JSON.stringify({
+      name: 'CI/CD Test',
+      ...customManifest,
+    }),
+  );
+  zip.addFile(
+    'background.js',
+    await Bun.file('extension/background.js').text(),
+  );
 
-  archive.finalize();
-
-  return promise;
+  await Bun.write(file, await zip.toBuffer());
 }
 
 logger.start('Creating extension ZIPs to upload...');
 
 const chromeZip = 'extension/chrome.zip';
 const firefoxZip = 'extension/firefox.zip';
-const extensionManifest = 'extension/manifest.json';
 const version = getUniqueVersion();
 
 await createExtensionZip(chromeZip, {
