@@ -1,10 +1,14 @@
+const escapeChars = ['=', '\n', '$', '#', ' ', '"', "'"];
+
 export function setDotenvValue(
   dotenv: string,
   key: string,
   value: string,
 ): string {
-  const needsQuotes = value.includes('"') || value.includes('\n');
-  const wrappedValue = needsQuotes ? `"${value}"` : value;
+  const needsQuotes = escapeChars.some(char => value.includes(char));
+  const wrappedValue = needsQuotes
+    ? `"${value.replaceAll('"', '\\"')}"`
+    : value;
 
   const keyIndex = findKey(dotenv, key);
   return keyIndex == null

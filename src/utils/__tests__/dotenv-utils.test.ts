@@ -23,7 +23,7 @@ describe('Dotenv Utils', () => {
 
     it('should add quotes when there is a quote in the string', () => {
       const env = 'TEST="123"';
-      const expected = 'TEST="42\""';
+      const expected = 'TEST="42\\""';
 
       const actual = setDotenvValue(env, 'TEST', '42"');
 
