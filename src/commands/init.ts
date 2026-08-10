@@ -13,6 +13,7 @@ import type { CustomEnv } from '../utils/env-utils';
 import { highlight, logger } from '../utils/logger';
 import { confirm, select, multiselect, question } from '@topcli/prompts';
 import { FetchError } from '../utils/errors';
+import { setDotenvValue } from '../utils/dotenv-utils';
 
 type Entry = [key: keyof CustomEnv, value: string | number | boolean];
 
@@ -264,10 +265,13 @@ async function initChromeV2(
   );
   entries.push([serviceAccountClientEmailEnvVar, serviceAccountClientEmail]);
 
-  const serviceAccountPrivateKey = await question(
+  let serviceAccountPrivateKey = await question(
     `Enter the ${highlight('private_key')} (copy the JSON value, minus the surrounding quotes, keeping the "\\n" characters as-is)`,
     { defaultValue: previousOptions?.serviceAccountPrivateKey },
   );
+  serviceAccountPrivateKey = serviceAccountPrivateKey
+    .replaceAll('\\n', '\n') // Convert typed "\n" to real newlines
+    .trim(); // Remove trailing slashes
   entries.push([serviceAccountPrivateKeyEnvVar, serviceAccountPrivateKey]);
 
   const skipSubmitReviewEnvVar = 'CHROME_SKIP_SUBMIT_REVIEW';
@@ -540,14 +544,8 @@ async function updateEnvFile(entries: Entry[]) {
   let template = await readFile(ENV_FILE, 'utf-8').catch(() => '');
 
   for (const [name, value] of entries) {
-    const replacement = `${name}=${JSON.stringify(value)}`;
-    const pattern = new RegExp(`^${name}=.*$`, 'm');
-    const existing = template.match(pattern);
-    if (existing) {
-      template = template.replace(existing[0], replacement);
-    } else {
-      template += `\n${replacement}`;
-    }
+    if (value == null) continue;
+    template = setDotenvValue(template, name, String(value));
   }
 
   const backupFilename = `${ENV_FILE}.backup-${Date.now()}`;
