@@ -1,5 +1,17 @@
 # Changelog
 
+## v6.1.1
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v6.1.0...v6.1.1)
+
+### 🩹 Fixes
+
+- **init:** Better handling of newline chars in CWS private key ([#92](https://github.com/aklinker1/publish-browser-extension/pull/92))
+
+### ❤️ Contributors
+
+- Aaron ([@aklinker1](https://github.com/aklinker1))
+
 ## v6.1.0
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v6.0.0...v6.1.0)
