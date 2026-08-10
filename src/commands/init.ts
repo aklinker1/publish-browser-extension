@@ -265,11 +265,10 @@ async function initChromeV2(
   );
   entries.push([serviceAccountClientEmailEnvVar, serviceAccountClientEmail]);
 
-  let serviceAccountPrivateKey = await question(
+  const serviceAccountPrivateKey = await question(
     `Enter the ${highlight('private_key')} (copy the JSON value, minus the surrounding quotes, keeping the "\\n" characters as-is)`,
     { defaultValue: previousOptions?.serviceAccountPrivateKey },
   );
-  serviceAccountPrivateKey = serviceAccountPrivateKey.replaceAll('\\n', '\n');
   entries.push([serviceAccountPrivateKeyEnvVar, serviceAccountPrivateKey]);
 
   const skipSubmitReviewEnvVar = 'CHROME_SKIP_SUBMIT_REVIEW';

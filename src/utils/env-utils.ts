@@ -95,7 +95,3 @@ declare global {
     interface ProcessEnv extends CustomEnv {}
   }
 }
-
-/// gen-start:config-to-env
-
-/// gen-end:config-to-env
