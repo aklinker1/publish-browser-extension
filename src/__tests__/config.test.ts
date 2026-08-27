@@ -252,6 +252,19 @@ describe('resolveConfig', () => {
 
     expect(actual).toEqual(expected);
   });
+
+  it('should resolve config without a validation error when only fake zip paths are passed', () => {
+    const config: InlineConfig = {
+      chrome: { zip: '...' },
+      firefox: { zip: '...' },
+      edge: { zip: '...' },
+      opera: { zip: '...' },
+    };
+
+    const actual = resolveConfig(config);
+
+    expect(actual).toMatchObject(config);
+  });
 });
 
 describe('validateConfig', () => {

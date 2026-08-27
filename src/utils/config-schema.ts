@@ -196,15 +196,18 @@ export const ChromeWebStoreV2Options = object({
 export type ChromeWebStoreV2Options = Infer<typeof ChromeWebStoreV2Options>;
 
 /** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
-export type AllChromeOptions = {
-  [
-    key in keyof ChromeWebStoreV1_1Options | keyof ChromeWebStoreV2Options
-  ]: key extends keyof ChromeWebStoreV1_1Options
-    ? ChromeWebStoreV1_1Options[key]
-    : key extends keyof ChromeWebStoreV2Options
-      ? ChromeWebStoreV2Options[key]
-      : never;
-};
+export const AllChromeOptions = object({
+  ...ChromeWebStoreV1_1Options.schema,
+  ...ChromeWebStoreV2Options.schema,
+  apiVersion: meta(optional(enums(['v1.1', 'v2'])), {
+    path: 'chrome.apiVersion',
+    description:
+      'The API version to use for the Chrome Web Store: "v1.1" or "v2"',
+  }),
+});
+
+/** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
+export type AllChromeOptions = Infer<typeof AllChromeOptions>;
 
 export const FirefoxAddonStoreV5Options = object({
   zip: meta(nonempty(string()), {
@@ -339,7 +342,12 @@ export const ResolvedConfig = object({
 
 export type ResolvedConfig = Infer<typeof ResolvedConfig>;
 
-export const PartialResolvedConfig = deepPartial(ResolvedConfig);
+export const PartialResolvedConfig = deepPartial(
+  object({
+    ...ResolvedConfig.schema,
+    chrome: optional(AllChromeOptions),
+  }),
+);
 
 export type PartialResolvedConfig = Infer<typeof PartialResolvedConfig>;
 
