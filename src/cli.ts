@@ -34,9 +34,10 @@ cli.help();
   cli.option('--chrome-cancel-pending [chromeCancelPending]', "[API v2 only] Cancel any pending review before submitting the new version (default: false)")
   cli.option('--chrome-publisher-id [chromePublisherId]', "[API v2 only] Publisher ID who owns the extension")
   cli.option('--chrome-publish-type [chromePublishType]', "[API v2 only] Set to \"STAGED_PUBLISH\" to not publish the extension immediately after submission")
-  cli.option('--chrome-service-account-client-email [chromeServiceAccountClientEmail]', "[API v2 only] Client email of the service account used for authorizing requests to the Chrome Web Store")
-  cli.option('--chrome-service-account-private-key [chromeServiceAccountPrivateKey]', "[API v2 only] Private key of the service account used for authorizing requests to the Chrome Web Store")
   cli.option('--chrome-skip-review [chromeSkipReview]', "[API v2 only] Some updates, like ad-blocker rule updates, can skip the review process and be published immediately after submission")
+  cli.option('--chrome-service-account-client-email [chromeServiceAccountClientEmail]', "[API v2 only; mutually exclusive with serviceAccountAccessToken] Client email of the service account used for authorizing requests to the Chrome Web Store")
+  cli.option('--chrome-service-account-private-key [chromeServiceAccountPrivateKey]', "[API v2 only; mutually exclusive with serviceAccountAccessToken] Private key of the service account used for authorizing requests to the Chrome Web Store")
+  cli.option('--chrome-service-account-access-token [chromeServiceAccountAccessToken]', "[API v2 only; mutually exclusive with serviceAccountClientEmail and serviceAccountPrivateKey] Short-lived OAuth 2.0 access token used for authorizing requests to the Chrome Web Store")
   cli.option('--chrome-client-id [chromeClientId]', "[Deprecated: API v1.1 only] Client ID used for authorizing requests to the Chrome Web Store")
   cli.option('--chrome-client-secret [chromeClientSecret]', "[Deprecated: API v1.1 only] Client secret used for authorizing requests to the Chrome Web Store")
   cli.option('--chrome-publish-target [chromePublishTarget]', "[Deprecated: API v1.1 only] Group to publish to, \"default\" or \"trustedTesters\"")
@@ -84,9 +85,10 @@ function configFromFlags(flags: any): InlineConfig {
   config.chrome.cancelPending = flags.chromeCancelPending
   config.chrome.publisherId = flags.chromePublisherId
   config.chrome.publishType = flags.chromePublishType
+  config.chrome.skipReview = flags.chromeSkipReview
   config.chrome.serviceAccountClientEmail = flags.chromeServiceAccountClientEmail
   config.chrome.serviceAccountPrivateKey = flags.chromeServiceAccountPrivateKey
-  config.chrome.skipReview = flags.chromeSkipReview
+  config.chrome.serviceAccountAccessToken = flags.chromeServiceAccountAccessToken
   config.chrome.clientId = flags.chromeClientId
   config.chrome.clientSecret = flags.chromeClientSecret
   config.chrome.publishTarget = flags.chromePublishTarget

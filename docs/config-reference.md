@@ -11,9 +11,10 @@
 - [`chrome.cancelPending`](#chromecancelpending) (API v2 only)
 - [`chrome.publisherId`](#chromepublisherid) (API v2 only)
 - [`chrome.publishType`](#chromepublishtype) (API v2 only)
-- [`chrome.serviceAccountClientEmail`](#chromeserviceaccountclientemail) (API v2 only)
-- [`chrome.serviceAccountPrivateKey`](#chromeserviceaccountprivatekey) (API v2 only)
 - [`chrome.skipReview`](#chromeskipreview) (API v2 only)
+- [`chrome.serviceAccountClientEmail`](#chromeserviceaccountclientemail) (API v2 only; mutually exclusive with serviceAccountAccessToken)
+- [`chrome.serviceAccountPrivateKey`](#chromeserviceaccountprivatekey) (API v2 only; mutually exclusive with serviceAccountAccessToken)
+- [`chrome.serviceAccountAccessToken`](#chromeserviceaccountaccesstoken) (API v2 only; mutually exclusive with serviceAccountClientEmail and serviceAccountPrivateKey)
 - [`chrome.clientId`](#chromeclientid) (Deprecated: API v1.1 only)
 - [`chrome.clientSecret`](#chromeclientsecret) (Deprecated: API v1.1 only)
 - [`chrome.publishTarget`](#chromepublishtarget) (Deprecated: API v1.1 only)
@@ -110,26 +111,6 @@ Set to "STAGED_PUBLISH" to not publish the extension immediately after submissio
 - _CLI Flag_: `--chrome-publish-type`
 - _Env Var_: `CHROME_PUBLISH_TYPE`
 
-### `chrome.serviceAccountClientEmail`
-
-> [!NOTE]
-> API v2 only
-
-Client email of the service account used for authorizing requests to the Chrome Web Store
-
-- _CLI Flag_: `--chrome-service-account-client-email`
-- _Env Var_: `CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL`
-
-### `chrome.serviceAccountPrivateKey`
-
-> [!NOTE]
-> API v2 only
-
-Private key of the service account used for authorizing requests to the Chrome Web Store
-
-- _CLI Flag_: `--chrome-service-account-private-key`
-- _Env Var_: `CHROME_SERVICE_ACCOUNT_PRIVATE_KEY`
-
 ### `chrome.skipReview`
 
 > [!NOTE]
@@ -139,6 +120,36 @@ Some updates, like ad-blocker rule updates, can skip the review process and be p
 
 - _CLI Flag_: `--chrome-skip-review`
 - _Env Var_: `CHROME_SKIP_REVIEW`
+
+### `chrome.serviceAccountClientEmail`
+
+> [!NOTE]
+> API v2 only; mutually exclusive with serviceAccountAccessToken
+
+Client email of the service account used for authorizing requests to the Chrome Web Store
+
+- _CLI Flag_: `--chrome-service-account-client-email`
+- _Env Var_: `CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL`
+
+### `chrome.serviceAccountPrivateKey`
+
+> [!NOTE]
+> API v2 only; mutually exclusive with serviceAccountAccessToken
+
+Private key of the service account used for authorizing requests to the Chrome Web Store
+
+- _CLI Flag_: `--chrome-service-account-private-key`
+- _Env Var_: `CHROME_SERVICE_ACCOUNT_PRIVATE_KEY`
+
+### `chrome.serviceAccountAccessToken`
+
+> [!NOTE]
+> API v2 only; mutually exclusive with serviceAccountClientEmail and serviceAccountPrivateKey
+
+Short-lived OAuth 2.0 access token used for authorizing requests to the Chrome Web Store
+
+- _CLI Flag_: `--chrome-service-account-access-token`
+- _Env Var_: `CHROME_SERVICE_ACCOUNT_ACCESS_TOKEN`
 
 ### `chrome.clientId`
 

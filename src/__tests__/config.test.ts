@@ -224,6 +224,46 @@ describe('resolveConfig', () => {
     expect(actual).toEqual(expected);
   });
 
+  it('should accept a short-lived Chrome Web Store access token', () => {
+    const config: InlineConfig = {
+      chrome: {
+        apiVersion: 'v2',
+        extensionId: 'extensionId',
+        publisherId: 'publisherId',
+        serviceAccountAccessToken: 'access-token',
+        zip: 'zip',
+      },
+    };
+
+    expect(validateConfig(resolveConfig(config)).chrome).toMatchObject({
+      serviceAccountAccessToken: 'access-token',
+    });
+  });
+
+  it('should reject incomplete or conflicting Chrome Web Store credentials', () => {
+    const base = {
+      apiVersion: 'v2' as const,
+      extensionId: 'extensionId',
+      publisherId: 'publisherId',
+      zip: 'zip',
+    };
+
+    expect(() => validateConfig({ chrome: base })).toThrow('Invalid config:');
+    expect(() =>
+      validateConfig({
+        chrome: {
+          ...base,
+          serviceAccountAccessToken: 'access-token',
+          serviceAccountClientEmail: 'client@example.com',
+          serviceAccountPrivateKey: 'private-key',
+        },
+      }),
+    ).toThrow(
+      'Invalid config:\n' +
+        '  - \u001b[36mchrome\u001b[39m: Provide either serviceAccountAccessToken or both serviceAccountClientEmail and serviceAccountPrivateKey, but not both',
+    );
+  });
+
   it('should exclude chrome, firefox, edge and opera objects when their zip option is not passed', () => {
     const config: InlineConfig = {
       dryRun: false,
@@ -264,7 +304,7 @@ describe('validateConfig', () => {
       },
     };
     expect(() => validateConfig(config)).toThrowError(
-      'Invalid config:\n  - \u001B[36mchrome.zip\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.extensionId\u001B[39m: Expected a nonempty string but received an empty one\n  - \u001B[36mchrome.publisherId\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.serviceAccountClientEmail\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.serviceAccountPrivateKey\u001B[39m: Expected a string, but received: undefined',
+      'Invalid config:\n  - \u001B[36mchrome.zip\u001B[39m: Expected a string, but received: undefined\n  - \u001B[36mchrome.extensionId\u001B[39m: Expected a nonempty string but received an empty one\n  - \u001B[36mchrome.publisherId\u001B[39m: Expected a string, but received: undefined',
     );
   });
 });
