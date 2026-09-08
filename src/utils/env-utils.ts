@@ -18,12 +18,14 @@ export interface CustomEnv {
   CHROME_PUBLISHER_ID: string | undefined;
   /** [API v2 only] Set to "STAGED_PUBLISH" to not publish the extension immediately after submission */
   CHROME_PUBLISH_TYPE: string | undefined;
-  /** [API v2 only] Client email of the service account used for authorizing requests to the Chrome Web Store */
-  CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: string | undefined;
-  /** [API v2 only] Private key of the service account used for authorizing requests to the Chrome Web Store */
-  CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: string | undefined;
   /** [API v2 only] Some updates, like ad-blocker rule updates, can skip the review process and be published immediately after submission */
   CHROME_SKIP_REVIEW: string | undefined;
+  /** [API v2 only; mutually exclusive with serviceAccountAccessToken] Client email of the service account used for authorizing requests to the Chrome Web Store */
+  CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: string | undefined;
+  /** [API v2 only; mutually exclusive with serviceAccountAccessToken] Private key of the service account used for authorizing requests to the Chrome Web Store */
+  CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: string | undefined;
+  /** [API v2 only; mutually exclusive with serviceAccountClientEmail and serviceAccountPrivateKey] Short-lived OAuth 2.0 access token used for authorizing requests to the Chrome Web Store */
+  CHROME_SERVICE_ACCOUNT_ACCESS_TOKEN: string | undefined;
   /** [Deprecated: API v1.1 only] Client ID used for authorizing requests to the Chrome Web Store */
   CHROME_CLIENT_ID: string | undefined;
   /** [Deprecated: API v1.1 only] Client secret used for authorizing requests to the Chrome Web Store */
