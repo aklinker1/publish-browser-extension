@@ -18,6 +18,7 @@ import {
   trimmed,
   defaulted,
   partial,
+  refine,
 } from 'superstruct';
 import type { DeepPartial } from './types';
 
@@ -145,7 +146,7 @@ export const ChromeWebStoreV1_1Options = object({
 /** @deprecated Will be removed October 15th, 2026, when the CWS API v1.1 is shut down. */
 export type ChromeWebStoreV1_1Options = Infer<typeof ChromeWebStoreV1_1Options>;
 
-export const ChromeWebStoreV2Options = object({
+const ChromeWebStoreV2OptionsShape = {
   apiVersion: meta(literal('v2'), {
     path: 'chrome.apiVersion',
     description:
@@ -157,15 +158,21 @@ export const ChromeWebStoreV2Options = object({
     note: 'API v2 only',
     description: 'Publisher ID who owns the extension',
   }),
-  serviceAccountClientEmail: meta(nonempty(trimmed(string())), {
+  serviceAccountAccessToken: meta(optional(nonempty(trimmed(string()))), {
+    path: 'chrome.serviceAccountAccessToken',
+    note: 'API v2 only; mutually exclusive with serviceAccountClientEmail and serviceAccountPrivateKey',
+    description:
+      'Short-lived OAuth 2.0 access token used for authorizing requests to the Chrome Web Store',
+  }),
+  serviceAccountClientEmail: meta(optional(nonempty(trimmed(string()))), {
     path: 'chrome.serviceAccountClientEmail',
-    note: 'API v2 only',
+    note: 'API v2 only; mutually exclusive with serviceAccountAccessToken',
     description:
       'Client email of the service account used for authorizing requests to the Chrome Web Store',
   }),
-  serviceAccountPrivateKey: meta(nonempty(trimmed(string())), {
+  serviceAccountPrivateKey: meta(optional(nonempty(trimmed(string()))), {
     path: 'chrome.serviceAccountPrivateKey',
-    note: 'API v2 only',
+    note: 'API v2 only; mutually exclusive with serviceAccountAccessToken',
     description:
       'Private key of the service account used for authorizing requests to the Chrome Web Store',
   }),
@@ -191,7 +198,18 @@ export const ChromeWebStoreV2Options = object({
     note: 'API v2 only',
     description: 'Cancel any pending review before submitting the new version',
   }),
-});
+};
+
+export const ChromeWebStoreV2Options = refine(
+  object(ChromeWebStoreV2OptionsShape),
+  'chrome-v2-authentication',
+  value =>
+    Boolean(value.serviceAccountAccessToken) !==
+      Boolean(
+        value.serviceAccountClientEmail && value.serviceAccountPrivateKey,
+      ) ||
+    'Provide either serviceAccountAccessToken or both serviceAccountClientEmail and serviceAccountPrivateKey, but not both',
+);
 
 export type ChromeWebStoreV2Options = Infer<typeof ChromeWebStoreV2Options>;
 

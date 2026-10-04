@@ -48,9 +48,10 @@ export function resolveConfig(config?: InlineConfig): PartialResolvedConfig {
   if (raw.chrome)  raw.chrome.cancelPending             = (config as any)?.chrome?.cancelPending             ?? process.env.CHROME_CANCEL_PENDING
   if (raw.chrome)  raw.chrome.publisherId               = (config as any)?.chrome?.publisherId               ?? process.env.CHROME_PUBLISHER_ID
   if (raw.chrome)  raw.chrome.publishType               = (config as any)?.chrome?.publishType               ?? process.env.CHROME_PUBLISH_TYPE
+  if (raw.chrome)  raw.chrome.skipReview                = (config as any)?.chrome?.skipReview                ?? process.env.CHROME_SKIP_REVIEW
   if (raw.chrome)  raw.chrome.serviceAccountClientEmail = (config as any)?.chrome?.serviceAccountClientEmail ?? process.env.CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL
   if (raw.chrome)  raw.chrome.serviceAccountPrivateKey  = (config as any)?.chrome?.serviceAccountPrivateKey  ?? process.env.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY
-  if (raw.chrome)  raw.chrome.skipReview                = (config as any)?.chrome?.skipReview                ?? process.env.CHROME_SKIP_REVIEW
+  if (raw.chrome)  raw.chrome.serviceAccountAccessToken = (config as any)?.chrome?.serviceAccountAccessToken ?? process.env.CHROME_SERVICE_ACCOUNT_ACCESS_TOKEN
   if (raw.chrome)  raw.chrome.clientId                  = (config as any)?.chrome?.clientId                  ?? process.env.CHROME_CLIENT_ID
   if (raw.chrome)  raw.chrome.clientSecret              = (config as any)?.chrome?.clientSecret              ?? process.env.CHROME_CLIENT_SECRET
   if (raw.chrome)  raw.chrome.publishTarget             = (config as any)?.chrome?.publishTarget             ?? process.env.CHROME_PUBLISH_TARGET

@@ -109,14 +109,17 @@ export class ChromeWebStoreV2 implements Store {
   }
 
   private async getAccessToken(): Promise<string> {
+    if (this.options.serviceAccountAccessToken)
+      return this.options.serviceAccountAccessToken;
+
     if (!this.accessTokenCache)
-      this.accessTokenCache = this.getAccessTokenNoCache();
+      this.accessTokenCache = this.generateAccessToken();
 
     const data = await this.accessTokenCache;
     return data.access_token;
   }
 
-  private async getAccessTokenNoCache(): Promise<ServiceAccountTokenResponse> {
+  private async generateAccessToken(): Promise<ServiceAccountTokenResponse> {
     const res = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
@@ -125,8 +128,8 @@ export class ChromeWebStoreV2 implements Store {
       body: new URLSearchParams({
         grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
         assertion: createGcpServiceAccountJwt(
-          this.options.serviceAccountClientEmail,
-          this.options.serviceAccountPrivateKey,
+          this.options.serviceAccountClientEmail!,
+          this.options.serviceAccountPrivateKey!,
           ['https://www.googleapis.com/auth/chromewebstore'],
         ),
       }),
