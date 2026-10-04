@@ -1,5 +1,22 @@
 # Changelog
 
+## v6.2.0
+
+[compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v6.1.1...v6.2.0)
+
+### 🚀 Enhancements
+
+- Support Chrome Web Store access tokens ([#96](https://github.com/aklinker1/publish-browser-extension/pull/96))
+
+### 🩹 Fixes
+
+- Fix validation error on init command ([#94](https://github.com/aklinker1/publish-browser-extension/pull/94))
+
+### ❤️ Contributors
+
+- Otokotoba
+- Sebastien A <sebastien.arod@gmail.com>
+
 ## v6.1.1
 
 [compare changes](https://github.com/aklinker1/publish-browser-extension/compare/v6.1.0...v6.1.1)
