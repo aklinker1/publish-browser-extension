@@ -59,6 +59,7 @@ export function resolveConfig(config?: InlineConfig): PartialResolvedConfig {
   if (raw.chrome)  raw.chrome.reviewExemption           = (config as any)?.chrome?.reviewExemption           ?? process.env.CHROME_REVIEW_EXEMPTION
   if (raw.edge)    raw.edge.apiKey                      = (config as any)?.edge?.apiKey                      ?? process.env.EDGE_API_KEY
   if (raw.edge)    raw.edge.clientId                    = (config as any)?.edge?.clientId                    ?? process.env.EDGE_CLIENT_ID
+  if (raw.edge)    raw.edge.notes                       = (config as any)?.edge?.notes                       ?? process.env.EDGE_NOTES
   if (raw.edge)    raw.edge.productId                   = (config as any)?.edge?.productId                   ?? process.env.EDGE_PRODUCT_ID
   if (raw.edge)    raw.edge.skipSubmitReview            = (config as any)?.edge?.skipSubmitReview            ?? process.env.EDGE_SKIP_SUBMIT_REVIEW
   if (raw.edge)    raw.edge.zip                         = (config as any)?.edge?.zip                         ?? process.env.EDGE_ZIP
