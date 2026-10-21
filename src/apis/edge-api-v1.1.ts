@@ -54,8 +54,10 @@ export type Endpoints = {
       params: {
         productId: string;
       };
-      /** Yes, an empty object for some reason. */
-      body: {};
+      body: {
+        /** Notes for certification, shown to the reviewers. */
+        notes?: string;
+      };
     };
   };
 };

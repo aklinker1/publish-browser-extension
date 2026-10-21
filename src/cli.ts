@@ -45,6 +45,7 @@ cli.help();
   cli.option('--chrome-review-exemption [chromeReviewExemption]', "[Deprecated: API v1.1 only] Submit update using expedited review process")
   cli.option('--edge-api-key [edgeApiKey]', "API key used for authorizing requests to Microsofts addon API v1.1")
   cli.option('--edge-client-id [edgeClientId]', "Client ID used for authorizing requests to Microsofts addon API")
+  cli.option('--edge-notes [edgeNotes]', "Notes for certification, shown to the reviewers. Use them for test account details or steps to test the extension")
   cli.option('--edge-product-id [edgeProductId]', "Product ID listed on the developer dashboard")
   cli.option('--edge-skip-submit-review [edgeSkipSubmitReview]', "Just upload the extension zip, don't submit it for review or publish it (default: false)")
   cli.option('--edge-zip [edgeZip]', "Path to extension zip to upload")
@@ -96,6 +97,7 @@ function configFromFlags(flags: any): InlineConfig {
   config.chrome.reviewExemption = flags.chromeReviewExemption
   config.edge.apiKey = flags.edgeApiKey
   config.edge.clientId = flags.edgeClientId
+  config.edge.notes = flags.edgeNotes
   config.edge.productId = flags.edgeProductId
   config.edge.skipSubmitReview = flags.edgeSkipSubmitReview
   config.edge.zip = flags.edgeZip

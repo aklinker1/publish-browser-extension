@@ -22,6 +22,7 @@
 - [`chrome.reviewExemption`](#chromereviewexemption) (Deprecated: API v1.1 only)
 - [`edge.apiKey`](#edgeapikey)
 - [`edge.clientId`](#edgeclientid)
+- [`edge.notes`](#edgenotes)
 - [`edge.productId`](#edgeproductid)
 - [`edge.skipSubmitReview`](#edgeskipsubmitreview)
 - [`edge.zip`](#edgezip)
@@ -214,6 +215,13 @@ Client ID used for authorizing requests to Microsofts addon API
 
 - _CLI Flag_: `--edge-client-id`
 - _Env Var_: `EDGE_CLIENT_ID`
+
+### `edge.notes`
+
+Notes for certification, shown to the reviewers. Use them for test account details or steps to test the extension
+
+- _CLI Flag_: `--edge-notes`
+- _Env Var_: `EDGE_NOTES`
 
 ### `edge.productId`
 

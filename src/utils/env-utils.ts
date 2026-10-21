@@ -40,6 +40,8 @@ export interface CustomEnv {
   EDGE_API_KEY: string | undefined;
   /** Client ID used for authorizing requests to Microsofts addon API */
   EDGE_CLIENT_ID: string | undefined;
+  /** Notes for certification, shown to the reviewers. Use them for test account details or steps to test the extension */
+  EDGE_NOTES: string | undefined;
   /** Product ID listed on the developer dashboard */
   EDGE_PRODUCT_ID: string | undefined;
   /** Just upload the extension zip, don't submit it for review or publish it */

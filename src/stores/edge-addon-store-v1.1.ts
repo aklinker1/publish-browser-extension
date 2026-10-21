@@ -69,7 +69,7 @@ export class EdgeAddonStoreV1_1 implements Store {
     this.setStatus('Submitting new version');
     await this.client.post('/v1/products/{productId}/submissions', {
       params: { productId: this.options.productId },
-      body: {},
+      body: this.options.notes ? { notes: this.options.notes } : {},
     });
   }
 }

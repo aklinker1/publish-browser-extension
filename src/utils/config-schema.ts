@@ -308,6 +308,11 @@ export const EdgeAddonStoreV1_1Options = object({
     description:
       'API key used for authorizing requests to Microsofts addon API v1.1',
   }),
+  notes: meta(optional(nonempty(string())), {
+    path: 'edge.notes',
+    description:
+      'Notes for certification, shown to the reviewers. Use them for test account details or steps to test the extension',
+  }),
   skipSubmitReview: meta(defaulted(stringbool, false), {
     path: 'edge.skipSubmitReview',
     description:
