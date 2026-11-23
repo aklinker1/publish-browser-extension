@@ -7,7 +7,8 @@ import {
 } from '../config';
 import type { FirefoxAddonStoreV5Options } from '../utils/config-schema';
 
-const RESET_ENV_NAMES = /(^CHROME_|^FIREFOX_|^EDGE_|^OPERA_|^DRY_RUN$)/;
+const RESET_ENV_NAMES =
+  /(^CHROME_|^FIREFOX_|^EDGE_|^OPERA_|^SAFARI_|^DRY_RUN$)/;
 
 describe('resolveConfig', () => {
   beforeEach(() => {
@@ -56,6 +57,15 @@ describe('resolveConfig', () => {
         zip: 'zip',
         packageId: 1,
         sessionId: 'sessionId',
+        skipSubmitReview: true,
+      },
+      safari: {
+        projectPath: 'projectPath',
+        issuerId: 'issuerId',
+        keyId: 'keyId',
+        keyPath: 'keyPath',
+        appId: '123456',
+        macosDeploymentTarget: '13.0',
         skipSubmitReview: true,
       },
     } satisfies ResolvedConfig;
@@ -116,6 +126,15 @@ describe('resolveConfig', () => {
     const operaSkipSubmitReview = true;
     process.env.OPERA_SKIP_SUBMIT_REVIEW = String(operaSkipSubmitReview);
 
+    process.env.SAFARI_PROJECT_PATH = 'SAFARI_PROJECT_PATH';
+    process.env.SAFARI_ISSUER_ID = 'SAFARI_ISSUER_ID';
+    process.env.SAFARI_KEY_ID = 'SAFARI_KEY_ID';
+    process.env.SAFARI_KEY_PATH = 'SAFARI_KEY_PATH';
+    process.env.SAFARI_APP_ID = '6775834119';
+    process.env.SAFARI_MACOS_DEPLOYMENT_TARGET = '13.0';
+    const safariSkipSubmitReview = true;
+    process.env.SAFARI_SKIP_SUBMIT_REVIEW = String(safariSkipSubmitReview);
+
     const expected: ResolvedConfig = {
       dryRun,
       chrome: {
@@ -157,6 +176,15 @@ describe('resolveConfig', () => {
         sessionId: process.env.OPERA_SESSION_ID!,
         skipSubmitReview: operaSkipSubmitReview,
       },
+      safari: {
+        projectPath: process.env.SAFARI_PROJECT_PATH!,
+        issuerId: process.env.SAFARI_ISSUER_ID!,
+        keyId: process.env.SAFARI_KEY_ID!,
+        keyPath: process.env.SAFARI_KEY_PATH,
+        appId: process.env.SAFARI_APP_ID,
+        macosDeploymentTarget: process.env.SAFARI_MACOS_DEPLOYMENT_TARGET!,
+        skipSubmitReview: safariSkipSubmitReview,
+      },
     };
 
     const actual = resolveConfig({});
@@ -191,6 +219,11 @@ describe('resolveConfig', () => {
         packageId: 1,
         sessionId: 'sessionId',
       },
+      safari: {
+        projectPath: 'projectPath',
+        issuerId: 'issuerId',
+        keyId: 'keyId',
+      },
     };
 
     const expected = {
@@ -215,6 +248,11 @@ describe('resolveConfig', () => {
       },
       opera: {
         ...config.opera,
+        skipSubmitReview: false,
+      },
+      safari: {
+        ...config.safari,
+        macosDeploymentTarget: '12.0',
         skipSubmitReview: false,
       },
     } as ResolvedConfig;
@@ -264,7 +302,7 @@ describe('resolveConfig', () => {
     );
   });
 
-  it('should exclude chrome, firefox, edge and opera objects when their zip option is not passed', () => {
+  it('should exclude chrome, firefox, edge, opera and safari objects when their zip/projectPath option is not passed', () => {
     const config: InlineConfig = {
       dryRun: false,
       chrome: {
@@ -279,6 +317,9 @@ describe('resolveConfig', () => {
       opera: {
         packageId: 1,
       },
+      safari: {
+        issuerId: 'issuerId',
+      },
     };
     const expected: ResolvedConfig = {
       dryRun: false,
@@ -286,6 +327,7 @@ describe('resolveConfig', () => {
       edge: undefined,
       firefox: undefined,
       opera: undefined,
+      safari: undefined,
     };
 
     const actual = resolveConfig(config);
@@ -299,6 +341,7 @@ describe('resolveConfig', () => {
       firefox: { zip: '...' },
       edge: { zip: '...' },
       opera: { zip: '...' },
+      safari: { projectPath: '...' },
     };
 
     const actual = resolveConfig(config);

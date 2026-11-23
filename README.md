@@ -10,6 +10,7 @@ https://github.com/aklinker1/publish-browser-extension/assets/10101283/b0e856ca-
   - [Edge](https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home)
   - [Firefox](https://addons.mozilla.org/en-US/firefox/extensions/)
   - [Opera](https://addons.opera.com/developer/)
+  - [Safari](https://developer.apple.com/safari/extensions/) (macOS & iOS App Store)
 
 - Helper script to generate secrets and configure options
 - **Upload sources ZIP** to the Firefox Addon Store
@@ -43,10 +44,28 @@ publish-extension \
   --chrome-zip dist/chrome.zip \
   --firefox-zip dist/firefox.zip --firefox-sources-zip dist/sources.zip \
   --edge-zip dist/chrome.zip \
-  --opera-zip dist/opera.zip
+  --opera-zip dist/opera.zip \
+  --safari-project-path dist/safari
 ```
 
 `publish-extension` will automatically look for a `.env.submit` file and load it if it exists.
+
+### Safari App Store
+
+Publishing to the Safari App Store requires **macOS with Xcode** installed (`xcodebuild`) and an [App Store Connect API Key](https://appstoreconnect.apple.com/access/integrations/api) (`.p8` file, Key ID, and Issuer ID).
+
+- **Locally**: place `AuthKey_<KEY_ID>.p8` in `~/.appstoreconnect/private_keys/` (or pass `--safari-key-path` / `SAFARI_KEY_PATH`).
+- **In CI (e.g. GitHub Actions `macos-latest`)**: pass the `.p8` key content via `SAFARI_PRIVATE_KEY` (raw PEM or base64) and a reusable Apple Distribution `.p12` certificate via `SAFARI_CERTIFICATE_BASE64` + `SAFARI_CERTIFICATE_PASSWORD`. `publish-extension` automatically writes the temporary `.p8` file, imports the `.p12` into a temporary keychain, and cleans up both afterward:
+  ```yaml
+  - name: Publish Safari extension
+    env:
+      SAFARI_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER }}
+      SAFARI_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      SAFARI_PRIVATE_KEY: ${{ secrets.APPLE_API_KEY }}
+      SAFARI_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+      SAFARI_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+    run: publish-extension --safari-project-path ".output/My Extension"
+  ```
 
 ## JS Usage
 

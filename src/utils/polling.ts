@@ -19,10 +19,15 @@ export function pollUntil<T>(
         reject(new Error('Timeout'));
         return;
       }
-      const res = await condition();
-      if (res != null) {
+      try {
+        const res = await condition();
+        if (res != null) {
+          clearInterval(intervalId);
+          resolve(res);
+        }
+      } catch (err) {
         clearInterval(intervalId);
-        resolve(res);
+        reject(err);
       }
     }, interval);
   });

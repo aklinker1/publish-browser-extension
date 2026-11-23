@@ -15,6 +15,7 @@ export type {
   InlineConfig,
   OperaAddonsStoreOptions,
   ResolvedConfig,
+  SafariAddonStoreOptions,
 } from './utils/config-schema';
 
 /// gen-start:config-resolver
@@ -28,15 +29,17 @@ export function resolveConfig(config?: InlineConfig): PartialResolvedConfig {
   const raw: Record<string, any> = {}
 
   // Init store objects
-  const chromeZip  = (config as any)?.chrome?.zip  ?? process.env.CHROME_ZIP
-  const edgeZip    = (config as any)?.edge?.zip    ?? process.env.EDGE_ZIP
-  const firefoxZip = (config as any)?.firefox?.zip ?? process.env.FIREFOX_ZIP
-  const operaZip   = (config as any)?.opera?.zip   ?? process.env.OPERA_ZIP
+  const chromeZip         = (config as any)?.chrome?.zip         ?? process.env.CHROME_ZIP
+  const edgeZip           = (config as any)?.edge?.zip           ?? process.env.EDGE_ZIP
+  const firefoxZip        = (config as any)?.firefox?.zip        ?? process.env.FIREFOX_ZIP
+  const operaZip          = (config as any)?.opera?.zip          ?? process.env.OPERA_ZIP
+  const safariProjectPath = (config as any)?.safari?.projectPath ?? process.env.SAFARI_PROJECT_PATH
 
-  if (chromeZip)  raw.chrome  ??= {}
-  if (edgeZip)    raw.edge    ??= {}
-  if (firefoxZip) raw.firefox ??= {}
-  if (operaZip)   raw.opera   ??= {}
+  if (chromeZip)         raw.chrome  ??= {}
+  if (edgeZip)           raw.edge    ??= {}
+  if (firefoxZip)        raw.firefox ??= {}
+  if (operaZip)          raw.opera   ??= {}
+  if (safariProjectPath) raw.safari  ??= {}
 
   // Set values
   raw.dryRun                           = (config as any)?.dryRun                            ?? process.env.DRY_RUN
@@ -75,6 +78,16 @@ export function resolveConfig(config?: InlineConfig): PartialResolvedConfig {
   if (raw.opera)   raw.opera.sessionId                  = (config as any)?.opera?.sessionId                  ?? process.env.OPERA_SESSION_ID
   if (raw.opera)   raw.opera.skipSubmitReview           = (config as any)?.opera?.skipSubmitReview           ?? process.env.OPERA_SKIP_SUBMIT_REVIEW
   if (raw.opera)   raw.opera.zip                        = (config as any)?.opera?.zip                        ?? process.env.OPERA_ZIP
+  if (raw.safari)  raw.safari.appId                     = (config as any)?.safari?.appId                     ?? process.env.SAFARI_APP_ID
+  if (raw.safari)  raw.safari.certificateBase64         = (config as any)?.safari?.certificateBase64         ?? process.env.SAFARI_CERTIFICATE_BASE64
+  if (raw.safari)  raw.safari.certificatePassword       = (config as any)?.safari?.certificatePassword       ?? process.env.SAFARI_CERTIFICATE_PASSWORD
+  if (raw.safari)  raw.safari.issuerId                  = (config as any)?.safari?.issuerId                  ?? process.env.SAFARI_ISSUER_ID
+  if (raw.safari)  raw.safari.keyId                     = (config as any)?.safari?.keyId                     ?? process.env.SAFARI_KEY_ID
+  if (raw.safari)  raw.safari.keyPath                   = (config as any)?.safari?.keyPath                   ?? process.env.SAFARI_KEY_PATH
+  if (raw.safari)  raw.safari.macosDeploymentTarget     = (config as any)?.safari?.macosDeploymentTarget     ?? process.env.SAFARI_MACOS_DEPLOYMENT_TARGET
+  if (raw.safari)  raw.safari.privateKey                = (config as any)?.safari?.privateKey                ?? process.env.SAFARI_PRIVATE_KEY
+  if (raw.safari)  raw.safari.projectPath               = (config as any)?.safari?.projectPath               ?? process.env.SAFARI_PROJECT_PATH
+  if (raw.safari)  raw.safari.skipSubmitReview          = (config as any)?.safari?.skipSubmitReview          ?? process.env.SAFARI_SKIP_SUBMIT_REVIEW
 
   return validateConfigWith(raw, PartialResolvedConfig);
 }

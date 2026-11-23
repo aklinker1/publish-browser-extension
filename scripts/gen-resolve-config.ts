@@ -27,6 +27,24 @@ const renderValue = (meta: { path: string }, padding = allPathsPadding) => {
   ).toUpperCase()}`;
 };
 
+const STORE_TRIGGER_FIELD: Record<string, string> = {
+  safari: 'projectPath',
+};
+
+const triggerFieldFor = (store: string) => STORE_TRIGGER_FIELD[store] ?? 'zip';
+const triggerVarFor = (store: string) => {
+  const field = triggerFieldFor(store);
+  return store + field[0]!.toUpperCase() + field.slice(1);
+};
+const triggerVarPadding = nestedPaths.reduce(
+  (max, store) => Math.max(max, triggerVarFor(store).length),
+  0,
+);
+const triggerPathPadding = nestedPaths.reduce(
+  (max, store) => Math.max(max, `${store}.${triggerFieldFor(store)}`.length),
+  0,
+);
+
 const lines: string[] = [
   `// prettier-ignore`,
   `/**`,
@@ -39,13 +57,13 @@ const lines: string[] = [
   ``,
   '  // Init store objects',
   ...nestedPaths.map(
-    path =>
-      `  const ${(path + 'Zip').padEnd(storeNamePadding + 3)} = ${renderValue({ path: path + '.zip' }, storeNamePadding + 4)}`,
+    store =>
+      `  const ${triggerVarFor(store).padEnd(triggerVarPadding)} = ${renderValue({ path: `${store}.${triggerFieldFor(store)}` }, triggerPathPadding)}`,
   ),
   ``,
   ...nestedPaths.map(
-    path =>
-      `  if ${('(' + path + 'Zip)').padEnd(storeNamePadding + 5)} raw.${path.padEnd(storeNamePadding)} ??= {}`,
+    store =>
+      `  if ${('(' + triggerVarFor(store) + ')').padEnd(triggerVarPadding + 2)} raw.${store.padEnd(storeNamePadding)} ??= {}`,
   ),
   ``,
   '  // Set values',

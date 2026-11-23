@@ -4,6 +4,7 @@ import {
   type ChromeWebStoreV2Options,
   type FirefoxAddonStoreV5Options,
   type OperaAddonsStoreOptions,
+  type SafariAddonStoreOptions,
   resolveConfig,
   type AllChromeOptions,
   type InlineConfig,
@@ -34,6 +35,7 @@ export async function init(config: InlineConfig) {
       { value: 'firefox', label: 'Firefox Addon Store' },
       { value: 'edge', label: 'Edge Addon Store' },
       { value: 'opera', label: 'Opera Addons' },
+      { value: 'safari', label: 'Safari App Store' },
     ],
     showHint: true,
   });
@@ -62,12 +64,15 @@ export async function init(config: InlineConfig) {
   if (stores?.includes('opera')) {
     replacements.push(...(await initOpera(previousConfig.opera)));
   }
+  if (stores?.includes('safari')) {
+    replacements.push(...(await initSafari(previousConfig.safari)));
+  }
 
   await updateEnvFile(replacements);
 
   logger.log();
   logger.log(
-    `To submit an update, run:\n\n  ${highlight('publish-extension --chrome-zip path/to/extension.zip')}\n    ${highlight('--firefox-zip path/to/extension.zip')}\n    ${highlight('--edge-zip path/to/extension.zip')}\n    ${highlight('--opera-zip path/to/extension.zip')}`,
+    `To submit an update, run:\n\n  ${highlight('publish-extension --chrome-zip path/to/extension.zip')}\n    ${highlight('--firefox-zip path/to/extension.zip')}\n    ${highlight('--edge-zip path/to/extension.zip')}\n    ${highlight('--opera-zip path/to/extension.zip')}\n    ${highlight('--safari-project-path path/to/xcode-project')}`,
   );
   logger.log();
 }
@@ -529,6 +534,83 @@ async function initEdge(
   entries.push([apiKeyEnvVar, apiKey]);
 
   const skipSubmitReviewEnvVar = 'EDGE_SKIP_SUBMIT_REVIEW';
+  logger.log();
+  logger.info(highlight(skipSubmitReviewEnvVar));
+  const submitForReview = await confirm(
+    'After uploading, submit new version for review?',
+    { initial: !previousOptions?.skipSubmitReview },
+  );
+  entries.push([skipSubmitReviewEnvVar, !submitForReview]);
+
+  return entries;
+}
+
+async function initSafari(
+  previousOptions: Partial<SafariAddonStoreOptions> | undefined,
+): Promise<Entry[]> {
+  const entries: Entry[] = [];
+
+  console.log();
+  logger.info('\x1b[1mSafari App Store Setup\x1b[0m');
+
+  const projectPathEnvVar = 'SAFARI_PROJECT_PATH';
+  logger.log();
+  logger.info(highlight(projectPathEnvVar));
+  logger.log(
+    'Path to the Xcode project directory (or .xcodeproj) containing your Safari Web Extension',
+  );
+  const projectPath = await question('Enter the Xcode project path', {
+    defaultValue: previousOptions?.projectPath,
+  });
+  entries.push([projectPathEnvVar, projectPath]);
+
+  const issuerIdEnvVar = 'SAFARI_ISSUER_ID';
+  const keyIdEnvVar = 'SAFARI_KEY_ID';
+  logger.log();
+  logger.info(`${highlight(issuerIdEnvVar)} and ${highlight(keyIdEnvVar)}`);
+  logger.log(
+    'Create an App Store Connect API key (App Manager role or higher) at:',
+  );
+  logger.log(
+    `  ${ARROW} https://appstoreconnect.apple.com/access/integrations/api`,
+  );
+  const issuerId = await question('Enter the Issuer ID (UUID)', {
+    defaultValue: previousOptions?.issuerId,
+  });
+  entries.push([issuerIdEnvVar, issuerId]);
+
+  const keyId = await question('Enter the Key ID', {
+    defaultValue: previousOptions?.keyId,
+  });
+  entries.push([keyIdEnvVar, keyId]);
+
+  const keyPathEnvVar = 'SAFARI_KEY_PATH';
+  logger.log();
+  logger.info(highlight(keyPathEnvVar));
+  logger.log(
+    'Optional path to the AuthKey_<keyId>.p8 file (leave blank to use Apple standard lookup paths)',
+  );
+  const keyPath = await question('Enter the .p8 key path (optional)', {
+    defaultValue: previousOptions?.keyPath,
+  });
+  if (keyPath.trim()) {
+    entries.push([keyPathEnvVar, keyPath.trim()]);
+  }
+
+  const appIdEnvVar = 'SAFARI_APP_ID';
+  logger.log();
+  logger.info(highlight(appIdEnvVar));
+  logger.log(
+    'Optional numeric App Store Connect App ID (leave blank to auto-resolve from the Xcode project bundle identifier)',
+  );
+  const appId = await question('Enter the App ID (optional)', {
+    defaultValue: previousOptions?.appId,
+  });
+  if (appId.trim()) {
+    entries.push([appIdEnvVar, appId.trim()]);
+  }
+
+  const skipSubmitReviewEnvVar = 'SAFARI_SKIP_SUBMIT_REVIEW';
   logger.log();
   logger.info(highlight(skipSubmitReviewEnvVar));
   const submitForReview = await confirm(
