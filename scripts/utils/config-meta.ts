@@ -6,6 +6,7 @@ import {
   FirefoxAddonStoreV5Options,
   OperaAddonsStoreOptions,
   ResolvedConfig,
+  SafariAddonStoreOptions,
   isMetaStruct,
   type MetaStruct,
 } from '../../src/utils/config-schema';
@@ -17,6 +18,7 @@ const schemasWithOptions = [
   ...Object.values(EdgeAddonStoreV1_1Options.schema),
   ...Object.values(FirefoxAddonStoreV5Options.schema),
   ...Object.values(OperaAddonsStoreOptions.schema),
+  ...Object.values(SafariAddonStoreOptions.schema),
 ].filter(schema => isMetaStruct(schema as Struct<any>)) as MetaStruct<any>[];
 
 const seenPaths = new Set<string>();

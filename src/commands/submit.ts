@@ -4,6 +4,7 @@ import { type InlineConfig, resolveConfig, validateConfig } from '../config';
 import { EdgeAddonStoreV1_1 } from '../stores/edge-addon-store-v1.1';
 import { FirefoxAddonStoreV5 } from '../stores/firefox-addon-store-v5';
 import { OperaAddonsStore } from '../stores/opera-addons-store';
+import { SafariAddonStore } from '../stores/safari-addon-store';
 import type { Store, SubmitResult } from '../stores/store';
 import { ChromeWebStoreV2 } from '../stores/chrome-web-store-v2';
 import { logger } from '../utils/logger';
@@ -66,8 +67,17 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
     });
   }
 
+  if (internalConfig.safari) {
+    const storeOptions = internalConfig.safari;
+    stores.push({
+      id: 'safari',
+      name: 'Safari App Store',
+      getStore: setStatus => new SafariAddonStore(storeOptions, setStatus),
+    });
+  }
+
   if (stores.length === 0) {
-    throw Error('No ZIP files detected to upload');
+    throw Error('No extension files or projects detected to upload');
   }
 
   // Execute the tasks
@@ -79,7 +89,7 @@ export async function submit(config: InlineConfig): Promise<SubmitResults> {
         try {
           const store = getStore(t.setOutput);
 
-          t.setOutput('Checking ZIP files exist');
+          t.setOutput('Checking files exist');
           await store.ensureZipsExist();
 
           await store.submit(internalConfig.dryRun);

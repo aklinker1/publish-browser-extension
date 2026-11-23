@@ -7,3 +7,9 @@ export * from './stores/edge-addon-store-v1.1';
 export * from './stores/chrome-web-store-v1.1';
 export * from './stores/chrome-web-store-v2';
 export * from './stores/opera-addons-store';
+export {
+  SafariAddonStore,
+  type SafariAddonStoreDeps,
+  type ExecFn,
+  type ExecResult,
+} from './stores/safari-addon-store';

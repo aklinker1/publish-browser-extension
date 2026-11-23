@@ -10,6 +10,7 @@ https://github.com/aklinker1/publish-browser-extension/assets/10101283/b0e856ca-
   - [Edge](https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home)
   - [Firefox](https://addons.mozilla.org/en-US/firefox/extensions/)
   - [Opera](https://addons.opera.com/developer/)
+  - [Safari](https://developer.apple.com/safari/extensions/) (macOS & iOS App Store)
 
 - Helper script to generate secrets and configure options
 - **Upload sources ZIP** to the Firefox Addon Store
@@ -43,10 +44,26 @@ publish-extension \
   --chrome-zip dist/chrome.zip \
   --firefox-zip dist/firefox.zip --firefox-sources-zip dist/sources.zip \
   --edge-zip dist/chrome.zip \
-  --opera-zip dist/opera.zip
+  --opera-zip dist/opera.zip \
+  --safari-project-path dist/safari
 ```
 
 `publish-extension` will automatically look for a `.env.submit` file and load it if it exists.
+
+### Safari App Store
+
+Publishing to the Safari App Store requires **macOS with Xcode** installed (`xcodebuild`) and an [App Store Connect API Key](https://appstoreconnect.apple.com/access/integrations/api) (`.p8` file, Key ID, and Issuer ID).
+
+- Locally, place `AuthKey_<KEY_ID>.p8` in `~/.appstoreconnect/private_keys/` (or pass `--safari-key-path` / `SAFARI_KEY_PATH`).
+- In CI (e.g. GitHub Actions `macos-latest`), import your Apple Distribution `.p12` certificate into a temporary keychain before running `publish-extension` so `xcodebuild` can sign the archive:
+  ```sh
+  security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+  security default-keychain -s build.keychain
+  security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+  echo "$APPLE_DIST_CERT_P12_BASE64" | base64 --decode > cert.p12
+  security import cert.p12 -k build.keychain -P "$APPLE_DIST_CERT_PASSWORD" -T /usr/bin/codesign
+  security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+  ```
 
 ## JS Usage
 
