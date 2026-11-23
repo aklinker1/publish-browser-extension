@@ -364,6 +364,21 @@ const SafariAddonStoreOptionsShape = {
     description:
       'Path to the .p8 private key file (defaults to Apple standard lookup paths for AuthKey_<keyId>.p8)',
   }),
+  privateKey: meta(optional(nonempty(trimmed(string()))), {
+    path: 'safari.privateKey',
+    description:
+      'App Store Connect .p8 private key content (raw PEM or base64-encoded); alternative to keyPath for CI environments',
+  }),
+  certificateBase64: meta(optional(nonempty(trimmed(string()))), {
+    path: 'safari.certificateBase64',
+    description:
+      'Base64-encoded Apple Distribution .p12 certificate to import into a temporary keychain on ephemeral CI runners',
+  }),
+  certificatePassword: meta(optional(string()), {
+    path: 'safari.certificatePassword',
+    description:
+      'Password for the .p12 certificate provided via certificateBase64',
+  }),
   appId: meta(optional(nonempty(trimmed(coercedString))), {
     path: 'safari.appId',
     description:

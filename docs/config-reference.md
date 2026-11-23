@@ -39,10 +39,13 @@
 - [`opera.skipSubmitReview`](#operaskipsubmitreview)
 - [`opera.zip`](#operazip)
 - [`safari.appId`](#safariappid)
+- [`safari.certificateBase64`](#safaricertificatebase64)
+- [`safari.certificatePassword`](#safaricertificatepassword)
 - [`safari.issuerId`](#safariissuerid)
 - [`safari.keyId`](#safarikeyid)
 - [`safari.keyPath`](#safarikeypath)
 - [`safari.macosDeploymentTarget`](#safarimacosdeploymenttarget)
+- [`safari.privateKey`](#safariprivatekey)
 - [`safari.projectPath`](#safariprojectpath)
 - [`safari.skipSubmitReview`](#safariskipsubmitreview)
 
@@ -358,6 +361,20 @@ Numeric App Store Connect App ID (auto-resolved from the Xcode project bundle id
 - _CLI Flag_: `--safari-app-id`
 - _Env Var_: `SAFARI_APP_ID`
 
+### `safari.certificateBase64`
+
+Base64-encoded Apple Distribution .p12 certificate to import into a temporary keychain on ephemeral CI runners
+
+- _CLI Flag_: `--safari-certificate-base64`
+- _Env Var_: `SAFARI_CERTIFICATE_BASE64`
+
+### `safari.certificatePassword`
+
+Password for the .p12 certificate provided via certificateBase64
+
+- _CLI Flag_: `--safari-certificate-password`
+- _Env Var_: `SAFARI_CERTIFICATE_PASSWORD`
+
 ### `safari.issuerId`
 
 App Store Connect API Issuer ID (UUID) used for signing, uploading, and submitting
@@ -387,6 +404,13 @@ Minimum macOS deployment target when archiving the macOS app
 
 - _CLI Flag_: `--safari-macos-deployment-target`
 - _Env Var_: `SAFARI_MACOS_DEPLOYMENT_TARGET`
+
+### `safari.privateKey`
+
+App Store Connect .p8 private key content (raw PEM or base64-encoded); alternative to keyPath for CI environments
+
+- _CLI Flag_: `--safari-private-key`
+- _Env Var_: `SAFARI_PRIVATE_KEY`
 
 ### `safari.projectPath`
 

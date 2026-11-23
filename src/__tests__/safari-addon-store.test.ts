@@ -13,9 +13,11 @@ import {
   extractBundleIdentifier,
   extractDevelopmentTeam,
   formatExecOutput,
+  normalizePrivateKeyP8,
   resolveKeyPath,
   resolveXcodeprojPath,
   SafariAddonStore,
+  setupTemporaryKeychain,
   type ExecFn,
 } from '../stores/safari-addon-store';
 import { resolveConfig, validateConfig } from '../config';
@@ -223,6 +225,71 @@ describe('SafariAddonStore helpers', () => {
     });
     // Raw R||S signature for P-256 is always 64 bytes
     expect(Buffer.from(s!, 'base64url').length).toBe(64);
+  });
+
+  it('normalizes raw PEM, escaped-newline PEM, and base64-encoded .p8 keys', () => {
+    const pem = '-----BEGIN PRIVATE KEY-----\nABC\n-----END PRIVATE KEY-----\n';
+    expect(normalizePrivateKeyP8(pem)).toBe(pem);
+    expect(
+      normalizePrivateKeyP8(
+        '-----BEGIN PRIVATE KEY-----\\nABC\\n-----END PRIVATE KEY-----',
+      ),
+    ).toBe(pem);
+    expect(
+      normalizePrivateKeyP8(Buffer.from(pem, 'utf8').toString('base64')),
+    ).toBe(pem);
+    expect(() => normalizePrivateKeyP8('not-a-valid-key')).toThrow(
+      /Invalid safari\.privateKey/,
+    );
+  });
+
+  it('imports a .p12 certificate into a temporary keychain and restores keychains on cleanup', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pbe-keychain-test-'));
+    try {
+      const calls: string[][] = [];
+      const exec: ExecFn = async (cmd, args) => {
+        calls.push([cmd, ...args]);
+        if (args[0] === 'list-keychains' && args.length === 3) {
+          return {
+            status: 0,
+            stdout: '    "/Users/test/Library/Keychains/login.keychain-db"\n',
+            stderr: '',
+          };
+        }
+        if (args[0] === 'default-keychain' && args.length === 3) {
+          return {
+            status: 0,
+            stdout: '    "/Users/test/Library/Keychains/login.keychain-db"\n',
+            stderr: '',
+          };
+        }
+        return { status: 0, stdout: '', stderr: '' };
+      };
+
+      const cleanup = await setupTemporaryKeychain(
+        exec,
+        dir,
+        Buffer.from('fake-p12-bytes').toString('base64'),
+        'secret-pw',
+      );
+      expect(calls.some(c => c[1] === 'create-keychain')).toBe(true);
+      expect(
+        calls.some(c => c[1] === 'import' && c.includes('secret-pw')),
+      ).toBe(true);
+      expect(calls.some(c => c[1] === 'set-key-partition-list')).toBe(true);
+
+      await cleanup();
+      expect(calls.some(c => c[1] === 'delete-keychain')).toBe(true);
+      expect(
+        calls.some(
+          c =>
+            c[1] === 'default-keychain' &&
+            c.includes('/Users/test/Library/Keychains/login.keychain-db'),
+        ),
+      ).toBe(true);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });
 

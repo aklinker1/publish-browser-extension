@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
@@ -335,6 +336,173 @@ export async function resolveBuiltInfoPlistPath(
   return builtInfoPlistPath(archivePath, appName, platform);
 }
 
+/**
+ * Normalizes an App Store Connect `.p8` private key passed directly as a string
+ * (raw PEM, PEM with literal `\n` escapes, or base64-encoded PEM).
+ */
+export function normalizePrivateKeyP8(input: string): string {
+  const trimmed = input.trim();
+  if (trimmed.includes('-----BEGIN')) {
+    const normalized = trimmed.replaceAll('\\n', '\n');
+    return normalized.endsWith('\n') ? normalized : `${normalized}\n`;
+  }
+  const decoded = Buffer.from(trimmed.replace(/\s+/g, ''), 'base64')
+    .toString('utf8')
+    .trim();
+  if (!decoded.includes('-----BEGIN')) {
+    throw new Error(
+      'Invalid safari.privateKey: expected a PEM .p8 private key or base64-encoded PEM',
+    );
+  }
+  return decoded.endsWith('\n') ? decoded : `${decoded}\n`;
+}
+
+function parseKeychainList(stdout: string): string[] {
+  return stdout
+    .split('\n')
+    .map(line => line.trim().replace(/^"(.*)"$/, '$1'))
+    .filter(Boolean);
+}
+
+/**
+ * Imports a base64-encoded `.p12` distribution certificate into a temporary
+ * macOS keychain so ephemeral CI runners reuse a single signing identity
+ * instead of minting a new Apple certificate on every run.
+ */
+export async function setupTemporaryKeychain(
+  exec: ExecFn,
+  workDir: string,
+  certificateBase64: string,
+  certificatePassword: string = '',
+): Promise<() => Promise<void>> {
+  const keychainPath = join(workDir, 'app-signing.keychain-db');
+  const keychainPassword = randomBytes(24).toString('base64');
+  const certPath = join(workDir, 'certificate.p12');
+
+  const existingListRes = await exec('security', [
+    'list-keychains',
+    '-d',
+    'user',
+  ]);
+  const existingKeychains =
+    existingListRes.status === 0
+      ? parseKeychainList(existingListRes.stdout)
+      : [];
+
+  const existingDefaultRes = await exec('security', [
+    'default-keychain',
+    '-d',
+    'user',
+  ]);
+  const existingDefault =
+    existingDefaultRes.status === 0
+      ? parseKeychainList(existingDefaultRes.stdout)[0]
+      : undefined;
+
+  const runSecurity = async (args: string[], label: string) => {
+    const res = await exec('security', args);
+    if (res.status !== 0) {
+      throw new Error(
+        `Failed to ${label} temporary signing keychain:\n${formatExecOutput(res)}`,
+      );
+    }
+  };
+
+  let created = false;
+  try {
+    await writeFile(
+      certPath,
+      Buffer.from(certificateBase64.replace(/\s+/g, ''), 'base64'),
+      { mode: 0o600 },
+    );
+    await runSecurity(
+      ['create-keychain', '-p', keychainPassword, keychainPath],
+      'create',
+    );
+    created = true;
+    await runSecurity(
+      ['set-keychain-settings', '-lut', '21600', keychainPath],
+      'configure',
+    );
+    await runSecurity(
+      ['unlock-keychain', '-p', keychainPassword, keychainPath],
+      'unlock',
+    );
+    await runSecurity(
+      [
+        'import',
+        certPath,
+        '-P',
+        certificatePassword,
+        '-A',
+        '-t',
+        'cert',
+        '-f',
+        'pkcs12',
+        '-k',
+        keychainPath,
+      ],
+      'import certificate into',
+    );
+    await runSecurity(
+      [
+        'list-keychains',
+        '-d',
+        'user',
+        '-s',
+        keychainPath,
+        ...existingKeychains.filter(k => k !== keychainPath),
+      ],
+      'register',
+    );
+    await runSecurity(
+      ['default-keychain', '-d', 'user', '-s', keychainPath],
+      'select default',
+    );
+    await runSecurity(
+      [
+        'set-key-partition-list',
+        '-S',
+        'apple-tool:,apple:,codesign:',
+        '-s',
+        '-k',
+        keychainPassword,
+        keychainPath,
+      ],
+      'set key partition list on',
+    );
+  } catch (err) {
+    if (created) {
+      await exec('security', ['delete-keychain', keychainPath]).catch(() => {});
+    }
+    throw err;
+  } finally {
+    await rm(certPath, { force: true }).catch(() => {});
+  }
+
+  return async () => {
+    if (existingKeychains.length > 0) {
+      await exec('security', [
+        'list-keychains',
+        '-d',
+        'user',
+        '-s',
+        ...existingKeychains,
+      ]).catch(() => {});
+    }
+    if (existingDefault) {
+      await exec('security', [
+        'default-keychain',
+        '-d',
+        'user',
+        '-s',
+        existingDefault,
+      ]).catch(() => {});
+    }
+    await exec('security', ['delete-keychain', keychainPath]).catch(() => {});
+  };
+}
+
 export interface SafariAddonStoreDeps {
   exec?: ExecFn;
   platform?: NodeJS.Platform;
@@ -373,10 +541,14 @@ export class SafariAddonStore implements Store {
   async ensureZipsExist(): Promise<void> {
     this.assertMacOS();
     await resolveXcodeprojPath(this.options.projectPath);
-    resolveKeyPath({
-      keyId: this.options.keyId,
-      keyPath: this.options.keyPath,
-    });
+    if (this.options.privateKey) {
+      normalizePrivateKeyP8(this.options.privateKey);
+    } else {
+      resolveKeyPath({
+        keyId: this.options.keyId,
+        keyPath: this.options.keyPath,
+      });
+    }
   }
 
   async submit(dryRun: boolean): Promise<void> {
@@ -384,10 +556,15 @@ export class SafariAddonStore implements Store {
     const { xcodeprojPath, projectName } = await resolveXcodeprojPath(
       this.options.projectPath,
     );
-    const keyPath = resolveKeyPath({
-      keyId: this.options.keyId,
-      keyPath: this.options.keyPath,
-    });
+    const inlinePrivateKeyP8 = this.options.privateKey
+      ? normalizePrivateKeyP8(this.options.privateKey)
+      : undefined;
+    const existingKeyPath = inlinePrivateKeyP8
+      ? undefined
+      : resolveKeyPath({
+          keyId: this.options.keyId,
+          keyPath: this.options.keyPath,
+        });
 
     this.setStatus('Inspecting Xcode project schemes');
     const listRes = await this.exec('xcodebuild', [
@@ -457,11 +634,17 @@ export class SafariAddonStore implements Store {
     const teamId = extractDevelopmentTeam(settingsStdout);
     const bundleIdentifier = extractBundleIdentifier(settingsStdout);
 
-    const credentials = await loadAscCredentials({
-      keyId: this.options.keyId,
-      issuerId: this.options.issuerId,
-      keyPath,
-    });
+    const credentials = inlinePrivateKeyP8
+      ? {
+          keyId: this.options.keyId,
+          issuerId: this.options.issuerId,
+          privateKeyP8: inlinePrivateKeyP8,
+        }
+      : await loadAscCredentials({
+          keyId: this.options.keyId,
+          issuerId: this.options.issuerId,
+          keyPath: existingKeyPath!,
+        });
     const api = new SafariAppStoreConnectApi(credentials, this.fetchImpl);
 
     if (dryRun) {
@@ -482,19 +665,37 @@ export class SafariAddonStore implements Store {
       return;
     }
 
-    const auth = authArgs({
-      keyId: this.options.keyId,
-      issuerId: this.options.issuerId,
-      keyPath,
-    });
     const workDir = await mkdtemp(join(tmpdir(), 'publish-ext-safari-'));
     const uploaded: Array<{
       platform: SafariPlatform;
       version: string;
       buildNumber?: string;
     }> = [];
+    let cleanupKeychain: (() => Promise<void>) | undefined;
 
     try {
+      let keyPath = existingKeyPath;
+      if (inlinePrivateKeyP8) {
+        keyPath = join(workDir, `AuthKey_${this.options.keyId}.p8`);
+        await writeFile(keyPath, inlinePrivateKeyP8, { mode: 0o600 });
+      }
+
+      if (this.options.certificateBase64) {
+        this.setStatus('Importing signing certificate into temporary keychain');
+        cleanupKeychain = await setupTemporaryKeychain(
+          this.exec,
+          workDir,
+          this.options.certificateBase64,
+          this.options.certificatePassword,
+        );
+      }
+
+      const auth = authArgs({
+        keyId: this.options.keyId,
+        issuerId: this.options.issuerId,
+        keyPath: keyPath!,
+      });
+
       for (const platform of platforms) {
         const scheme = schemes[platform]!;
         const archivePath = join(workDir, `${platform}.xcarchive`);
@@ -576,6 +777,9 @@ export class SafariAddonStore implements Store {
         uploaded.push({ platform, version: builtVersion, buildNumber });
       }
     } finally {
+      if (cleanupKeychain) {
+        await cleanupKeychain();
+      }
       await rm(workDir, { recursive: true, force: true });
     }
 

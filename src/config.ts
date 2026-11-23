@@ -79,10 +79,13 @@ export function resolveConfig(config?: InlineConfig): PartialResolvedConfig {
   if (raw.opera)   raw.opera.skipSubmitReview           = (config as any)?.opera?.skipSubmitReview           ?? process.env.OPERA_SKIP_SUBMIT_REVIEW
   if (raw.opera)   raw.opera.zip                        = (config as any)?.opera?.zip                        ?? process.env.OPERA_ZIP
   if (raw.safari)  raw.safari.appId                     = (config as any)?.safari?.appId                     ?? process.env.SAFARI_APP_ID
+  if (raw.safari)  raw.safari.certificateBase64         = (config as any)?.safari?.certificateBase64         ?? process.env.SAFARI_CERTIFICATE_BASE64
+  if (raw.safari)  raw.safari.certificatePassword       = (config as any)?.safari?.certificatePassword       ?? process.env.SAFARI_CERTIFICATE_PASSWORD
   if (raw.safari)  raw.safari.issuerId                  = (config as any)?.safari?.issuerId                  ?? process.env.SAFARI_ISSUER_ID
   if (raw.safari)  raw.safari.keyId                     = (config as any)?.safari?.keyId                     ?? process.env.SAFARI_KEY_ID
   if (raw.safari)  raw.safari.keyPath                   = (config as any)?.safari?.keyPath                   ?? process.env.SAFARI_KEY_PATH
   if (raw.safari)  raw.safari.macosDeploymentTarget     = (config as any)?.safari?.macosDeploymentTarget     ?? process.env.SAFARI_MACOS_DEPLOYMENT_TARGET
+  if (raw.safari)  raw.safari.privateKey                = (config as any)?.safari?.privateKey                ?? process.env.SAFARI_PRIVATE_KEY
   if (raw.safari)  raw.safari.projectPath               = (config as any)?.safari?.projectPath               ?? process.env.SAFARI_PROJECT_PATH
   if (raw.safari)  raw.safari.skipSubmitReview          = (config as any)?.safari?.skipSubmitReview          ?? process.env.SAFARI_SKIP_SUBMIT_REVIEW
 
